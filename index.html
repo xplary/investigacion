@@ -57,7 +57,7 @@
             <h2 id="subtitulo-doc" class="text-muted fs-5 fw-normal mb-0" contenteditable="true" title="Clic para editar subtítulo">Y sus determinantes macrofinancieros en la banca múltiple del Perú (2018-2026)</h2>
         </div>
         
-        <!-- IDENTIDAD GLOBAL (Arriba a la derecha) -->
+        <!-- IDENTIDAD GLOBAL -->
         <div class="p-2 rounded bg-white shadow-sm border border-brand" style="min-width: 220px;">
             <label for="nombre-usuario" class="form-label small fw-bold text-brand mb-1"><i class="fas fa-user-astronaut me-1"></i> Identidad Activa</label>
             <input type="text" id="nombre-usuario" class="form-control form-control-sm fw-bold" title="Este nombre aparecerá en tus notas y en el chat" onchange="guardarNombre()" onkeyup="guardarNombre()">
@@ -93,13 +93,13 @@
 
                     <div class="d-flex justify-content-between align-items-center mt-3">
                         <input type="file" id="input-foto" accept="image/*" style="display: none;" onchange="cargarImagen(event)">
-                        <button class="btn btn-sm btn-light border shadow-sm" onclick="document.getElementById('input-foto').click()">
+                        <button class="btn btn-sm btn-light border shadow-sm" type="button" onclick="document.getElementById('input-foto').click()">
                             <i class="fas fa-camera me-1 text-muted"></i> Foto
                         </button>
                         
                         <div>
-                            <button id="btn-cancelar-edicion" class="btn btn-sm btn-secondary d-none me-1" onclick="cancelarEdicion()">Cancelar</button>
-                            <button id="btn-publicar" class="btn btn-brand px-4 shadow-sm fw-bold" onclick="publicarNota()">
+                            <button id="btn-cancelar-edicion" class="btn btn-sm btn-secondary d-none me-1" type="button" onclick="cancelarEdicion()">Cancelar</button>
+                            <button id="btn-publicar" class="btn btn-brand px-4 shadow-sm fw-bold" type="button" onclick="publicarNota()">
                                 Publicar <i class="fas fa-paper-plane ms-1"></i>
                             </button>
                         </div>
@@ -119,7 +119,7 @@
                 <div class="card-footer bg-white border-top p-2">
                     <div class="input-group input-group-sm">
                         <input type="text" id="chat-input" class="form-control" placeholder="Escribe un mensaje..." onkeypress="manejarEnterChat(event)">
-                        <button class="btn btn-brand" onclick="enviarMensaje()"><i class="fas fa-paper-plane"></i></button>
+                        <button class="btn btn-brand" type="button" onclick="enviarMensaje()"><i class="fas fa-paper-plane"></i></button>
                     </div>
                 </div>
             </div>
@@ -128,7 +128,7 @@
             <div class="card card-custom mb-4 border-0 shadow-sm">
                 <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3">
                     <span class="fw-bold text-dark"><i class="fas fa-bookmark me-1 text-brand"></i> Bibliografía Compartida</span>
-                    <button class="btn btn-sm btn-light border text-brand rounded-circle" onclick="agregarBibliografia()">
+                    <button class="btn btn-sm btn-light border text-brand rounded-circle" type="button" onclick="agregarBibliografia()">
                         <i class="fas fa-plus"></i>
                     </button>
                 </div>
@@ -172,7 +172,6 @@
 
     function inicializarNombre() {
         let nombreGuardado = localStorage.getItem('identidadUNP');
-        // Si no hay nombre guardado, le creamos uno aleatorio
         if (!nombreGuardado || nombreGuardado.trim() === "") {
             nombreGuardado = generarNombreAleatorio();
             localStorage.setItem('identidadUNP', nombreGuardado);
@@ -182,7 +181,6 @@
 
     function guardarNombre() {
         let nuevoNombre = document.getElementById('nombre-usuario').value.trim();
-        // Si el usuario borra su nombre por completo, le forzamos uno aleatorio
         if (nuevoNombre === "") {
             nuevoNombre = generarNombreAleatorio();
             document.getElementById('nombre-usuario').value = nuevoNombre;
@@ -190,9 +188,7 @@
         localStorage.setItem('identidadUNP', nuevoNombre);
     }
 
-    // Inicializamos el nombre apenas carga la página
     window.addEventListener('DOMContentLoaded', inicializarNombre);
-
 
     // --- VARIABLES GLOBALES DE ESTADO ---
     let imagenActualBase64 = null;
@@ -209,7 +205,7 @@
         db.collection("config").doc("textos-cabecera").set({
             titulo: elementTitulo.innerText.trim(),
             subtitulo: elementSubtitulo.innerText.trim()
-        }, { merge: true });
+        }, { merge: true }).catch(err => console.error("Error guardando títulos", err));
     }
 
     elementTitulo.addEventListener('blur', guardarTitulos);
@@ -238,18 +234,42 @@
         });
     }
 
-    // --- MANEJO DE IMÁGENES ---
+    // --- MANEJO DE IMÁGENES CON COMPRESOR AUTOMÁTICO ---
     function cargarImagen(event) {
         const archivo = event.target.files[0];
-        if (archivo) {
-            const lector = new FileReader();
-            lector.onload = function(e) {
-                imagenActualBase64 = e.target.result;
+        if (!archivo) return;
+        
+        const lector = new FileReader();
+        lector.onload = function(e) {
+            // COMPRESOR DE IMAGEN (Evita que Firebase rechace la publicación por sobrepeso)
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 800;
+                const MAX_HEIGHT = 800;
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                } else {
+                    if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // Convertir a JPEG comprimido
+                imagenActualBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                
                 document.getElementById('preview-img').src = imagenActualBase64;
                 document.getElementById('preview-container').style.display = 'inline-block';
-            }
-            lector.readAsDataURL(archivo);
-        }
+            };
+            img.src = e.target.result;
+        };
+        lector.readAsDataURL(archivo);
     }
 
     function quitarImagen() {
@@ -263,9 +283,13 @@
     function publicarNota() {
         if (!db) return alert("Error de conexión.");
         const texto = document.getElementById('texto-nota').value.trim();
-        const autor = document.getElementById('nombre-usuario').value.trim(); // Nunca estará vacío ahora
+        const autor = document.getElementById('nombre-usuario').value.trim();
         
-        if (texto === "" && !imagenActualBase64) return alert("Escribe un texto o sube una imagen.");
+        if (texto === "" && !imagenActualBase64) return alert("Escribe un texto o sube una foto.");
+
+        // Desactivar botón mientras sube
+        const btnPublicar = document.getElementById('btn-publicar');
+        btnPublicar.disabled = true;
 
         if (idEdicionActual) {
             db.collection("notas").doc(idEdicionActual).update({
@@ -274,6 +298,10 @@
                 editado: true
             }).then(() => {
                 cancelarEdicion();
+                btnPublicar.disabled = false;
+            }).catch(err => {
+                alert("Error al editar. Revisa tu conexión o las reglas de tu Firebase.");
+                btnPublicar.disabled = false;
             });
         } else {
             db.collection("notas").add({
@@ -285,6 +313,11 @@
             }).then(() => {
                 document.getElementById('texto-nota').value = "";
                 quitarImagen();
+                btnPublicar.disabled = false;
+            }).catch(err => {
+                alert("Error al publicar la nota. ¿Tus reglas de Firebase (Modo de Prueba) han caducado? Revísalas en la consola.");
+                console.error(err);
+                btnPublicar.disabled = false;
             });
         }
     }
@@ -322,7 +355,7 @@
 
     function eliminarNota(id) {
         if (confirm("¿Estás seguro de eliminar esta publicación?")) {
-            db.collection("notas").doc(id).delete();
+            db.collection("notas").doc(id).delete().catch(err => alert("Error al eliminar."));
             if (idEdicionActual === id) cancelarEdicion(); 
         }
     }
@@ -334,7 +367,6 @@
             feed.innerHTML = ""; 
             notasData = {}; 
             
-            // Leemos el nombre actual de la caja superior para colorear las notas propias
             const miNombre = document.getElementById('nombre-usuario').value.trim().toLowerCase();
 
             querySnapshot.forEach((doc) => {
@@ -370,7 +402,7 @@
     function enviarMensaje() {
         if (!db) return;
         const msj = document.getElementById('chat-input').value.trim();
-        const autor = document.getElementById('nombre-usuario').value.trim(); // Nunca estará vacío
+        const autor = document.getElementById('nombre-usuario').value.trim(); 
         
         if (!msj) return;
 
@@ -378,7 +410,7 @@
             autor: autor,
             mensaje: msj,
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
+        }).catch(err => alert("Error enviando mensaje."));
 
         document.getElementById('chat-input').value = "";
     }
@@ -395,7 +427,6 @@
 
             querySnapshot.forEach((doc) => {
                 const chat = doc.data();
-                // Verificación estricta: Si el autor guardado es igual al nombre que tengo arriba, va a la derecha
                 const isMe = (chat.autor.toLowerCase() === miNombre);
                 const bubbleClass = isMe ? "chat-me" : "chat-other";
                 
@@ -422,7 +453,7 @@
             titulo: titulo,
             url: url,
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
+        }).catch(err => alert("Error agregando bibliografía."));
     }
 
     function editarBiblio(id) {
