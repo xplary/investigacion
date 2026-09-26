@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Investigación - UNP</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            background-color: #f8f9fa;
+            color: #212529;
+            font-family: system-ui, -apple-system, sans-serif;
+            padding-bottom: 50px;
+        }
+        .text-brand { color: #712cf9; }
+        .bg-brand { background-color: #712cf9; color: white; }
+        .btn-brand { background-color: #712cf9; color: white; border: none; }
+        .btn-brand:hover { background-color: #5a23c8; color: white; }
+        
+        .card-custom {
+            border: 1px solid rgba(0,0,0,.08);
+            border-radius: 0.75rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.04);
+            background: #fff;
+        }
+        
+        [contenteditable="true"] { padding: 5px; border-radius: 4px; transition: 0.2s; }
+        [contenteditable="true"]:hover { background-color: #e9ecef; outline: none; }
+        
+        .note-card { border-left: 4px solid #712cf9 !important; transition: 0.2s; }
+        .note-card:hover { transform: translateY(-2px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.08) !important; }
+        
+        .form-control-custom { border: 1px solid #dee2e6; border-radius: 0.5rem; resize: none; }
+        .form-control-custom:focus { border-color: #712cf9; box-shadow: 0 0 0 0.25rem rgba(113, 44, 249, 0.25); }
+        
+        .note-img { max-width: 100%; border-radius: 0.5rem; margin-top: 10px; border: 1px solid #e9ecef; }
+        
+        /* Vista previa de imagen antes de publicar */
+        #preview-container { display: none; position: relative; margin-bottom: 10px; }
+        #preview-img { max-height: 150px; border-radius: 5px; }
+        .btn-remove-img { position: absolute; top: -10px; left: -10px; border-radius: 50%; padding: 2px 8px; }
+    </style>
+</head>
+<body>
+
+<div class="container py-4">
+    <header class="pb-3 mb-4 border-bottom">
+        <div class="text-muted small mb-2 fw-semibold">
+            <i class="fas fa-university me-1 text-brand"></i> UNIVERSIDAD NACIONAL DE PIURA
+        </div>
+        <h1 class="fw-bold fs-2" contenteditable="true">Dinámica de la morosidad</h1>
+        <h2 class="text-muted fs-5 fw-normal" contenteditable="true">Y sus determinantes macrofinancieros en la banca múltiple del Perú (2018-2026)</h2>
+    </header>
+
+    <div class="row g-4">
+        <!-- COLUMNA IZQUIERDA: BITÁCORA -->
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold m-0"><i class="fas fa-edit me-2 text-brand"></i> Bitácora de Trabajo</h4>
+                
+                <!-- SELECTOR DE USUARIO -->
+                <div class="d-flex align-items-center bg-white border px-3 py-1 rounded shadow-sm">
+                    <span class="small fw-bold me-2 text-muted">Publicando como:</span>
+                    <select id="selector-usuario" class="form-select form-select-sm border-0 fw-bold text-brand" style="width: auto; background: transparent;">
+                        <option value="Tú">Tú</option>
+                        <option value="Adriel">Adriel</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="card card-custom mb-4 border-0 shadow-sm">
+                <div class="card-body">
+                    <textarea id="texto-nota" class="form-control form-control-custom mb-3" rows="3" placeholder="Escribe un nuevo hallazgo, enlace o idea..."></textarea>
+                    
+                    <!-- Contenedor de previsualización de imagen -->
+                    <div id="preview-container">
+                        <img id="preview-img" src="" alt="Vista previa">
+                        <button class="btn btn-danger btn-sm btn-remove-img" onclick="quitarImagen()"><i class="fas fa-times"></i></button>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <div>
+                            <!-- Input de archivo oculto -->
+                            <input type="file" id="input-foto" accept="image/*" style="display: none;" onchange="cargarImagen(event)">
+                            <button class="btn btn-sm btn-light border text-muted" onclick="document.getElementById('input-foto').click()">
+                                <i class="fas fa-image me-1"></i> Subir Foto
+                            </button>
+                            <button class="btn btn-sm btn-light border text-muted ms-1" onclick="limpiarBitacora()">
+                                <i class="fas fa-trash me-1"></i> Borrar Todo
+                            </button>
+                        </div>
+                        <button class="btn btn-brand px-4 shadow-sm" onclick="publicarNota()">
+                            <i class="fas fa-paper-plane me-2"></i> Publicar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feed de Notas -->
+            <div id="feed-notas"></div>
+        </div>
+
+        <!-- COLUMNA DERECHA -->
+        <div class="col-lg-4">
+            <div class="card card-custom mb-4 border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom fw-bold text-dark py-3">
+                    <i class="fas fa-info-circle me-1 text-brand"></i> Detalles
+                </div>
+                <div class="card-body">
+                    <h6 class="text-muted fw-bold small">METODOLOGÍA</h6>
+                    <p class="fs-6 mb-3">Modelo Econométrico de Datos de Panel (Efectos Fijos / Aleatorios).</p>
+                    <div class="row text-center border-top pt-3">
+                        <div class="col-6 border-end">
+                            <div class="text-muted small fw-bold mb-1">EQUIPO</div>
+                            <div class="fw-semibold">Tú & Adriel</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-muted small fw-bold mb-1">DATOS</div>
+                            <div class="fw-semibold">SBS / BCRP</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let imagenActualBase64 = null;
+    const feed = document.getElementById('feed-notas');
+
+    // Cargar notas guardadas al iniciar la página
+    document.addEventListener("DOMContentLoaded", cargarNotasGuardadas);
+
+    // Función para leer la imagen y mostrar vista previa
+    function cargarImagen(event) {
+        const archivo = event.target.files[0];
+        if (archivo) {
+            const lector = new FileReader();
+            lector.onload = function(e) {
+                imagenActualBase64 = e.target.result;
+                document.getElementById('preview-img').src = imagenActualBase64;
+                document.getElementById('preview-container').style.display = 'inline-block';
+            }
+            lector.readAsDataURL(archivo);
+        }
+    }
+
+    // Función para quitar la imagen seleccionada antes de publicar
+    function quitarImagen() {
+        imagenActualBase64 = null;
+        document.getElementById('preview-img').src = "";
+        document.getElementById('preview-container').style.display = 'none';
+        document.getElementById('input-foto').value = "";
+    }
+
+    // Función para publicar
+    function publicarNota() {
+        const texto = document.getElementById('texto-nota').value.trim();
+        const usuario = document.getElementById('selector-usuario').value;
+        
+        if (texto === "" && !imagenActualBase64) {
+            alert("Escribe un texto o sube una imagen.");
+            return;
+        }
+
+        const opcionesFecha = { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' };
+        const fechaActual = new Date().toLocaleDateString('es-ES', opcionesFecha);
+
+        // Crear el objeto de la nota
+        const nuevaNota = {
+            usuario: usuario,
+            fecha: fechaActual,
+            texto: texto.replace(/\n/g, '<br>'),
+            imagen: imagenActualBase64
+        };
+
+        // Guardar en memoria y dibujar
+        guardarNotaEnMemoria(nuevaNota);
+        dibujarNota(nuevaNota);
+
+        // Limpiar el formulario
+        document.getElementById('texto-nota').value = "";
+        quitarImagen();
+    }
+
+    // Función para dibujar la nota en el HTML
+    function dibujarNota(nota) {
+        let htmlImagen = nota.imagen ? `<img src="${nota.imagen}" class="note-img">` : '';
+        let iconoUser = nota.usuario === "Adriel" ? "fa-user-astronaut" : "fa-user-circle";
+        
+        const notaHTML = `
+            <div class="card card-custom note-card mb-3 border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between text-muted small mb-2">
+                        <span class="fw-semibold text-dark"><i class="fas ${iconoUser} me-1 text-brand"></i> ${nota.usuario}</span>
+                        <span>${nota.fecha}</span>
+                    </div>
+                    <p class="card-text mb-2">${nota.texto}</p>
+                    ${htmlImagen}
+                </div>
+            </div>
+        `;
+        feed.insertAdjacentHTML('afterbegin', notaHTML);
+    }
+
+    // Funciones de Memoria Local (localStorage)
+    function guardarNotaEnMemoria(nota) {
+        let notas = JSON.parse(localStorage.getItem('misNotasUNP')) || [];
+        notas.push(nota);
+        localStorage.setItem('misNotasUNP', JSON.stringify(notas));
+    }
+
+    function cargarNotasGuardadas() {
+        let notas = JSON.parse(localStorage.getItem('misNotasUNP')) || [];
+        feed.innerHTML = ""; // Limpiar feed
+        // Dibujar al revés para que las nuevas salgan arriba
+        notas.forEach(nota => dibujarNota(nota));
+    }
+
+    function limpiarBitacora() {
+        if(confirm("¿Estás seguro de borrar todas las notas guardadas? Esto no se puede deshacer.")) {
+            localStorage.removeItem('misNotasUNP');
+            feed.innerHTML = "";
+        }
+    }
+</script>
+
+</body>
+</html>
