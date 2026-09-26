@@ -43,6 +43,11 @@
         .chat-me { background-color: #712cf9; color: white; border-bottom-right-radius: 2px; align-self: flex-end; }
         .chat-other { background-color: #fff; border: 1px solid #dee2e6; color: #212529; border-bottom-left-radius: 2px; align-self: flex-start; }
         .chat-author { font-size: 0.65rem; font-weight: bold; margin-bottom: 3px; opacity: 0.8; }
+
+        /* Estilos para listas y enlaces dentro de las publicaciones */
+        .note-card ul, .note-card ol { padding-left: 1.5rem; margin-top: 0.5rem; margin-bottom: 0.5rem; }
+        .note-card a { color: #712cf9; text-decoration: underline; font-weight: 500; }
+        .note-card a:hover { color: #5a23c8; }
     </style>
 </head>
 <body>
@@ -84,6 +89,15 @@
                     <i class="fas fa-pen me-1 text-brand"></i> Nueva Publicación
                 </div>
                 <div class="card-body">
+                    <!-- BARRA DE HERRAMIENTAS DE FORMATO -->
+                    <div class="btn-group btn-group-sm mb-2 w-100 shadow-sm" role="group">
+                        <button type="button" class="btn btn-outline-secondary" onclick="insertarFormato('bold')" title="Negrita"><i class="fas fa-bold"></i></button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="insertarFormato('italic')" title="Cursiva"><i class="fas fa-italic"></i></button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="insertarFormato('color')" title="Color de texto"><i class="fas fa-palette"></i></button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="insertarFormato('list')" title="Lista con viñetas"><i class="fas fa-list-ul"></i></button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="insertarFormato('link')" title="Enlace / Link"><i class="fas fa-link"></i></button>
+                    </div>
+
                     <textarea id="texto-nota" class="form-control form-control-custom mb-2" rows="3" placeholder="Redacta un hallazgo o apunte..."></textarea>
                     
                     <div id="preview-container">
@@ -196,6 +210,36 @@
     let biblioData = {}; 
     let idEdicionActual = null; 
 
+    // --- HERRAMIENTA DE FORMATO DE TEXTO ---
+    function insertarFormato(tipo) {
+        const textarea = document.getElementById('texto-nota');
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const textoSeleccionado = textarea.value.substring(start, end);
+        let reemplazo = '';
+
+        if (tipo === 'bold') {
+            reemplazo = `<b>${textoSeleccionado || 'texto en negrita'}</b>`;
+        } else if (tipo === 'italic') {
+            reemplazo = `<i>${textoSeleccionado || 'texto en cursiva'}</i>`;
+        } else if (tipo === 'color') {
+            const color = prompt("Ingresa el color (ej. #712cf9, red, blue, green):", "#712cf9");
+            if (!color) return;
+            reemplazo = `<span style="color: ${color};">${textoSeleccionado || 'texto con color'}</span>`;
+        } else if (tipo === 'list') {
+            reemplazo = `<ul><li>${textoSeleccionado || 'Elemento de lista'}</li></ul>`;
+        } else if (tipo === 'link') {
+            let url = prompt("Ingresa el enlace web (URL):", "https://");
+            if (!url) return;
+            if (!url.startsWith('http')) url = 'https://' + url;
+            reemplazo = `<a href="${url}" target="_blank">${textoSeleccionado || url}</a>`;
+        }
+
+        textarea.value = textarea.value.substring(0, start) + reemplazo + textarea.value.substring(end);
+        textarea.focus();
+        textarea.setSelectionRange(start + reemplazo.length, start + reemplazo.length);
+    }
+
     // --- SINCRONIZACIÓN DE TÍTULOS ---
     const elementTitulo = document.getElementById('titulo-doc');
     const elementSubtitulo = document.getElementById('subtitulo-doc');
@@ -241,7 +285,6 @@
         
         const lector = new FileReader();
         lector.onload = function(e) {
-            // COMPRESOR DE IMAGEN (Evita que Firebase rechace la publicación por sobrepeso)
             const img = new Image();
             img.onload = function() {
                 const canvas = document.createElement('canvas');
@@ -261,7 +304,6 @@
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
 
-                // Convertir a JPEG comprimido
                 imagenActualBase64 = canvas.toDataURL('image/jpeg', 0.7);
                 
                 document.getElementById('preview-img').src = imagenActualBase64;
@@ -287,7 +329,6 @@
         
         if (texto === "" && !imagenActualBase64) return alert("Escribe un texto o sube una foto.");
 
-        // Desactivar botón mientras sube
         const btnPublicar = document.getElementById('btn-publicar');
         btnPublicar.disabled = true;
 
@@ -300,7 +341,7 @@
                 cancelarEdicion();
                 btnPublicar.disabled = false;
             }).catch(err => {
-                alert("Error al editar. Revisa tu conexión o las reglas de tu Firebase.");
+                alert("Error al editar.");
                 btnPublicar.disabled = false;
             });
         } else {
@@ -315,7 +356,7 @@
                 quitarImagen();
                 btnPublicar.disabled = false;
             }).catch(err => {
-                alert("Error al publicar la nota. ¿Tus reglas de Firebase (Modo de Prueba) han caducado? Revísalas en la consola.");
+                alert("Error al publicar la nota.");
                 console.error(err);
                 btnPublicar.disabled = false;
             });
@@ -389,7 +430,7 @@
                                 <span class="fw-bold text-dark"><i class="fas ${iconoUser} me-1"></i> ${nota.autor}</span>
                                 <span>${nota.fecha_texto || ''} ${textoEditado}</span>
                             </div>
-                            <p class="card-text mb-0">${nota.texto}</p>
+                            <div class="card-text mb-0">${nota.texto}</div>
                             ${htmlImagen}
                         </div>
                     </div>
