@@ -17,6 +17,7 @@
         body { background-color: #f8f9fa; color: #212529; font-family: system-ui, sans-serif; padding-bottom: 50px; }
         .text-brand { color: #712cf9; }
         .bg-brand { background-color: #712cf9; color: white; }
+        .border-brand { border-color: #712cf9 !important; }
         .btn-brand { background-color: #712cf9; color: white; border: none; }
         .btn-brand:hover { background-color: #5a23c8; color: white; }
         .card-custom { border: 1px solid rgba(0,0,0,.08); border-radius: 0.75rem; box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.04); background: #fff; }
@@ -32,13 +33,11 @@
         #preview-img { max-height: 100px; border-radius: 5px; }
         .btn-remove-img { position: absolute; top: -10px; left: -10px; border-radius: 50%; padding: 2px 8px; }
         
-        /* Botones de acción en notas */
         .action-buttons { position: absolute; top: 12px; right: 15px; display: flex; gap: 8px; opacity: 0.7; transition: 0.2s;}
         .note-card:hover .action-buttons { opacity: 1; }
         .btn-icon { background: none; border: none; cursor: pointer; font-size: 0.9rem; padding: 0;}
         .btn-icon:hover { transform: scale(1.1); }
         
-        /* Estilos del Chat */
         #chat-messages { height: 250px; overflow-y: auto; background-color: #f1f3f5; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
         .chat-bubble { max-width: 85%; padding: 8px 12px; border-radius: 12px; font-size: 0.85rem; line-height: 1.3;}
         .chat-me { background-color: #712cf9; color: white; border-bottom-right-radius: 2px; align-self: flex-end; }
@@ -49,13 +48,20 @@
 <body>
 
 <div class="container py-4">
-    <header class="pb-3 mb-4 border-bottom">
-        <div class="text-muted small mb-2 fw-semibold">
-            <i class="fas fa-university me-1 text-brand"></i> UNIVERSIDAD NACIONAL DE PIURA
+    <header class="pb-3 mb-4 border-bottom d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div>
+            <div class="text-muted small mb-2 fw-semibold">
+                <i class="fas fa-university me-1 text-brand"></i> UNIVERSIDAD NACIONAL DE PIURA
+            </div>
+            <h1 id="titulo-doc" class="fw-bold fs-2 mb-1" contenteditable="true" title="Clic para editar título">Dinámica de la morosidad</h1>
+            <h2 id="subtitulo-doc" class="text-muted fs-5 fw-normal mb-0" contenteditable="true" title="Clic para editar subtítulo">Y sus determinantes macrofinancieros en la banca múltiple del Perú (2018-2026)</h2>
         </div>
-        <!-- Títulos Editables y Sincronizados -->
-        <h1 id="titulo-doc" class="fw-bold fs-2" contenteditable="true" title="Clic para editar título">Dinámica de la morosidad</h1>
-        <h2 id="subtitulo-doc" class="text-muted fs-5 fw-normal" contenteditable="true" title="Clic para editar subtítulo">Y sus determinantes macrofinancieros en la banca múltiple del Perú (2018-2026)</h2>
+        
+        <!-- IDENTIDAD GLOBAL (Arriba a la derecha) -->
+        <div class="p-2 rounded bg-white shadow-sm border border-brand" style="min-width: 220px;">
+            <label for="nombre-usuario" class="form-label small fw-bold text-brand mb-1"><i class="fas fa-user-astronaut me-1"></i> Identidad Activa</label>
+            <input type="text" id="nombre-usuario" class="form-control form-control-sm fw-bold" title="Este nombre aparecerá en tus notas y en el chat" onchange="guardarNombre()" onkeyup="guardarNombre()">
+        </div>
     </header>
 
     <div class="row g-4">
@@ -78,12 +84,6 @@
                     <i class="fas fa-pen me-1 text-brand"></i> Nueva Publicación
                 </div>
                 <div class="card-body">
-                    <div class="input-group input-group-sm mb-3 shadow-sm">
-                        <span class="input-group-text bg-light border-end-0"><i class="fas fa-user text-brand"></i></span>
-                        <!-- Input de nombre vacío por defecto -->
-                        <input type="text" id="nombre-usuario" class="form-control border-start-0 fw-bold" placeholder="Escribe tu nombre aquí...">
-                    </div>
-
                     <textarea id="texto-nota" class="form-control form-control-custom mb-2" rows="3" placeholder="Redacta un hallazgo o apunte..."></textarea>
                     
                     <div id="preview-container">
@@ -145,7 +145,7 @@
 
 <script>
     // ==========================================
-    // CONFIGURACIÓN DE FIREBASE (Con tus datos)
+    // CONFIGURACIÓN DE FIREBASE
     // ==========================================
     const firebaseConfig = {
         apiKey: "AIzaSyBlz5QoMwyp5oEJOXbocwFYuypxiIa-udI",
@@ -165,13 +165,42 @@
         document.getElementById('cargando-notas').innerHTML = "⚠️ Error al conectar con Firebase.";
     }
 
+    // --- MANEJO DE IDENTIDAD GLOBAL (NOMBRES) ---
+    function generarNombreAleatorio() {
+        return "Investigador_" + Math.floor(Math.random() * 10000);
+    }
+
+    function inicializarNombre() {
+        let nombreGuardado = localStorage.getItem('identidadUNP');
+        // Si no hay nombre guardado, le creamos uno aleatorio
+        if (!nombreGuardado || nombreGuardado.trim() === "") {
+            nombreGuardado = generarNombreAleatorio();
+            localStorage.setItem('identidadUNP', nombreGuardado);
+        }
+        document.getElementById('nombre-usuario').value = nombreGuardado;
+    }
+
+    function guardarNombre() {
+        let nuevoNombre = document.getElementById('nombre-usuario').value.trim();
+        // Si el usuario borra su nombre por completo, le forzamos uno aleatorio
+        if (nuevoNombre === "") {
+            nuevoNombre = generarNombreAleatorio();
+            document.getElementById('nombre-usuario').value = nuevoNombre;
+        }
+        localStorage.setItem('identidadUNP', nuevoNombre);
+    }
+
+    // Inicializamos el nombre apenas carga la página
+    window.addEventListener('DOMContentLoaded', inicializarNombre);
+
+
     // --- VARIABLES GLOBALES DE ESTADO ---
     let imagenActualBase64 = null;
     let notasData = {}; 
     let biblioData = {}; 
     let idEdicionActual = null; 
 
-    // --- SINCRONIZACIÓN DE TÍTULOS EN TIEMPO REAL ---
+    // --- SINCRONIZACIÓN DE TÍTULOS ---
     const elementTitulo = document.getElementById('titulo-doc');
     const elementSubtitulo = document.getElementById('subtitulo-doc');
 
@@ -183,11 +212,9 @@
         }, { merge: true });
     }
 
-    // Guardar cuando se hace clic fuera del título
     elementTitulo.addEventListener('blur', guardarTitulos);
     elementSubtitulo.addEventListener('blur', guardarTitulos);
 
-    // Evitar que den 'Enter' creando saltos de línea (guarda y quita el cursor)
     function prevenirEnter(e) {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -197,12 +224,10 @@
     elementTitulo.addEventListener('keydown', prevenirEnter);
     elementSubtitulo.addEventListener('keydown', prevenirEnter);
 
-    // Escuchar cambios de otros usuarios en los títulos
     if (db) {
         db.collection("config").doc("textos-cabecera").onSnapshot((doc) => {
             if (doc.exists) {
                 const data = doc.data();
-                // Solo actualizar si el usuario actual NO está escribiendo en ellos en este momento
                 if (document.activeElement !== elementTitulo && data.titulo) {
                     elementTitulo.innerText = data.titulo;
                 }
@@ -238,12 +263,11 @@
     function publicarNota() {
         if (!db) return alert("Error de conexión.");
         const texto = document.getElementById('texto-nota').value.trim();
-        const autor = document.getElementById('nombre-usuario').value.trim() || "Anónimo";
+        const autor = document.getElementById('nombre-usuario').value.trim(); // Nunca estará vacío ahora
         
         if (texto === "" && !imagenActualBase64) return alert("Escribe un texto o sube una imagen.");
 
         if (idEdicionActual) {
-            // MODO EDICIÓN
             db.collection("notas").doc(idEdicionActual).update({
                 texto: texto.replace(/\n/g, '<br>'),
                 imagen: imagenActualBase64,
@@ -252,7 +276,6 @@
                 cancelarEdicion();
             });
         } else {
-            // MODO NUEVO
             db.collection("notas").add({
                 autor: autor,
                 texto: texto.replace(/\n/g, '<br>'),
@@ -311,6 +334,9 @@
             feed.innerHTML = ""; 
             notasData = {}; 
             
+            // Leemos el nombre actual de la caja superior para colorear las notas propias
+            const miNombre = document.getElementById('nombre-usuario').value.trim().toLowerCase();
+
             querySnapshot.forEach((doc) => {
                 const nota = doc.data();
                 notasData[doc.id] = nota; 
@@ -318,9 +344,7 @@
                 let htmlImagen = nota.imagen ? `<img src="${nota.imagen}" class="note-img mt-2">` : '';
                 let textoEditado = nota.editado ? `<span class="text-muted ms-2" style="font-size:0.6rem;">(Editado)</span>` : '';
                 
-                // Saber si el que publicó es el mismo que está usando la app para cambiar el ícono
-                const miNombre = document.getElementById('nombre-usuario').value.trim().toLowerCase();
-                let iconoUser = (nota.autor.toLowerCase() === miNombre && miNombre !== "") ? "fa-user-circle text-brand" : "fa-user-astronaut text-secondary";
+                let iconoUser = (nota.autor.toLowerCase() === miNombre) ? "fa-user-circle text-brand" : "fa-user-astronaut text-secondary";
 
                 feed.innerHTML += `
                     <div class="card card-custom note-card mb-3 border-0 shadow-sm" style="animation: fadeIn 0.5s;">
@@ -346,7 +370,7 @@
     function enviarMensaje() {
         if (!db) return;
         const msj = document.getElementById('chat-input').value.trim();
-        const autor = document.getElementById('nombre-usuario').value.trim() || "Anónimo";
+        const autor = document.getElementById('nombre-usuario').value.trim(); // Nunca estará vacío
         
         if (!msj) return;
 
@@ -371,7 +395,8 @@
 
             querySnapshot.forEach((doc) => {
                 const chat = doc.data();
-                const isMe = chat.autor.toLowerCase() === miNombre && miNombre !== "";
+                // Verificación estricta: Si el autor guardado es igual al nombre que tengo arriba, va a la derecha
+                const isMe = (chat.autor.toLowerCase() === miNombre);
                 const bubbleClass = isMe ? "chat-me" : "chat-other";
                 
                 chatBox.innerHTML += `
