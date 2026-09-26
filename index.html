@@ -9,7 +9,7 @@
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- FIREBASE (El motor para que sea en tiempo real) -->
+    <!-- FIREBASE -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
@@ -20,15 +20,30 @@
         .btn-brand { background-color: #712cf9; color: white; border: none; }
         .btn-brand:hover { background-color: #5a23c8; color: white; }
         .card-custom { border: 1px solid rgba(0,0,0,.08); border-radius: 0.75rem; box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.04); background: #fff; }
-        [contenteditable="true"] { padding: 5px; border-radius: 4px; transition: 0.2s; }
-        [contenteditable="true"]:hover { background-color: #e9ecef; outline: none; }
-        .note-card { border-left: 4px solid #712cf9 !important; }
+        [contenteditable="true"] { padding: 5px; border-radius: 4px; transition: 0.2s; border: 1px dashed transparent; }
+        [contenteditable="true"]:hover { background-color: #e9ecef; border-color: #adb5bd; outline: none; }
+        [contenteditable="true"]:focus { background-color: #fff; border-color: #712cf9; box-shadow: 0 0 0 0.2rem rgba(113,44,249,.25); outline: none; }
+        
+        .note-card { border-left: 4px solid #712cf9 !important; position: relative; }
         .form-control-custom { border: 1px solid #dee2e6; border-radius: 0.5rem; resize: none; }
         .form-control-custom:focus { border-color: #712cf9; box-shadow: 0 0 0 0.25rem rgba(113, 44, 249, 0.25); }
         .note-img { max-width: 100%; border-radius: 0.5rem; margin-top: 10px; border: 1px solid #e9ecef; }
         #preview-container { display: none; position: relative; margin-bottom: 10px; }
         #preview-img { max-height: 100px; border-radius: 5px; }
         .btn-remove-img { position: absolute; top: -10px; left: -10px; border-radius: 50%; padding: 2px 8px; }
+        
+        /* Botones de acción en notas */
+        .action-buttons { position: absolute; top: 12px; right: 15px; display: flex; gap: 8px; opacity: 0.7; transition: 0.2s;}
+        .note-card:hover .action-buttons { opacity: 1; }
+        .btn-icon { background: none; border: none; cursor: pointer; font-size: 0.9rem; padding: 0;}
+        .btn-icon:hover { transform: scale(1.1); }
+        
+        /* Estilos del Chat */
+        #chat-messages { height: 250px; overflow-y: auto; background-color: #f1f3f5; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .chat-bubble { max-width: 85%; padding: 8px 12px; border-radius: 12px; font-size: 0.85rem; line-height: 1.3;}
+        .chat-me { background-color: #712cf9; color: white; border-bottom-right-radius: 2px; align-self: flex-end; }
+        .chat-other { background-color: #fff; border: 1px solid #dee2e6; color: #212529; border-bottom-left-radius: 2px; align-self: flex-start; }
+        .chat-author { font-size: 0.65rem; font-weight: bold; margin-bottom: 3px; opacity: 0.8; }
     </style>
 </head>
 <body>
@@ -38,15 +53,15 @@
         <div class="text-muted small mb-2 fw-semibold">
             <i class="fas fa-university me-1 text-brand"></i> UNIVERSIDAD NACIONAL DE PIURA
         </div>
-        <h1 class="fw-bold fs-2" contenteditable="true">Dinámica de la morosidad</h1>
-        <h2 class="text-muted fs-5 fw-normal" contenteditable="true">Y sus determinantes macrofinancieros en la banca múltiple del Perú (2018-2026)</h2>
+        <!-- Títulos Editables y Sincronizados -->
+        <h1 id="titulo-doc" class="fw-bold fs-2" contenteditable="true" title="Clic para editar título">Dinámica de la morosidad</h1>
+        <h2 id="subtitulo-doc" class="text-muted fs-5 fw-normal" contenteditable="true" title="Clic para editar subtítulo">Y sus determinantes macrofinancieros en la banca múltiple del Perú (2018-2026)</h2>
     </header>
 
     <div class="row g-4">
-        <!-- COLUMNA IZQUIERDA: SÓLO EL FEED DE NOTAS -->
+        <!-- COLUMNA IZQUIERDA: FEED DE NOTAS -->
         <div class="col-lg-7">
             <h4 class="fw-bold mb-3"><i class="fas fa-satellite-dish me-2 text-brand"></i> Transmisiones del Equipo</h4>
-            <!-- Feed donde aparecerán las notas de ambos -->
             <div id="feed-notas">
                 <div class="text-center text-muted mt-5" id="cargando-notas">
                     <i class="fas fa-spinner fa-spin fa-2x mb-2"></i><br>Conectando a la base de datos...
@@ -57,16 +72,16 @@
         <!-- COLUMNA DERECHA: PANELES DE CONTROL -->
         <div class="col-lg-5">
             
-            <!-- PANEL 1: PUBLICAR NOTA -->
+            <!-- PANEL 1: PUBLICAR/EDITAR NOTA -->
             <div class="card card-custom mb-4 border-0 shadow-sm" style="border-top: 4px solid #712cf9 !important;">
-                <div class="card-header bg-white border-bottom fw-bold text-dark py-3">
+                <div class="card-header bg-white border-bottom fw-bold text-dark py-3" id="titulo-panel-edicion">
                     <i class="fas fa-pen me-1 text-brand"></i> Nueva Publicación
                 </div>
                 <div class="card-body">
-                    <!-- Nombre Editable Libremente -->
                     <div class="input-group input-group-sm mb-3 shadow-sm">
                         <span class="input-group-text bg-light border-end-0"><i class="fas fa-user text-brand"></i></span>
-                        <input type="text" id="nombre-usuario" class="form-control border-start-0 fw-bold" placeholder="Escribe tu nombre..." value="Adriel">
+                        <!-- Input de nombre vacío por defecto -->
+                        <input type="text" id="nombre-usuario" class="form-control border-start-0 fw-bold" placeholder="Escribe tu nombre aquí...">
                     </div>
 
                     <textarea id="texto-nota" class="form-control form-control-custom mb-2" rows="3" placeholder="Redacta un hallazgo o apunte..."></textarea>
@@ -81,14 +96,35 @@
                         <button class="btn btn-sm btn-light border shadow-sm" onclick="document.getElementById('input-foto').click()">
                             <i class="fas fa-camera me-1 text-muted"></i> Foto
                         </button>
-                        <button class="btn btn-brand px-4 shadow-sm fw-bold" onclick="publicarNota()">
-                            Publicar <i class="fas fa-paper-plane ms-1"></i>
-                        </button>
+                        
+                        <div>
+                            <button id="btn-cancelar-edicion" class="btn btn-sm btn-secondary d-none me-1" onclick="cancelarEdicion()">Cancelar</button>
+                            <button id="btn-publicar" class="btn btn-brand px-4 shadow-sm fw-bold" onclick="publicarNota()">
+                                Publicar <i class="fas fa-paper-plane ms-1"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- PANEL 2: BIBLIOGRAFÍA SINCRONIZADA -->
+            <!-- PANEL 2: CHAT DE EQUIPO -->
+            <div class="card card-custom mb-4 border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom fw-bold text-dark py-2 d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-comments me-1 text-brand"></i> Chat del Equipo</span>
+                    <span class="badge bg-success" style="font-size: 0.6rem;">EN LÍNEA</span>
+                </div>
+                <div id="chat-messages">
+                    <!-- Los mensajes del chat van aquí -->
+                </div>
+                <div class="card-footer bg-white border-top p-2">
+                    <div class="input-group input-group-sm">
+                        <input type="text" id="chat-input" class="form-control" placeholder="Escribe un mensaje..." onkeypress="manejarEnterChat(event)">
+                        <button class="btn btn-brand" onclick="enviarMensaje()"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PANEL 3: BIBLIOGRAFÍA -->
             <div class="card card-custom mb-4 border-0 shadow-sm">
                 <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3">
                     <span class="fw-bold text-dark"><i class="fas fa-bookmark me-1 text-brand"></i> Bibliografía Compartida</span>
@@ -109,30 +145,75 @@
 
 <script>
     // ==========================================
-    // ¡AQUÍ PEGARÁS LA CONFIGURACIÓN DE FIREBASE!
+    // CONFIGURACIÓN DE FIREBASE (Con tus datos)
     // ==========================================
     const firebaseConfig = {
-  apiKey: "AIzaSyBlz5QoMwyp5oEJOXbocwFYuypxiIa-udI",
-  authDomain: "tesis-b4554.firebaseapp.com",
-  projectId: "tesis-b4554",
-  storageBucket: "tesis-b4554.firebasestorage.app",
-  messagingSenderId: "145791282196",
-  appId: "1:145791282196:web:a73cecae9c93100371cb01",
-  measurementId: "G-VK5VEPFD9R"
-	};
+        apiKey: "AIzaSyBlz5QoMwyp5oEJOXbocwFYuypxiIa-udI",
+        authDomain: "tesis-b4554.firebaseapp.com",
+        projectId: "tesis-b4554",
+        storageBucket: "tesis-b4554.firebasestorage.app",
+        messagingSenderId: "145791282196",
+        appId: "1:145791282196:web:a73cecae9c93100371cb01",
+        measurementId: "G-VK5VEPFD9R"
+    };
 
-    // Inicializar Firebase (Solo funcionará cuando pegues tus claves arriba)
     let db;
     try {
         firebase.initializeApp(firebaseConfig);
         db = firebase.firestore();
     } catch (e) {
-        document.getElementById('cargando-notas').innerHTML = "⚠️ Falta configurar las claves de Firebase en el código.";
+        document.getElementById('cargando-notas').innerHTML = "⚠️ Error al conectar con Firebase.";
     }
 
+    // --- VARIABLES GLOBALES DE ESTADO ---
     let imagenActualBase64 = null;
+    let notasData = {}; 
+    let biblioData = {}; 
+    let idEdicionActual = null; 
 
-    // --- FUNCIONES DE IMÁGENES ---
+    // --- SINCRONIZACIÓN DE TÍTULOS EN TIEMPO REAL ---
+    const elementTitulo = document.getElementById('titulo-doc');
+    const elementSubtitulo = document.getElementById('subtitulo-doc');
+
+    function guardarTitulos() {
+        if (!db) return;
+        db.collection("config").doc("textos-cabecera").set({
+            titulo: elementTitulo.innerText.trim(),
+            subtitulo: elementSubtitulo.innerText.trim()
+        }, { merge: true });
+    }
+
+    // Guardar cuando se hace clic fuera del título
+    elementTitulo.addEventListener('blur', guardarTitulos);
+    elementSubtitulo.addEventListener('blur', guardarTitulos);
+
+    // Evitar que den 'Enter' creando saltos de línea (guarda y quita el cursor)
+    function prevenirEnter(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            e.target.blur(); 
+        }
+    }
+    elementTitulo.addEventListener('keydown', prevenirEnter);
+    elementSubtitulo.addEventListener('keydown', prevenirEnter);
+
+    // Escuchar cambios de otros usuarios en los títulos
+    if (db) {
+        db.collection("config").doc("textos-cabecera").onSnapshot((doc) => {
+            if (doc.exists) {
+                const data = doc.data();
+                // Solo actualizar si el usuario actual NO está escribiendo en ellos en este momento
+                if (document.activeElement !== elementTitulo && data.titulo) {
+                    elementTitulo.innerText = data.titulo;
+                }
+                if (document.activeElement !== elementSubtitulo && data.subtitulo) {
+                    elementSubtitulo.innerText = data.subtitulo;
+                }
+            }
+        });
+    }
+
+    // --- MANEJO DE IMÁGENES ---
     function cargarImagen(event) {
         const archivo = event.target.files[0];
         if (archivo) {
@@ -153,43 +234,104 @@
         document.getElementById('input-foto').value = "";
     }
 
-    // --- PUBLICAR NOTA EN LA NUBE ---
+    // --- CREAR Y EDITAR NOTAS ---
     function publicarNota() {
-        if (!db) return alert("Configura Firebase primero.");
+        if (!db) return alert("Error de conexión.");
         const texto = document.getElementById('texto-nota').value.trim();
         const autor = document.getElementById('nombre-usuario').value.trim() || "Anónimo";
         
         if (texto === "" && !imagenActualBase64) return alert("Escribe un texto o sube una imagen.");
 
-        // Crear la nota en la nube
-        db.collection("notas").add({
-            autor: autor,
-            texto: texto.replace(/\n/g, '<br>'),
-            imagen: imagenActualBase64,
-            fecha_texto: new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }),
-            timestamp: firebase.firestore.FieldValue.serverTimestamp() // Para ordenar cronológicamente
-        }).then(() => {
-            document.getElementById('texto-nota').value = "";
-            quitarImagen();
-        });
+        if (idEdicionActual) {
+            // MODO EDICIÓN
+            db.collection("notas").doc(idEdicionActual).update({
+                texto: texto.replace(/\n/g, '<br>'),
+                imagen: imagenActualBase64,
+                editado: true
+            }).then(() => {
+                cancelarEdicion();
+            });
+        } else {
+            // MODO NUEVO
+            db.collection("notas").add({
+                autor: autor,
+                texto: texto.replace(/\n/g, '<br>'),
+                imagen: imagenActualBase64,
+                fecha_texto: new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }),
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                document.getElementById('texto-nota').value = "";
+                quitarImagen();
+            });
+        }
     }
 
-    // --- ESCUCHAR NOTAS EN TIEMPO REAL ---
+    function iniciarEdicionNota(id) {
+        idEdicionActual = id;
+        const nota = notasData[id];
+        
+        document.getElementById('texto-nota').value = nota.texto.replace(/<br>/g, '\n');
+        
+        if (nota.imagen) {
+            imagenActualBase64 = nota.imagen;
+            document.getElementById('preview-img').src = imagenActualBase64;
+            document.getElementById('preview-container').style.display = 'inline-block';
+        } else {
+            quitarImagen();
+        }
+
+        document.getElementById('titulo-panel-edicion').innerHTML = '<i class="fas fa-edit me-1 text-warning"></i> Editando Publicación';
+        document.getElementById('btn-publicar').innerHTML = 'Guardar <i class="fas fa-save ms-1"></i>';
+        document.getElementById('btn-publicar').classList.replace('btn-brand', 'btn-warning');
+        document.getElementById('btn-cancelar-edicion').classList.remove('d-none');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function cancelarEdicion() {
+        idEdicionActual = null;
+        document.getElementById('texto-nota').value = "";
+        quitarImagen();
+        document.getElementById('titulo-panel-edicion').innerHTML = '<i class="fas fa-pen me-1 text-brand"></i> Nueva Publicación';
+        document.getElementById('btn-publicar').innerHTML = 'Publicar <i class="fas fa-paper-plane ms-1"></i>';
+        document.getElementById('btn-publicar').classList.replace('btn-warning', 'btn-brand');
+        document.getElementById('btn-cancelar-edicion').classList.add('d-none');
+    }
+
+    function eliminarNota(id) {
+        if (confirm("¿Estás seguro de eliminar esta publicación?")) {
+            db.collection("notas").doc(id).delete();
+            if (idEdicionActual === id) cancelarEdicion(); 
+        }
+    }
+
+    // --- ESCUCHAR NOTAS ---
     if (db) {
         db.collection("notas").orderBy("timestamp", "desc").onSnapshot((querySnapshot) => {
             const feed = document.getElementById('feed-notas');
-            feed.innerHTML = ""; // Limpiamos
+            feed.innerHTML = ""; 
+            notasData = {}; 
             
             querySnapshot.forEach((doc) => {
                 const nota = doc.data();
-                let htmlImagen = nota.imagen ? `<img src="${nota.imagen}" class="note-img mt-2">` : '';
+                notasData[doc.id] = nota; 
                 
+                let htmlImagen = nota.imagen ? `<img src="${nota.imagen}" class="note-img mt-2">` : '';
+                let textoEditado = nota.editado ? `<span class="text-muted ms-2" style="font-size:0.6rem;">(Editado)</span>` : '';
+                
+                // Saber si el que publicó es el mismo que está usando la app para cambiar el ícono
+                const miNombre = document.getElementById('nombre-usuario').value.trim().toLowerCase();
+                let iconoUser = (nota.autor.toLowerCase() === miNombre && miNombre !== "") ? "fa-user-circle text-brand" : "fa-user-astronaut text-secondary";
+
                 feed.innerHTML += `
                     <div class="card card-custom note-card mb-3 border-0 shadow-sm" style="animation: fadeIn 0.5s;">
+                        <div class="action-buttons">
+                            <button class="btn-icon text-primary" onclick="iniciarEdicionNota('${doc.id}')" title="Editar"><i class="fas fa-pencil-alt"></i></button>
+                            <button class="btn-icon text-danger" onclick="eliminarNota('${doc.id}')" title="Eliminar"><i class="fas fa-trash-alt"></i></button>
+                        </div>
                         <div class="card-body">
-                            <div class="d-flex justify-content-between text-muted small mb-2">
-                                <span class="fw-bold text-dark"><i class="fas fa-user-circle me-1 text-brand"></i> ${nota.autor}</span>
-                                <span>${nota.fecha_texto || ''}</span>
+                            <div class="d-flex justify-content-between text-muted small mb-2" style="padding-right: 40px;">
+                                <span class="fw-bold text-dark"><i class="fas ${iconoUser} me-1"></i> ${nota.autor}</span>
+                                <span>${nota.fecha_texto || ''} ${textoEditado}</span>
                             </div>
                             <p class="card-text mb-0">${nota.texto}</p>
                             ${htmlImagen}
@@ -200,9 +342,52 @@
         });
     }
 
-    // --- AGREGAR BIBLIOGRAFÍA A LA NUBE ---
+    // --- CHAT DEL EQUIPO ---
+    function enviarMensaje() {
+        if (!db) return;
+        const msj = document.getElementById('chat-input').value.trim();
+        const autor = document.getElementById('nombre-usuario').value.trim() || "Anónimo";
+        
+        if (!msj) return;
+
+        db.collection("chat").add({
+            autor: autor,
+            mensaje: msj,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        document.getElementById('chat-input').value = "";
+    }
+
+    function manejarEnterChat(e) {
+        if (e.key === "Enter") enviarMensaje();
+    }
+
+    if (db) {
+        db.collection("chat").orderBy("timestamp", "asc").onSnapshot((querySnapshot) => {
+            const chatBox = document.getElementById('chat-messages');
+            chatBox.innerHTML = "";
+            const miNombre = document.getElementById('nombre-usuario').value.trim().toLowerCase();
+
+            querySnapshot.forEach((doc) => {
+                const chat = doc.data();
+                const isMe = chat.autor.toLowerCase() === miNombre && miNombre !== "";
+                const bubbleClass = isMe ? "chat-me" : "chat-other";
+                
+                chatBox.innerHTML += `
+                    <div class="chat-bubble ${bubbleClass}">
+                        ${!isMe ? `<div class="chat-author text-brand">${chat.autor}</div>` : ''}
+                        ${chat.mensaje}
+                    </div>
+                `;
+            });
+            chatBox.scrollTop = chatBox.scrollHeight;
+        });
+    }
+
+    // --- BIBLIOGRAFÍA ---
     function agregarBibliografia() {
-        if (!db) return alert("Configura Firebase primero.");
+        if (!db) return;
         const titulo = prompt("Ingresa el título de la fuente:");
         if (!titulo) return;
         let url = prompt("Ingresa el enlace web (URL):") || "#";
@@ -215,19 +400,48 @@
         });
     }
 
-    // --- ESCUCHAR BIBLIOGRAFÍA EN TIEMPO REAL ---
+    function editarBiblio(id) {
+        const data = biblioData[id];
+        const nuevoTitulo = prompt("Editar título de la fuente:", data.titulo);
+        if (nuevoTitulo === null) return; 
+        
+        let nuevaUrl = prompt("Editar enlace web (URL):", data.url);
+        if (nuevaUrl === null) return;
+        if (nuevaUrl !== "#" && !nuevaUrl.startsWith('http')) nuevaUrl = 'https://' + nuevaUrl;
+
+        db.collection("bibliografia").doc(id).update({ titulo: nuevoTitulo, url: nuevaUrl });
+    }
+
+    function eliminarBiblio(id) {
+        if (confirm("¿Eliminar esta referencia de la bibliografía?")) {
+            db.collection("bibliografia").doc(id).delete();
+        }
+    }
+
     if (db) {
         db.collection("bibliografia").orderBy("timestamp", "desc").onSnapshot((querySnapshot) => {
             const lista = document.getElementById('lista-biblio');
             lista.innerHTML = "";
+            biblioData = {};
+
             querySnapshot.forEach((doc) => {
                 const bib = doc.data();
+                biblioData[doc.id] = bib; 
+                
                 lista.innerHTML += `
-                    <li class="list-group-item border-0 border-bottom py-3">
-                        <div class="fw-semibold text-dark">${bib.titulo}</div>
-                        <a href="${bib.url}" target="_blank" class="text-decoration-none small text-primary">
-                            <i class="fas fa-external-link-alt me-1"></i> Ver recurso
-                        </a>
+                    <li class="list-group-item border-0 border-bottom py-3 position-relative group-hover">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="fw-semibold text-dark">${bib.titulo}</div>
+                                <a href="${bib.url}" target="_blank" class="text-decoration-none small text-primary">
+                                    <i class="fas fa-external-link-alt me-1"></i> Ver recurso
+                                </a>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm text-secondary p-0" onclick="editarBiblio('${doc.id}')" title="Editar"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-sm text-danger p-0" onclick="eliminarBiblio('${doc.id}')" title="Eliminar"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
                     </li>
                 `;
             });
