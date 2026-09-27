@@ -9,11 +9,12 @@
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- FIREBASE -->
+    <!-- FIREBASE (App, Firestore y Auth) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 
-    <!-- PEER.JS (Motor WebRTC para llamadas P2P sin servidores externos) -->
+    <!-- PEER.JS (Motor WebRTC para llamadas P2P) -->
     <script src="https://unpkg.com/peerjs@1.5.1/dist/peerjs.min.js"></script>
 
     <style>
@@ -29,21 +30,30 @@
         [contenteditable="true"]:hover { background-color: #e9ecef; border-color: #adb5bd; outline: none; }
         [contenteditable="true"]:focus { background-color: #fff; border-color: #712cf9; box-shadow: 0 0 0 0.2rem rgba(113,44,249,.25); outline: none; }
         
-        /* ====================================================
-           ESTILO DE PUBLICACIONES MEJORADO
-           ==================================================== */
+        /* Contenedor central con margen lateral ajustado al 10% */
+        @media (min-width: 992px) {
+            .main-content-wrapper { padding-left: 4%; padding-right: 4%; }
+        }
+        @media (min-width: 1200px) {
+            .main-content-wrapper { padding-left: 10%; padding-right: 10%; }
+        }
+        @media (min-width: 1600px) {
+            .main-content-wrapper { padding-left: 12%; padding-right: 12%; }
+        }
+
+        /* Estilo para las publicaciones */
         .note-card { 
             border: 1px solid #e2e8f0 !important; 
             border-left: 5px solid #712cf9 !important; 
             border-radius: 1rem; 
             background: #fff; 
             transition: all 0.25s ease; 
-            margin-bottom: 1.8rem !important; /* <-- Mayor separación entre publicaciones */
+            margin-bottom: 1.8rem !important; 
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
         }
         .note-card:hover { 
             background-color: #fcfcfd; 
-            transform: translateY(-3px); /* <-- Efecto de flotación al pasar el mouse */
+            transform: translateY(-3px); 
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04) !important;
         }
         
@@ -61,10 +71,18 @@
         .btn-icon { background: none; border: none; cursor: pointer; font-size: 1rem; padding: 0;}
         .btn-icon:hover { transform: scale(1.1); }
         
-        /* Sidebar Discord Style */
-        .discord-sidebar { background-color: #2b2d31; color: #dbdee1; border-radius: 0.75rem; overflow: hidden; box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.08); }
-        .discord-header { background-color: #1e1f22; padding: 15px; font-weight: bold; border-bottom: 1px solid #35363c; color: #fff; font-size: 0.95rem; }
-        .voice-user-item { padding: 6px 10px; border-radius: 6px; font-size: 0.85rem; display: flex; align-items: center; background: rgba(255,255,255,0.05); }
+        /* Item de usuario de voz en diseño blanco */
+        .voice-user-item { padding: 6px 10px; border-radius: 6px; font-size: 0.85rem; display: flex; align-items: center; background: #f8f9fa; border: 1px solid #e9ecef; color: #212529; }
+
+        /* Item de navegación destacado (Investigación Actual) */
+        .nav-item-active {
+            background-color: #f3f0ff;
+            color: #712cf9;
+            border-left: 4px solid #712cf9;
+            padding: 8px 12px;
+            border-radius: 0 6px 6px 0;
+            font-weight: 600;
+        }
 
         /* Chat Flotante */
         #chat-floating-panel {
@@ -95,132 +113,164 @@
 <body>
 
 <div class="container-fluid px-4 py-4">
+    
+    <!-- ENCABEZADO -->
     <header class="pb-3 mb-4 border-bottom d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
         <div>
-            <div class="text-muted small mb-2 fw-semibold">
-                <i class="fas fa-university me-1 text-brand"></i> UNIVERSIDAD NACIONAL DE PIURA
-            </div>
-            <h1 id="titulo-doc" class="fw-bold fs-2 mb-1" contenteditable="true" title="Clic para editar título">Dinámica de la morosidad</h1>
-            <h2 id="subtitulo-doc" class="text-muted fs-5 fw-normal mb-0" contenteditable="true" title="Clic para editar subtítulo">Y sus determinantes macrofinancieros en la banca múltiple del Perú (2018-2026)</h2>
+            <h1 id="titulo-doc" class="fw-bold fs-4 mb-1" contenteditable="true" title="Clic para editar título">Dinámica de la morosidad</h1>
+            <h2 id="subtitulo-doc" class="text-muted fs-6 fw-normal mb-0" contenteditable="true" title="Clic para editar subtítulo">Y sus determinantes macrofinancieros en la banca múltiple del Perú (2018-2026)</h2>
         </div>
         
-        <!-- IDENTIDAD GLOBAL -->
-        <div class="p-2 rounded bg-white shadow-sm border border-brand" style="min-width: 220px;">
-            <label for="nombre-usuario" class="form-label small fw-bold text-brand mb-1"><i class="fas fa-user-astronaut me-1"></i> Identidad Activa</label>
-            <input type="text" id="nombre-usuario" class="form-control form-control-sm fw-bold" title="Este nombre aparecerá en tus notas y en el chat" onchange="guardarNombre()" onkeyup="guardarNombre()">
+        <!-- IDENTIDAD ACTIVA CON GOOGLE AUTH -->
+        <div class="p-2 rounded bg-white shadow-sm border border-brand" style="min-width: 250px;">
+            <label class="form-label small fw-bold text-brand mb-1"><i class="fas fa-user-astronaut me-1"></i> Identidad Activa</label>
+            
+            <div id="auth-container">
+                <!-- Vista cuando NO ha iniciado sesión -->
+                <div id="logged-out-view">
+                    <button class="btn btn-outline-dark btn-sm w-100 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2 py-1" onclick="iniciarSesionGoogle()">
+                        <img src="https://www.svgrepo.com/show/475656/google-color.svg" width="16" height="16"> Iniciar sesión con Google
+                    </button>
+                </div>
+                <!-- Vista cuando SÍ ha iniciado sesión -->
+                <div id="logged-in-view" class="d-none align-items-center justify-content-between">
+                    <div class="d-flex align-items-center gap-2 text-truncate">
+                        <img id="user-avatar" src="" class="rounded-circle border" width="24" height="24">
+                        <span id="user-name" class="small fw-bold text-dark text-truncate"></span>
+                    </div>
+                    <button class="btn btn-sm btn-light text-danger border-0 p-1" onclick="cerrarSesion()" title="Cerrar sesión">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
         </div>
     </header>
 
-    <!-- DISTRIBUCIÓN DE 3 COLUMNAS -->
-    <div class="row g-4">
+    <!-- CONTENEDOR CON MÁRGENES LATERALES -->
+    <div class="main-content-wrapper">
         
-        <!-- COLUMNA 1: SIDEBAR IZQUIERDA (CANAL DE VOZ NATIVO) -->
-        <div class="col-lg-3">
-            <div class="discord-sidebar mb-4 pb-2">
-                <div class="discord-header d-flex justify-content-between align-items-center">
-                    <span><i class="fas fa-server me-2 text-brand"></i> UNP Servidor</span>
-                    <span id="estado-voz" class="badge bg-secondary" style="font-size: 0.6rem;">DESCONECTADO</span>
-                </div>
-                <div class="p-3">
-                    <div class="text-uppercase small text-muted fw-bold mb-2" style="font-size: 0.7rem; letter-spacing: 0.5px;">
-                        <i class="fas fa-volume-high text-success me-1"></i> Canal de Voz General
-                    </div>
-                    
-                    <!-- Lista de usuarios en la sala -->
-                    <div id="lista-usuarios-voz" class="mb-3 mt-3 min-vh-25">
-                        <div class="text-muted small fst-italic text-center py-2" id="mensaje-vacio-voz">Nadie conectado aún</div>
-                    </div>
-
-                    <!-- Audios invisibles -->
-                    <div id="audio-elements" style="display: none;"></div>
-
-                    <div id="controles-voz" class="mt-2">
-                        <button class="btn btn-success btn-sm w-100 fw-bold shadow-sm" onclick="conectarVoz()">
-                            <i class="fas fa-phone-alt me-1"></i> Conectarse a Voz
-                        </button>
-                    </div>
-                    
-                    <div class="d-none mt-2" id="controles-activo-voz">
-                        <div class="d-flex gap-2">
-                            <button id="btn-mute" class="btn btn-secondary btn-sm flex-fill fw-bold shadow-sm" onclick="toggleMute()" title="Silenciar micrófono">
-                                <i class="fas fa-microphone"></i>
-                            </button>
-                            <button class="btn btn-danger btn-sm flex-fill fw-bold shadow-sm" onclick="desconectarVoz()" title="Desconectarse">
-                                <i class="fas fa-phone-slash"></i> Salir
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- COLUMNA 2: FEED CENTRAL DE NOTAS (ESTILO TWITTER) -->
-        <div class="col-lg-5">
-            <h4 class="fw-bold mb-4"><i class="fas fa-satellite-dish me-2 text-brand"></i> Transmisiones del Equipo</h4>
-            <div id="feed-notas">
-                <div class="text-center text-muted mt-5" id="cargando-notas">
-                    <i class="fas fa-spinner fa-spin fa-2x mb-2"></i><br>Conectando a la base de datos...
-                </div>
-            </div>
-        </div>
-
-        <!-- COLUMNA 3: PANELES DERECHOS (PUBLICAR + BIBLIOGRAFÍA) -->
-        <div class="col-lg-4">
+        <!-- DISTRIBUCIÓN DE 3 COLUMNAS -->
+        <div class="row g-4">
             
-            <!-- PANEL 1: PUBLICAR/EDITAR NOTA -->
-            <div class="card card-custom mb-4 border-0 shadow-sm" style="border-top: 4px solid #712cf9 !important;">
-                <div class="card-header bg-white border-bottom fw-bold text-dark py-3" id="titulo-panel-edicion">
-                    <i class="fas fa-pen me-1 text-brand"></i> Nueva Publicación
-                </div>
-                <div class="card-body">
-                    <!-- BARRA DE HERRAMIENTAS DE FORMATO (TIEMPO REAL) -->
-                    <div class="btn-group btn-group-sm mb-2 w-100 shadow-sm" role="group">
-                        <button type="button" class="btn btn-outline-secondary" onclick="insertarFormato('bold')" title="Negrita"><i class="fas fa-bold"></i></button>
-                        <button type="button" class="btn btn-outline-secondary" onclick="insertarFormato('italic')" title="Cursiva"><i class="fas fa-italic"></i></button>
-                        <button type="button" class="btn btn-outline-secondary" onclick="insertarFormato('color')" title="Color de texto"><i class="fas fa-palette"></i></button>
-                        <button type="button" class="btn btn-outline-secondary" onclick="insertarFormato('list')" title="Lista con viñetas"><i class="fas fa-list-ul"></i></button>
-                        <button type="button" class="btn btn-outline-secondary" onclick="insertarFormato('link')" title="Enlace / Link"><i class="fas fa-link"></i></button>
+            <!-- COLUMNA 1: SIDEBAR IZQUIERDA (ENTORNO DE TRABAJO) -->
+            <div class="col-lg-3">
+                <div class="card card-custom border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-bottom fw-bold text-dark py-3">
+                        <i class="fas fa-folder-open me-2 text-brand"></i> Entorno de Trabajo
                     </div>
-
-                    <!-- EDITOR EN TIEMPO REAL (CONTENTEDITABLE) -->
-                    <div id="editor-nota" class="editor-custom mb-2" contenteditable="true" placeholder="Redacta un hallazgo o apunte..."></div>
-                    
-                    <div id="preview-container">
-                        <img id="preview-img" src="" alt="Vista previa">
-                        <button class="btn btn-danger btn-sm btn-remove-img" onclick="quitarImagen()"><i class="fas fa-times"></i></button>
-                    </div>
-
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <input type="file" id="input-foto" accept="image/*" style="display: none;" onchange="cargarImagen(event)">
-                        <button class="btn btn-sm btn-light border shadow-sm" type="button" onclick="document.getElementById('input-foto').click()">
-                            <i class="fas fa-camera me-1 text-muted"></i> Foto
-                        </button>
+                    <div class="card-body p-3">
+                        <div class="text-uppercase small text-muted fw-bold mb-3" style="font-size: 0.7rem; letter-spacing: 0.5px;">
+                            Investigaciones
+                        </div>
                         
-                        <div>
-                            <button id="btn-cancelar-edicion" class="btn btn-sm btn-secondary d-none me-1" type="button" onclick="cancelarEdicion()">Cancelar</button>
-                            <button id="btn-publicar" class="btn btn-brand px-4 shadow-sm fw-bold" type="button" onclick="publicarNota()">
-                                Publicar <i class="fas fa-paper-plane ms-1"></i>
+                        <div class="nav-item-active mb-3 d-flex align-items-center">
+                            <i class="fas fa-hashtag me-2"></i>
+                            <span class="text-truncate small" id="nav-titulo-actual">Dinámica de la morosidad</span>
+                        </div>
+
+                        <hr class="border-secondary opacity-10 my-3">
+
+                        <button class="btn btn-light btn-sm w-100 fw-bold shadow-sm d-flex justify-content-center align-items-center gap-2 border text-secondary" onclick="alert('La función de crear nuevas investigaciones se implementará en la próxima actualización.')">
+                            <i class="fas fa-plus"></i> Crear investigación
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLUMNA 2: FEED CENTRAL (EDITOR + NOTAS) -->
+            <div class="col-lg-5">
+                
+                <div class="card card-custom mb-4 border-0 shadow-sm" style="border-top: 4px solid #712cf9 !important;">
+                    <div class="card-header bg-white border-bottom fw-bold text-dark py-3" id="titulo-panel-edicion">
+                        <i class="fas fa-pen me-1 text-brand"></i> Nueva Publicación
+                    </div>
+                    <div class="card-body">
+                        <div class="btn-group btn-group-sm mb-2 w-100 shadow-sm" role="group">
+                            <button type="button" class="btn btn-outline-secondary" onclick="insertarFormato('bold')" title="Negrita"><i class="fas fa-bold"></i></button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="insertarFormato('italic')" title="Cursiva"><i class="fas fa-italic"></i></button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="insertarFormato('color')" title="Color de texto"><i class="fas fa-palette"></i></button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="insertarFormato('list')" title="Lista con viñetas"><i class="fas fa-list-ul"></i></button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="insertarFormato('link')" title="Enlace / Link"><i class="fas fa-link"></i></button>
+                        </div>
+
+                        <div id="editor-nota" class="editor-custom mb-2" contenteditable="true" placeholder="Redacta un hallazgo o apunte..."></div>
+                        
+                        <div id="preview-container">
+                            <img id="preview-img" src="" alt="Vista previa">
+                            <button class="btn btn-danger btn-sm btn-remove-img" onclick="quitarImagen()"><i class="fas fa-times"></i></button>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <input type="file" id="input-foto" accept="image/*" style="display: none;" onchange="cargarImagen(event)">
+                            <button class="btn btn-sm btn-light border shadow-sm" type="button" onclick="document.getElementById('input-foto').click()">
+                                <i class="fas fa-camera me-1 text-muted"></i> Foto
                             </button>
+                            
+                            <div>
+                                <button id="btn-cancelar-edicion" class="btn btn-sm btn-secondary d-none me-1" type="button" onclick="cancelarEdicion()">Cancelar</button>
+                                <button id="btn-publicar" class="btn btn-brand px-4 shadow-sm fw-bold" type="button" onclick="publicarNota()">
+                                    Publicar <i class="fas fa-paper-plane ms-1"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- PANEL 2: BIBLIOGRAFÍA -->
-            <div class="card card-custom mb-4 border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3">
-                    <span class="fw-bold text-dark"><i class="fas fa-bookmark me-1 text-brand"></i> Bibliografía Compartida</span>
-                    <button class="btn btn-sm btn-light border text-brand rounded-circle" type="button" onclick="agregarBibliografia()">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                </div>
-                <div class="card-body p-0 px-3">
-                    <ul class="list-group list-group-flush" id="lista-biblio">
-                        <!-- Las bibliografías cargarán aquí automáticamente -->
-                    </ul>
+                <div id="feed-notas">
+                    <div class="text-center text-muted mt-5" id="cargando-notas">
+                        <i class="fas fa-spinner fa-spin fa-2x mb-2"></i><br>Conectando...
+                    </div>
                 </div>
             </div>
 
+            <!-- COLUMNA 3: PANELES DERECHOS (VOZ + BIBLIOGRAFÍA) -->
+            <div class="col-lg-4">
+                
+                <div class="card card-custom border-0 shadow-sm mb-4" style="border-top: 4px solid #198754 !important;">
+                    <div class="card-header bg-white border-bottom fw-bold text-dark py-3 d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-headset me-2 text-success"></i> Sala de Voz</span>
+                        <span id="estado-voz" class="badge bg-secondary" style="font-size: 0.6rem;">DESCONECTADO</span>
+                    </div>
+                    <div class="card-body p-3">
+                        
+                        <div id="lista-usuarios-voz" class="mb-3 min-vh-25">
+                            <div class="text-muted small fst-italic text-center py-2" id="mensaje-vacio-voz">Nadie en la sala</div>
+                        </div>
+
+                        <div id="audio-elements" style="display: none;"></div>
+
+                        <div id="controles-voz" class="mt-2">
+                            <button class="btn btn-success btn-sm w-100 fw-bold shadow-sm" onclick="conectarVoz()">
+                                <i class="fas fa-phone-alt me-1"></i> Conectarse a Voz
+                            </button>
+                        </div>
+                        
+                        <div class="d-none mt-2" id="controles-activo-voz">
+                            <div class="d-flex gap-2">
+                                <button id="btn-mute" class="btn btn-light border btn-sm flex-fill fw-bold shadow-sm text-dark" onclick="toggleMute()" title="Silenciar micrófono">
+                                    <i class="fas fa-microphone"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm flex-fill fw-bold shadow-sm" onclick="desconectarVoz()" title="Desconectarse">
+                                    <i class="fas fa-phone-slash"></i> Salir
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card card-custom mb-4 border-0 shadow-sm">
+                    <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3">
+                        <span class="fw-bold text-dark"><i class="fas fa-bookmark me-1 text-brand"></i> Bibliografía</span>
+                        <button class="btn btn-sm btn-light border text-brand rounded-circle" type="button" onclick="agregarBibliografia()">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <div class="card-body p-0 px-3">
+                        <ul class="list-group list-group-flush" id="lista-biblio"></ul>
+                    </div>
+                </div>
+
+            </div>
         </div>
     </div>
 </div>
@@ -235,9 +285,7 @@
         <span class="fw-bold small"><i class="fas fa-comments me-1"></i> Chat del Equipo</span>
         <button class="btn btn-sm text-white p-0" onclick="toggleChat()"><i class="fas fa-times"></i></button>
     </div>
-    <div id="chat-messages">
-        <!-- Los mensajes del chat van aquí -->
-    </div>
+    <div id="chat-messages"></div>
     <div class="card-footer bg-white border-top p-2">
         <div class="input-group input-group-sm">
             <input type="text" id="chat-input" class="form-control" placeholder="Escribe un mensaje..." onkeypress="manejarEnterChat(event)">
@@ -248,7 +296,7 @@
 
 <script>
     // ==========================================
-    // CONFIGURACIÓN DE FIREBASE
+    // CONFIGURACIÓN DE FIREBASE Y AUTH
     // ==========================================
     const firebaseConfig = {
         apiKey: "AIzaSyBlz5QoMwyp5oEJOXbocwFYuypxiIa-udI",
@@ -260,41 +308,81 @@
         measurementId: "G-VK5VEPFD9R"
     };
 
-    let db;
+    let db, auth, googleProvider;
+    let usuarioActual = "Investigador_" + Math.floor(Math.random() * 10000);
+
     try {
         firebase.initializeApp(firebaseConfig);
         db = firebase.firestore();
+        auth = firebase.auth();
+        googleProvider = new firebase.auth.GoogleAuthProvider();
     } catch (e) {
         document.getElementById('cargando-notas').innerHTML = "⚠️ Error al conectar con Firebase.";
     }
 
-    // --- MANEJO DE IDENTIDAD GLOBAL (NOMBRES) ---
-    function generarNombreAleatorio() {
-        return "Investigador_" + Math.floor(Math.random() * 10000);
+    // --- GOOGLE SIGN-IN ---
+    function iniciarSesionGoogle() {
+        auth.signInWithPopup(googleProvider).catch((error) => {
+            alert("Error al iniciar sesión: " + error.message);
+        });
     }
 
-    function inicializarNombre() {
-        let nombreGuardado = localStorage.getItem('identidadUNP');
-        if (!nombreGuardado || nombreGuardado.trim() === "") {
-            nombreGuardado = generarNombreAleatorio();
-            localStorage.setItem('identidadUNP', nombreGuardado);
-        }
-        document.getElementById('nombre-usuario').value = nombreGuardado;
+    function cerrarSesion() {
+        auth.signOut();
     }
 
-    function guardarNombre() {
-        let nuevoNombre = document.getElementById('nombre-usuario').value.trim();
-        if (nuevoNombre === "") {
-            nuevoNombre = generarNombreAleatorio();
-            document.getElementById('nombre-usuario').value = nuevoNombre;
-        }
-        localStorage.setItem('identidadUNP', nuevoNombre);
-    }
+    // Escuchar cambios en la autenticación de Firebase
+    if (auth) {
+        auth.onAuthStateChanged((user) => {
+            const loggedOutView = document.getElementById('logged-out-view');
+            const loggedInView = document.getElementById('logged-in-view');
+            const userAvatar = document.getElementById('user-avatar');
+            const userName = document.getElementById('user-name');
 
-    window.addEventListener('DOMContentLoaded', inicializarNombre);
+            if (user) {
+                usuarioActual = user.displayName || "Investigador";
+                userAvatar.src = user.photoURL || "https://ui-avatars.com/api/?name=" + encodeURIComponent(usuarioActual);
+                userName.innerText = usuarioActual;
+                
+                loggedInView.classList.replace('d-none', 'd-flex');
+                loggedOutView.classList.add('d-none');
+            } else {
+                usuarioActual = "Investigador_" + Math.floor(Math.random() * 10000);
+                
+                loggedInView.classList.replace('d-flex', 'd-none');
+                loggedOutView.classList.remove('d-none');
+            }
+        });
+    }
 
     // ==========================================
-    // SISTEMA DE VOZ P2P NATIVO (SIN JITSI)
+    // FUNCIONES DE TIEMPO RELATIVO
+    // ==========================================
+    function tiempoRelativo(ms) {
+        const segundos = Math.floor((Date.now() - ms) / 1000);
+        if (segundos < 10) return `hace unos segundos`;
+        if (segundos < 60) return `hace ${segundos} segundos`;
+        const minutos = Math.floor(segundos / 60);
+        if (minutos < 60) return `hace ${minutos} minuto${minutos !== 1 ? 's' : ''}`;
+        const horas = Math.floor(minutos / 60);
+        if (horas < 24) return `hace ${horas} hora${horas !== 1 ? 's' : ''}`;
+        const dias = Math.floor(horas / 24);
+        if (dias < 30) return `hace ${dias} día${dias !== 1 ? 's' : ''}`;
+        const meses = Math.floor(dias / 30);
+        if (meses < 12) return `hace ${meses} mes${meses !== 1 ? 'es' : ''}`;
+        const anos = Math.floor(meses / 12);
+        return `hace ${anos} año${anos !== 1 ? 's' : ''}`;
+    }
+
+    setInterval(() => {
+        document.querySelectorAll('.tiempo-relativo').forEach(el => {
+            const ms = parseInt(el.getAttribute('data-timestamp'));
+            if(ms) el.innerText = tiempoRelativo(ms);
+        });
+    }, 30000);
+
+    // ==========================================
+    // SISTEMA DE VOZ P2P NATIVO
     // ==========================================
     let localStream = null;
     let peer = null;
@@ -303,25 +391,17 @@
     let isMuted = false;
 
     async function conectarVoz() {
-        const nombreUsuario = document.getElementById('nombre-usuario').value.trim() || "Investigador";
-        
         try {
-            // Solicitar acceso al micrófono
             localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-            
-            // Iniciar PeerJS para WebRTC P2P
             peer = new Peer();
             
             peer.on('open', (id) => {
-                // Registrarse en la sala de Firebase para que otros nos vean y nos llamen
                 db.collection('voice_room').add({
-                    nombre: nombreUsuario,
+                    nombre: usuarioActual,
                     peerId: id,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 }).then(docRef => {
                     myVoiceDocId = docRef.id;
-                    
-                    // Cambios en la UI
                     document.getElementById('estado-voz').className = 'badge bg-success';
                     document.getElementById('estado-voz').innerText = 'EN LÍNEA';
                     document.getElementById('controles-voz').classList.add('d-none');
@@ -329,9 +409,8 @@
                 });
             });
 
-            // Escuchar llamadas entrantes de nuevos usuarios
             peer.on('call', (call) => {
-                call.answer(localStream); // Contestar con nuestro micrófono
+                call.answer(localStream);
                 call.on('stream', (remoteStream) => {
                     agregarAudio(call.peer, remoteStream);
                 });
@@ -349,27 +428,22 @@
             
             const btnMute = document.getElementById('btn-mute');
             if (isMuted) {
-                btnMute.innerHTML = '<i class="fas fa-microphone-slash"></i>';
-                btnMute.classList.replace('btn-secondary', 'btn-danger');
+                btnMute.innerHTML = '<i class="fas fa-microphone-slash text-danger"></i>';
             } else {
                 btnMute.innerHTML = '<i class="fas fa-microphone"></i>';
-                btnMute.classList.replace('btn-danger', 'btn-secondary');
             }
         }
     }
 
     function desconectarVoz() {
-        // Borrarnos de la sala en Firebase
         if (myVoiceDocId) {
             db.collection('voice_room').doc(myVoiceDocId).delete();
             myVoiceDocId = null;
         }
-        // Cerrar conexión P2P
         if (peer) {
             peer.destroy();
             peer = null;
         }
-        // Apagar micrófono
         if (localStream) {
             localStream.getTracks().forEach(track => track.stop());
             localStream = null;
@@ -378,13 +452,12 @@
         document.getElementById('audio-elements').innerHTML = '';
         activeCalls = {};
         
-        // Restaurar UI
         document.getElementById('estado-voz').className = 'badge bg-secondary';
         document.getElementById('estado-voz').innerText = 'DESCONECTADO';
         document.getElementById('controles-voz').classList.remove('d-none');
         document.getElementById('controles-activo-voz').classList.add('d-none');
         
-        if(isMuted) toggleMute(); // Restaurar botón
+        if(isMuted) toggleMute(); 
     }
 
     function agregarAudio(peerId, stream) {
@@ -398,7 +471,6 @@
         }
     }
 
-    // Escuchar cambios en la sala de voz (Firebase)
     if (db) {
         db.collection('voice_room').onSnapshot((snapshot) => {
             const listaUI = document.getElementById('lista-usuarios-voz');
@@ -407,7 +479,7 @@
             let usuariosActivos = [];
 
             if(snapshot.empty) {
-                listaUI.innerHTML = '<div class="text-muted small fst-italic text-center py-2">Nadie conectado aún</div>';
+                listaUI.innerHTML = '<div class="text-muted small fst-italic text-center py-2">Nadie en la sala</div>';
             }
 
             snapshot.forEach((doc) => {
@@ -416,18 +488,16 @@
                 
                 const isMe = peer && data.peerId === peer.id;
                 const nombreMostrar = isMe ? `${data.nombre} (Tú)` : data.nombre;
-                const colorAcento = isMe ? "text-success" : "text-white";
+                const colorAcento = isMe ? "text-success" : "text-secondary";
                 
-                // Mostrar usuario en el sidebar
                 listaUI.innerHTML += `
-                    <div class="voice-user-item mb-2">
-                        <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(data.nombre)}&background=random&color=fff&size=24" class="rounded-circle me-2 shadow-sm">
+                    <div class="voice-user-item mb-2 shadow-sm">
+                        <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(data.nombre)}&background=random&color=fff&size=24" class="rounded-circle me-2 border">
                         <i class="fas fa-microphone ${colorAcento} me-2" style="font-size:0.75rem;"></i>
-                        <span class="text-light text-truncate" style="font-weight: 500;">${nombreMostrar}</span>
+                        <span class="text-dark text-truncate" style="font-weight: 500;">${nombreMostrar}</span>
                     </div>
                 `;
 
-                // Si estamos conectados y el usuario no somos nosotros, lo llamamos automáticamente
                 if (peer && peer.id && !isMe && !activeCalls[data.peerId]) {
                     const call = peer.call(data.peerId, localStream);
                     activeCalls[data.peerId] = call;
@@ -438,7 +508,6 @@
                 }
             });
 
-            // Limpiar audios y llamadas de gente que se fue de la sala
             document.querySelectorAll('audio.peer-audio').forEach(audioTag => {
                 const pId = audioTag.id.replace('audio-', '');
                 if (!usuariosActivos.includes(pId)) {
@@ -449,31 +518,26 @@
         });
     }
 
-    // Auto-desconectar si el usuario cierra la ventana
     window.addEventListener('beforeunload', () => {
         if (myVoiceDocId) {
             db.collection('voice_room').doc(myVoiceDocId).delete();
         }
     });
 
-
     // ==========================================
-    // HERRAMIENTAS Y PANELES (RESTO DE CÓDIGO)
+    // HERRAMIENTAS Y PANELES 
     // ==========================================
     function insertarFormato(tipo) {
         const editor = document.getElementById('editor-nota');
         editor.focus();
-
-        if (tipo === 'bold') {
-            document.execCommand('bold', false, null);
-        } else if (tipo === 'italic') {
-            document.execCommand('italic', false, null);
-        } else if (tipo === 'color') {
+        if (tipo === 'bold') { document.execCommand('bold', false, null); } 
+        else if (tipo === 'italic') { document.execCommand('italic', false, null); } 
+        else if (tipo === 'color') {
             const color = prompt("Ingresa el color (ej. #712cf9, red, blue, green):", "#712cf9");
             if (color) document.execCommand('foreColor', false, color);
-        } else if (tipo === 'list') {
-            document.execCommand('insertUnorderedList', false, null);
-        } else if (tipo === 'link') {
+        } 
+        else if (tipo === 'list') { document.execCommand('insertUnorderedList', false, null); } 
+        else if (tipo === 'link') {
             let url = prompt("Ingresa el enlace web (URL):", "https://");
             if (url) {
                 if (!url.startsWith('http')) url = 'https://' + url;
@@ -482,9 +546,9 @@
         }
     }
 
-    // Sincronización de títulos
     const elementTitulo = document.getElementById('titulo-doc');
     const elementSubtitulo = document.getElementById('subtitulo-doc');
+    const navTituloActual = document.getElementById('nav-titulo-actual'); 
 
     function guardarTitulos() {
         if (!db) return;
@@ -505,13 +569,15 @@
         db.collection("config").doc("textos-cabecera").onSnapshot((doc) => {
             if (doc.exists) {
                 const data = doc.data();
-                if (document.activeElement !== elementTitulo && data.titulo) elementTitulo.innerText = data.titulo;
+                if (document.activeElement !== elementTitulo && data.titulo) {
+                    elementTitulo.innerText = data.titulo;
+                    navTituloActual.innerText = data.titulo; 
+                }
                 if (document.activeElement !== elementSubtitulo && data.subtitulo) elementSubtitulo.innerText = data.subtitulo;
             }
         });
     }
 
-    // Compresor de imágenes y notas
     let imagenActualBase64 = null;
     let notasData = {}; 
     let biblioData = {}; 
@@ -551,7 +617,6 @@
         const editor = document.getElementById('editor-nota');
         const contenidoHTML = editor.innerHTML.trim();
         const textoPlano = editor.innerText.trim();
-        const autor = document.getElementById('nombre-usuario').value.trim();
         
         if (textoPlano === "" && !imagenActualBase64) return alert("Escribe un texto o sube una foto.");
 
@@ -566,8 +631,9 @@
             }).catch(err => { alert("Error al editar."); btnPublicar.disabled = false; });
         } else {
             db.collection("notas").add({
-                autor: autor, texto: contenidoHTML, imagen: imagenActualBase64,
-                fecha_texto: new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }),
+                autor: usuarioActual, 
+                texto: contenidoHTML, 
+                imagen: imagenActualBase64,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             }).then(() => {
                 editor.innerHTML = ""; quitarImagen(); btnPublicar.disabled = false;
@@ -608,21 +674,24 @@
         }
     }
 
-    // Escuchar Notas CON LA NUEVA ESTRUCTURA LIMPIA
     if (db) {
         db.collection("notas").orderBy("timestamp", "desc").onSnapshot((querySnapshot) => {
             const feed = document.getElementById('feed-notas');
             feed.innerHTML = ""; notasData = {}; 
-            const miNombre = document.getElementById('nombre-usuario').value.trim().toLowerCase();
+            const miNombre = usuarioActual.toLowerCase();
 
             querySnapshot.forEach((doc) => {
                 const nota = doc.data();
                 notasData[doc.id] = nota; 
                 let htmlImagen = nota.imagen ? `<img src="${nota.imagen}" class="note-img mt-2">` : '';
-                let textoEditado = nota.editado ? `<span class="text-muted ms-2" style="font-size:0.6rem;">(Editado)</span>` : '';
-                let iconoUser = (nota.autor.toLowerCase() === miNombre) ? "fa-user-circle text-brand" : "fa-user-astronaut text-secondary";
+                
+                let textoEditado = nota.editado ? `<span class="text-muted ms-1 fst-italic" style="font-size:0.6rem;">(Editado)</span>` : '';
+                
+                let ms = nota.timestamp ? nota.timestamp.toMillis() : Date.now();
+                let tiempoTexto = tiempoRelativo(ms);
+                
+                let iconoUser = (nota.autor && nota.autor.toLowerCase() === miNombre) ? "fa-user-circle text-brand" : "fa-user-astronaut text-secondary";
 
-                // <-- AQUÍ SE APLICA EL NUEVO DISEÑO INTERNO -->
                 feed.innerHTML += `
                     <div class="card card-custom note-card p-1" style="animation: fadeIn 0.4s;">
                         <div class="action-buttons">
@@ -631,8 +700,10 @@
                         </div>
                         <div class="card-body p-3 mt-1">
                             <div class="d-flex justify-content-between align-items-center text-muted small mb-3" style="padding-right: 40px;">
-                                <span class="fw-bold text-dark fs-6"><i class="fas ${iconoUser} me-1"></i> ${nota.autor}</span>
-                                <span class="badge bg-light text-secondary border">${nota.fecha_texto || ''} ${textoEditado}</span>
+                                <span class="fw-bold text-dark fs-6"><i class="fas ${iconoUser} me-1"></i> ${nota.autor || 'Anónimo'}</span>
+                                <span class="badge bg-light text-secondary border fw-normal">
+                                    <span class="tiempo-relativo" data-timestamp="${ms}">${tiempoTexto}</span>${textoEditado}
+                                </span>
                             </div>
                             <div class="card-text mb-0 text-dark" style="word-break: break-word; line-height: 1.6; font-size: 0.95rem;">${nota.texto}</div>
                             ${htmlImagen}
@@ -656,9 +727,8 @@
     function enviarMensaje() {
         if (!db) return;
         const msj = document.getElementById('chat-input').value.trim();
-        const autor = document.getElementById('nombre-usuario').value.trim(); 
         if (!msj) return;
-        db.collection("chat").add({ autor: autor, mensaje: msj, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+        db.collection("chat").add({ autor: usuarioActual, mensaje: msj, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
         document.getElementById('chat-input').value = "";
     }
     function manejarEnterChat(e) { if (e.key === "Enter") enviarMensaje(); }
@@ -667,14 +737,14 @@
         db.collection("chat").orderBy("timestamp", "asc").onSnapshot((querySnapshot) => {
             const chatBox = document.getElementById('chat-messages');
             chatBox.innerHTML = "";
-            const miNombre = document.getElementById('nombre-usuario').value.trim().toLowerCase();
+            const miNombre = usuarioActual.toLowerCase();
             querySnapshot.forEach((doc) => {
                 const chat = doc.data();
-                const isMe = (chat.autor.toLowerCase() === miNombre);
+                const isMe = (chat.autor && chat.autor.toLowerCase() === miNombre);
                 const bubbleClass = isMe ? "chat-me" : "chat-other";
                 chatBox.innerHTML += `
                     <div class="chat-bubble ${bubbleClass}">
-                        ${!isMe ? `<div class="chat-author text-brand">${chat.autor}</div>` : ''}
+                        ${!isMe ? `<div class="chat-author text-brand">${chat.autor || 'Anónimo'}</div>` : ''}
                         ${chat.mensaje}
                     </div>
                 `;
