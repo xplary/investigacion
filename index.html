@@ -319,7 +319,7 @@
         console.error("Error al conectar Firebase", e);
     }
 
-    // --- GOOGLE SIGN-IN CON REDIRECCIÓN (OPTIMIZADO PARA MÓVILES) ---
+    // --- GOOGLE SIGN-IN CON REDIRECCIÓN (OPTIMIZADO MÓVIL) ---
     function iniciarSesionGoogle() {
         auth.signInWithRedirect(googleProvider).catch((error) => {
             alert("Error al iniciar sesión: " + error.message);
@@ -330,39 +330,42 @@
         auth.signOut();
     }
 
-    // Manejar el resultado al regresar de la redirección de Google
-    auth.getRedirectResult().catch((error) => {
-        console.error("Error en redirect:", error);
+    // RESOLUCIÓN DE ESTADO DE AUTENTICACIÓN (ESPECIAL PARA MÓVILES)
+    auth.getRedirectResult().then((result) => {
+        if (result.user) {
+            manejarUsuarioLogueado(result.user);
+        }
+    }).catch((error) => {
+        console.error("Error en redirect result:", error);
     });
 
     auth.onAuthStateChanged(async (user) => {
-        const loggedOutView = document.getElementById('logged-out-view');
-        const loggedInView = document.getElementById('logged-in-view');
-        const userAvatar = document.getElementById('user-avatar');
-        const userName = document.getElementById('user-name');
-
         if (user) {
-            usuarioActual = user.displayName || "Investigador";
-            usuarioUid = user.uid;
-            userAvatar.src = user.photoURL || "https://ui-avatars.com/api/?name=" + encodeURIComponent(usuarioActual);
-            userName.innerText = usuarioActual;
-            
-            loggedInView.classList.replace('d-none', 'd-flex');
-            loggedOutView.classList.add('d-none');
-
-            await registrarAccesoInvestigacion(user.uid, currentInvId);
-            cargarListaInvestigaciones(user.uid);
+            manejarUsuarioLogueado(user);
         } else {
             usuarioActual = "Invitado_" + Math.floor(Math.random() * 1000);
             usuarioUid = null;
             
-            loggedInView.classList.replace('d-flex', 'd-none');
-            loggedOutView.classList.remove('d-none');
+            document.getElementById('logged-in-view').classList.replace('d-flex', 'd-none');
+            document.getElementById('logged-out-view').classList.remove('d-none');
             cargarListaInvestigaciones(null);
         }
-
         inicializarCanalInvestigacion();
     });
+
+    async function manejarUsuarioLogueado(user) {
+        usuarioActual = user.displayName || "Investigador";
+        usuarioUid = user.uid;
+        
+        document.getElementById('user-avatar').src = user.photoURL || "https://ui-avatars.com/api/?name=" + encodeURIComponent(usuarioActual);
+        document.getElementById('user-name').innerText = usuarioActual;
+        
+        document.getElementById('logged-in-view').classList.replace('d-none', 'd-flex');
+        document.getElementById('logged-out-view').classList.add('d-none');
+
+        await registrarAccesoInvestigacion(user.uid, currentInvId);
+        cargarListaInvestigaciones(user.uid);
+    }
 
     // ==========================================
     // GESTIÓN DE INVESTIGACIONES Y CANALES
