@@ -116,25 +116,19 @@
             <h2 id="subtitulo-doc" class="text-muted fs-6 fw-normal mb-0" contenteditable="true" title="Clic para editar subtítulo">Cargando detalles...</h2>
         </div>
         
-        <!-- IDENTIDAD ACTIVA HÍBRIDA -->
+        <!-- IDENTIDAD ACTIVA GOOGLE -->
         <div class="p-2 rounded bg-white shadow-sm border border-brand" style="min-width: 250px;">
-            <div class="d-flex justify-content-between align-items-center mb-1">
-                <label class="form-label small fw-bold text-brand mb-0"><i class="fas fa-user-astronaut me-1"></i> Identidad Activa</label>
-                <button class="btn btn-link btn-sm text-secondary p-0 text-decoration-none" style="font-size: 0.75rem;" onclick="cambiarNombreManual()" title="Editar tu nombre manualmente">
-                    <i class="fas fa-pen"></i> Editar nombre
-                </button>
-            </div>
-            
+            <label class="form-label small fw-bold text-brand mb-1"><i class="fas fa-user-astronaut me-1"></i> Identidad Activa</label>
             <div id="auth-container">
                 <div id="logged-out-view">
-                    <button class="btn btn-outline-dark btn-sm w-100 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2 py-1 mb-1" onclick="iniciarSesionGoogle()">
+                    <button class="btn btn-outline-dark btn-sm w-100 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2 py-1" onclick="iniciarSesionGoogle()">
                         <img src="https://www.svgrepo.com/show/475656/google-color.svg" width="16" height="16"> Iniciar sesión con Google
                     </button>
                 </div>
-                <div id="logged-in-view" class="d-flex align-items-center justify-content-between">
+                <div id="logged-in-view" class="d-none align-items-center justify-content-between">
                     <div class="d-flex align-items-center gap-2 text-truncate">
                         <img id="user-avatar" src="" class="rounded-circle border" width="24" height="24">
-                        <span id="user-name" class="small fw-bold text-dark text-truncate" title="Clic para editar" style="cursor: pointer;" onclick="cambiarNombreManual()"></span>
+                        <span id="user-name" class="small fw-bold text-dark text-truncate"></span>
                     </div>
                     <button class="btn btn-sm btn-light text-danger border-0 p-1" onclick="cerrarSesion()" title="Cerrar sesión">
                         <i class="fas fa-sign-out-alt"></i>
@@ -307,9 +301,8 @@
     };
 
     let db, auth, googleProvider;
-    let usuarioActual = localStorage.getItem('unp_nombre_usuario') || ("Investigador_" + Math.floor(Math.random() * 1000));
-    let usuarioUid = localStorage.getItem('unp_uid_usuario') || ('local_' + Math.random().toString(36).substring(2, 9));
-    let avatarUrlActual = localStorage.getItem('unp_avatar_usuario') || `https://ui-avatars.com/api/?name=${encodeURIComponent(usuarioActual)}&background=random&color=fff`;
+    let usuarioActual = "Invitado_" + Math.floor(Math.random() * 1000);
+    let usuarioUid = null;
 
     let voiceSessionId = localStorage.getItem('unp_voice_session_id');
     if (!voiceSessionId) {
@@ -330,54 +323,34 @@
         console.error("Error al conectar Firebase", e);
     }
 
-    // --- GOOGLE SIGN-IN ---
+    // --- GOOGLE SIGN-IN ROBUSTO (POPUP + REDIRECT FALLBACK) ---
     function iniciarSesionGoogle() {
-        auth.signInWithRedirect(googleProvider).catch((error) => {
-            alert("Error al iniciar sesión: " + error.message);
+        auth.signInWithPopup(googleProvider).then((result) => {
+            manejarUsuarioLogueado(result.user);
+        }).catch((error) => {
+            if (error.code === 'auth/popup-blocked' || error.code === 'auth/cancelled-popup-request') {
+                // Si el navegador bloquea el popup, usamos redirección
+                auth.signInWithRedirect(googleProvider).catch((err) => {
+                    alert("Error al iniciar sesión: " + err.message);
+                });
+            } else {
+                alert("Error al iniciar sesión: " + error.message);
+            }
         });
     }
 
     function cerrarSesion() {
         desconectarVoz();
         auth.signOut().then(() => {
-            localStorage.removeItem('unp_nombre_usuario');
-            localStorage.removeItem('unp_uid_usuario');
-            localStorage.removeItem('unp_avatar_usuario');
             window.location.reload();
         }).catch(() => {
-            localStorage.removeItem('unp_nombre_usuario');
-            localStorage.removeItem('unp_uid_usuario');
-            localStorage.removeItem('unp_avatar_usuario');
             window.location.reload();
         });
     }
 
-    function cambiarNombreManual() {
-        const nuevoNombre = prompt("Ingresa tu nombre y apellido real para identificarte:", usuarioActual);
-        if (nuevoNombre && nuevoNombre.trim()) {
-            usuarioActual = nuevoNombre.trim();
-            avatarUrlActual = `https://ui-avatars.com/api/?name=${encodeURIComponent(usuarioActual)}&background=712cf9&color=fff`;
-            
-            localStorage.setItem('unp_nombre_usuario', usuarioActual);
-            localStorage.setItem('unp_uid_usuario', usuarioUid);
-            localStorage.setItem('unp_avatar_usuario', avatarUrlActual);
-
-            actualizarVistaUsuarioUI();
-            registrarAccesoInvestigacion(usuarioUid, currentInvId);
-            alert("¡Identidad actualizada con éxito!");
-        }
-    }
-
-    function actualizarVistaUsuarioUI() {
-        document.getElementById('user-avatar').src = avatarUrlActual;
-        document.getElementById('user-name').innerText = usuarioActual;
-        document.getElementById('logged-in-view').classList.replace('d-none', 'd-flex');
-        document.getElementById('logged-out-view').classList.add('d-none');
-    }
-
     auth.getRedirectResult().then((result) => {
         if (result && result.user) {
-            guardarUsuarioGoogle(result.user);
+            manejarUsuarioLogueado(result.user);
         }
     }).catch((error) => {
         console.error("Error en getRedirectResult:", error);
@@ -385,30 +358,29 @@
 
     auth.onAuthStateChanged(async (user) => {
         if (user) {
-            guardarUsuarioGoogle(user);
-        } else if (!localStorage.getItem('unp_nombre_usuario')) {
+            manejarUsuarioLogueado(user);
+        } else {
+            usuarioActual = "Invitado_" + Math.floor(Math.random() * 1000);
+            usuarioUid = null;
+            
             document.getElementById('logged-in-view').classList.replace('d-flex', 'd-none');
             document.getElementById('logged-out-view').classList.remove('d-none');
             cargarListaInvestigaciones(null);
-        } else {
-            actualizarVistaUsuarioUI();
-            await registrarAccesoInvestigacion(usuarioUid, currentInvId);
-            cargarListaInvestigaciones(usuarioUid);
         }
         inicializarCanalInvestigacion();
     });
 
-    function guardarUsuarioGoogle(user) {
+    async function manejarUsuarioLogueado(user) {
         usuarioActual = user.displayName || "Investigador";
         usuarioUid = user.uid;
-        avatarUrlActual = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(usuarioActual)}`;
+        
+        document.getElementById('user-avatar').src = user.photoURL || "https://ui-avatars.com/api/?name=" + encodeURIComponent(usuarioActual);
+        document.getElementById('user-name').innerText = usuarioActual;
+        
+        document.getElementById('logged-in-view').classList.replace('d-none', 'd-flex');
+        document.getElementById('logged-out-view').classList.add('d-none');
 
-        localStorage.setItem('unp_nombre_usuario', usuarioActual);
-        localStorage.setItem('unp_uid_usuario', usuarioUid);
-        localStorage.setItem('unp_avatar_usuario', avatarUrlActual);
-
-        actualizarVistaUsuarioUI();
-        registrarAccesoInvestigacion(user.uid, currentInvId);
+        await registrarAccesoInvestigacion(user.uid, currentInvId);
         cargarListaInvestigaciones(user.uid);
     }
 
@@ -429,6 +401,11 @@
     }
 
     async function crearNuevaInvestigacion() {
+        if (!usuarioUid) {
+            alert("Debes iniciar sesión con Google para crear y guardar investigaciones en tu cuenta.");
+            return;
+        }
+
         const titulo = prompt("Título de la nueva investigación:");
         if (!titulo || !titulo.trim()) return;
         const subtitulo = prompt("Subtítulo o descripción breve:") || "";
@@ -459,7 +436,7 @@
         const contenedor = document.getElementById('lista-investigaciones');
         let invsPorMostrar = ['general-unp'];
 
-        if (uid && !uid.startsWith('local_')) {
+        if (uid) {
             db.collection('users').doc(uid).onSnapshot(async (doc) => {
                 if (doc.exists && doc.data().investigaciones) {
                     invsPorMostrar = doc.data().investigaciones;
@@ -559,7 +536,6 @@
                 await audioCtx.resume();
             }
 
-            // Restricciones de audio profesionales estilo Meet (cancelación de eco agresiva)
             localStream = await navigator.mediaDevices.getUserMedia({ 
                 audio: { 
                     echoCancellation: true, 
@@ -679,7 +655,6 @@
             audio.playsInline = true;
             audio.controls = false;
             
-            // Nota: Se elimina la conexión manual a AudioContext.destination para evitar duplicación de audio y eco.
             document.getElementById('audio-elements').appendChild(audio);
         }
     }
@@ -727,7 +702,6 @@
                     </div>
                 `;
 
-                // Regla anti-eco: evita conexiones duplicadas cruzadas entre pares
                 if (peer && peer.id && !isMe && !activeCalls[data.peerId]) {
                     if (peer.id < data.peerId) {
                         const call = peer.call(data.peerId, localStream);
