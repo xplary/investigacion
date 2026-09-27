@@ -18,45 +18,167 @@
     <script src="https://unpkg.com/peerjs@1.5.1/dist/peerjs.min.js"></script>
 
     <style>
-        body { background-color: #f8f9fa; color: #212529; font-family: system-ui, sans-serif; padding-bottom: 50px; }
+        body { 
+            background-color: #f8f9fa; 
+            color: #212529; 
+            font-family: system-ui, sans-serif; 
+            padding-bottom: 30px; 
+        }
         .text-brand { color: #712cf9; }
         .bg-brand { background-color: #712cf9; color: white; }
         .border-brand { border-color: #712cf9 !important; }
         .btn-brand { background-color: #712cf9; color: white; border: none; }
         .btn-brand:hover { background-color: #5a23c8; color: white; }
-        .card-custom { border: 1px solid rgba(0,0,0,.08); border-radius: 0.75rem; box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.04); background: #fff; }
+        .card-custom { 
+            border: 1px solid rgba(0,0,0,.08); 
+            border-radius: 0.75rem; 
+            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.04); 
+            background: #fff; 
+        }
         
-        [contenteditable="true"] { padding: 5px; border-radius: 4px; transition: 0.2s; border: 1px dashed transparent; }
-        [contenteditable="true"]:hover { background-color: #e9ecef; border-color: #adb5bd; outline: none; }
-        [contenteditable="true"]:focus { background-color: #fff; border-color: #712cf9; box-shadow: 0 0 0 0.2rem rgba(113,44,249,.25); outline: none; }
+        [contenteditable="true"] { 
+            padding: 5px; 
+            border-radius: 4px; 
+            transition: 0.2s; 
+            border: 1px dashed transparent; 
+        }
+        [contenteditable="true"]:hover { 
+            background-color: #e9ecef; 
+            border-color: #adb5bd; 
+            outline: none; 
+        }
+        [contenteditable="true"]:focus { 
+            background-color: #fff; 
+            border-color: #712cf9; 
+            box-shadow: 0 0 0 0.2rem rgba(113,44,249,.25); 
+            outline: none; 
+        }
         
         @media (min-width: 992px) { .main-content-wrapper { padding-left: 4%; padding-right: 4%; } }
         @media (min-width: 1200px) { .main-content-wrapper { padding-left: 10%; padding-right: 10%; } }
         @media (min-width: 1600px) { .main-content-wrapper { padding-left: 12%; padding-right: 12%; } }
 
-        .note-card { border: 1px solid #e2e8f0 !important; border-left: 5px solid #712cf9 !important; border-radius: 1rem; background: #fff; transition: all 0.25s ease; margin-bottom: 1.8rem !important; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important; }
-        .note-card:hover { background-color: #fcfcfd; transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04) !important; }
+        .note-card { 
+            border: 1px solid #e2e8f0 !important; 
+            border-left: 5px solid #712cf9 !important; 
+            border-radius: 1rem; 
+            background: #fff; 
+            transition: all 0.25s ease; 
+            margin-bottom: 1.8rem !important; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+        }
+        .note-card:hover { 
+            background-color: #fcfcfd; 
+            transform: translateY(-3px); 
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04) !important;
+        }
         
-        .editor-custom { border: 1px solid #dee2e6; border-radius: 0.5rem; padding: 12px; min-height: 110px; max-height: 350px; overflow-y: auto; background: #fff; font-size: 0.95rem; }
-        .editor-custom:focus { border-color: #712cf9; box-shadow: 0 0 0 0.25rem rgba(113, 44, 249, 0.25); outline: none; }
+        .editor-custom { 
+            border: 1px solid #dee2e6; 
+            border-radius: 0.5rem; 
+            padding: 12px; 
+            min-height: 110px; 
+            max-height: 350px; 
+            overflow-y: auto; 
+            background: #fff; 
+            font-size: 0.95rem; 
+        }
+        .editor-custom:focus { 
+            border-color: #712cf9; 
+            box-shadow: 0 0 0 0.25rem rgba(113, 44, 249, 0.25); 
+            outline: none; 
+        }
         
-        .note-img { max-width: 100%; border-radius: 0.5rem; margin-top: 15px; border: 1px solid #e9ecef; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        #preview-container { display: none; position: relative; margin-bottom: 10px; }
-        #preview-img { max-height: 100px; border-radius: 5px; }
-        .btn-remove-img { position: absolute; top: -10px; left: -10px; border-radius: 50%; padding: 2px 8px; }
+        .note-img { 
+            max-width: 100%; 
+            border-radius: 0.5rem; 
+            margin-top: 15px; 
+            border: 1px solid #e9ecef; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+        }
+        #preview-container { 
+            display: none; 
+            position: relative; 
+            margin-bottom: 10px; 
+        }
+        #preview-img { 
+            max-height: 100px; 
+            border-radius: 5px; 
+        }
+        .btn-remove-img { 
+            position: absolute; 
+            top: -10px; 
+            left: -10px; 
+            border-radius: 50%; 
+            padding: 2px 8px; 
+        }
         
-        .action-buttons { position: absolute; top: 15px; right: 20px; display: flex; gap: 10px; opacity: 0.7; transition: 0.2s;}
+        .action-buttons { 
+            position: absolute; 
+            top: 15px; 
+            right: 20px; 
+            display: flex; 
+            gap: 10px; 
+            opacity: 0.7; 
+            transition: 0.2s;
+        }
         .note-card:hover .action-buttons { opacity: 1; }
         .btn-icon { background: none; border: none; cursor: pointer; font-size: 1rem; padding: 0;}
         .btn-icon:hover { transform: scale(1.1); }
         
-        .voice-user-item { padding: 6px 10px; border-radius: 6px; font-size: 0.85rem; display: flex; align-items: center; background: #f8f9fa; border: 1px solid #e9ecef; color: #212529; }
-        .nav-item-channel { padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; display: flex; align-items: center; justify-content: space-between; color: #495057; text-decoration: none; transition: 0.2s; margin-bottom: 5px; }
+        .voice-user-item { 
+            padding: 6px 10px; 
+            border-radius: 6px; 
+            font-size: 0.85rem; 
+            display: flex; 
+            align-items: center; 
+            background: #f8f9fa; 
+            border: 1px solid #e9ecef; 
+            color: #212529; 
+        }
+        .nav-item-channel { 
+            padding: 8px 12px; 
+            border-radius: 6px; 
+            font-size: 0.85rem; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            color: #495057; 
+            text-decoration: none; 
+            transition: 0.2s; 
+            margin-bottom: 5px; 
+        }
         .nav-item-channel:hover { background-color: #e9ecef; color: #712cf9; }
-        .nav-item-active { background-color: #f3f0ff !important; color: #712cf9 !important; border-left: 4px solid #712cf9; font-weight: 600; }
+        .nav-item-active { 
+            background-color: #f3f0ff !important; 
+            color: #712cf9 !important; 
+            border-left: 4px solid #712cf9; 
+            font-weight: 600; 
+        }
 
-        #chat-floating-panel { position: fixed; bottom: 90px; right: 25px; width: 340px; max-width: 90vw; z-index: 1050; display: none; box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.15); border-radius: 1rem; overflow: hidden; background: #fff; animation: fadeIn 0.3s ease; }
-        #chat-messages { height: 260px; overflow-y: auto; background-color: #f8f9fa; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        #chat-floating-panel { 
+            position: fixed; 
+            bottom: 90px; 
+            right: 25px; 
+            width: 340px; 
+            max-width: 90vw; 
+            z-index: 1050; 
+            display: none; 
+            box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.15); 
+            border-radius: 1rem; 
+            overflow: hidden; 
+            background: #fff; 
+            animation: fadeIn 0.3s ease; 
+        }
+        #chat-messages { 
+            height: 260px; 
+            overflow-y: auto; 
+            background-color: #f8f9fa; 
+            padding: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+        }
         .chat-bubble { max-width: 85%; padding: 8px 12px; border-radius: 12px; font-size: 0.85rem; line-height: 1.3;}
         .chat-me { background-color: #712cf9; color: white; border-bottom-right-radius: 2px; align-self: flex-end; }
         .chat-other { background-color: #fff; border: 1px solid #dee2e6; color: #212529; border-bottom-left-radius: 2px; align-self: flex-start; }
@@ -66,16 +188,89 @@
         .note-card a { color: #712cf9; text-decoration: underline; font-weight: 500; }
         .note-card a:hover { color: #5a23c8; }
 
-        /* Estilos nuevos para Perfiles (Dual Panel) */
-        .hover-perfil { transition: 0.2s; padding: 2px 6px; margin-left: -6px; border-radius: 6px; }
+        /* Estilos para Perfiles (Dual Panel) */
+        .hover-perfil { 
+            transition: 0.2s; 
+            padding: 2px 6px; 
+            margin-left: -6px; 
+            border-radius: 6px; 
+        }
         .hover-perfil:hover { background-color: rgba(113, 44, 249, 0.05); }
         .hover-perfil:hover .text-brand { text-decoration: underline; }
         
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 2000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-        .perfil-card { width: 100%; max-width: 750px; border-radius: 1rem; overflow: hidden; animation: scaleIn 0.2s ease-out; }
+        .modal-overlay { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100vw; 
+            height: 100vh; 
+            background: rgba(0,0,0,0.6); 
+            z-index: 2000; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            backdrop-filter: blur(4px); 
+        }
+        .perfil-card { 
+            width: 100%; 
+            max-width: 750px; 
+            border-radius: 1rem; 
+            overflow: hidden; 
+            animation: scaleIn 0.2s ease-out; 
+            max-height: 90vh; /* Previene que se salga de la pantalla en celulares */
+            overflow-y: auto;
+        }
         @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         .btn-outline-brand { color: #712cf9; border-color: #712cf9; background: white; font-weight: bold;}
         .btn-outline-brand:hover { background: #712cf9; color: white; }
+
+        /* ========================================================
+           DISEÑO MÓVIL ESTILO APP (Bottom Navigation Bar)
+           ======================================================== */
+        @media (max-width: 991.98px) {
+            body { 
+                padding-bottom: 80px; /* Deja espacio para que la barra inferior no tape el contenido */
+            }
+            
+            /* Ocultar por defecto los paneles laterales en móviles, se mostrará el Feed por defecto */
+            #col-canales, #col-paneles { display: none; }
+            
+            /* Barra de Navegación Inferior (Visible solo en celulares) */
+            #mobile-bottom-nav {
+                position: fixed; 
+                bottom: 0; 
+                left: 0; 
+                width: 100%; 
+                background: white; 
+                border-top: 1px solid #dee2e6;
+                display: flex; 
+                justify-content: space-around; 
+                align-items: center;
+                z-index: 1040; 
+                height: 65px;
+                box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+            }
+            .nav-btn {
+                background: transparent; 
+                border: none; 
+                color: #adb5bd; 
+                display: flex; 
+                flex-direction: column; 
+                align-items: center; 
+                justify-content: center;
+                width: 100%; 
+                height: 100%; 
+                transition: 0.2s;
+            }
+            .nav-btn i { font-size: 1.3rem; margin-bottom: 4px; transition: 0.2s; }
+            .nav-btn span { font-size: 0.65rem; font-weight: 700; transition: 0.2s; }
+            .nav-btn.active { color: #712cf9; }
+            .nav-btn.active i { transform: scale(1.15); }
+            
+            /* Ajuste del Chat Flotante en Móviles para que no choque con la barra */
+            #btn-toggle-chat { bottom: 85px !important; }
+            #chat-floating-panel { bottom: 85px !important; max-height: calc(100vh - 100px); }
+        }
     </style>
 </head>
 <body>
@@ -98,7 +293,7 @@
                     </button>
                 </div>
                 <div id="logged-in-view" class="d-none align-items-center justify-content-between">
-                    <div class="d-flex align-items-center gap-2 text-truncate hover-perfil cursor-pointer" onclick="abrirPerfil(usuarioUid, usuarioActual, avatarUrlActual)" title="Ver mi perfil" style="cursor: pointer;">
+                    <div class="d-flex align-items-center gap-2 text-truncate hover-perfil cursor-pointer" onclick="abrirPerfil(usuarioUid, usuarioActual, avatarUrlActual)" title="Ver mi perfil">
                         <img id="user-avatar" src="" class="rounded-circle border" width="32" height="32" style="object-fit: cover;">
                         <span id="user-name" class="small fw-bold text-dark text-truncate"></span>
                     </div>
@@ -110,12 +305,12 @@
         </div>
     </header>
 
-    <!-- CONTENEDOR PRINCIPAL -->
+    <!-- CONTENEDOR PRINCIPAL: GESTIÓN DE COLUMNAS -->
     <div class="main-content-wrapper">
         <div class="row g-4">
             
-            <!-- COLUMNA 1: SIDEBAR IZQUIERDA -->
-            <div class="col-lg-3">
+            <!-- COLUMNA 1: SIDEBAR IZQUIERDA (Canales) -->
+            <div class="col-lg-3" id="col-canales">
                 <div class="card card-custom border-0 shadow-sm mb-4">
                     <div class="card-header bg-white border-bottom fw-bold text-dark py-3 d-flex justify-content-between align-items-center">
                         <span><i class="fas fa-folder-open me-2 text-brand"></i> Investigaciones</span>
@@ -125,7 +320,9 @@
                     </div>
                     <div class="card-body p-3">
                         <div class="text-uppercase small text-muted fw-bold mb-2" style="font-size: 0.7rem; letter-spacing: 0.5px;">Mis Canales</div>
-                        <div id="lista-investigaciones" class="mb-3"><div class="text-muted small fst-italic text-center py-2">Cargando canales...</div></div>
+                        <div id="lista-investigaciones" class="mb-3">
+                            <div class="text-muted small fst-italic text-center py-2">Cargando canales...</div>
+                        </div>
                         <hr class="border-secondary opacity-10 my-3">
                         <button class="btn btn-light btn-sm w-100 fw-bold shadow-sm d-flex justify-content-center align-items-center gap-2 border text-secondary" onclick="crearNuevaInvestigacion()">
                             <i class="fas fa-plus"></i> Crear investigación
@@ -134,10 +331,12 @@
                 </div>
             </div>
 
-            <!-- COLUMNA 2: FEED CENTRAL -->
-            <div class="col-lg-5">
+            <!-- COLUMNA 2: FEED CENTRAL (Muro de Publicaciones) -->
+            <div class="col-lg-5" id="col-feed">
                 <div class="card card-custom mb-4 border-0 shadow-sm" style="border-top: 4px solid #712cf9 !important;">
-                    <div class="card-header bg-white border-bottom fw-bold text-dark py-3" id="titulo-panel-edicion"><i class="fas fa-pen me-1 text-brand"></i> Nueva Publicación</div>
+                    <div class="card-header bg-white border-bottom fw-bold text-dark py-3" id="titulo-panel-edicion">
+                        <i class="fas fa-pen me-1 text-brand"></i> Nueva Publicación
+                    </div>
                     <div class="card-body">
                         <div class="btn-group btn-group-sm mb-2 w-100 shadow-sm" role="group">
                             <button type="button" class="btn btn-outline-secondary" onclick="insertarFormato('bold')"><i class="fas fa-bold"></i></button>
@@ -146,35 +345,62 @@
                             <button type="button" class="btn btn-outline-secondary" onclick="insertarFormato('list')"><i class="fas fa-list-ul"></i></button>
                             <button type="button" class="btn btn-outline-secondary" onclick="insertarFormato('link')"><i class="fas fa-link"></i></button>
                         </div>
+                        
                         <div id="editor-nota" class="editor-custom mb-2" contenteditable="true" placeholder="Redacta un hallazgo o apunte..."></div>
-                        <div id="preview-container"><img id="preview-img" src="" alt="Vista previa"><button class="btn btn-danger btn-sm btn-remove-img" onclick="quitarImagen()"><i class="fas fa-times"></i></button></div>
+                        
+                        <div id="preview-container">
+                            <img id="preview-img" src="" alt="Vista previa">
+                            <button class="btn btn-danger btn-sm btn-remove-img" onclick="quitarImagen()"><i class="fas fa-times"></i></button>
+                        </div>
+                        
                         <div class="d-flex justify-content-between align-items-center mt-3">
                             <input type="file" id="input-foto" accept="image/*" style="display: none;" onchange="cargarImagen(event)">
-                            <button class="btn btn-sm btn-light border shadow-sm" type="button" onclick="document.getElementById('input-foto').click()"><i class="fas fa-camera me-1 text-muted"></i> Foto</button>
+                            <button class="btn btn-sm btn-light border shadow-sm" type="button" onclick="document.getElementById('input-foto').click()">
+                                <i class="fas fa-camera me-1 text-muted"></i> Foto
+                            </button>
                             <div>
                                 <button id="btn-cancelar-edicion" class="btn btn-sm btn-secondary d-none me-1" type="button" onclick="cancelarEdicion()">Cancelar</button>
-                                <button id="btn-publicar" class="btn btn-brand px-4 shadow-sm fw-bold" type="button" onclick="publicarNota()">Publicar <i class="fas fa-paper-plane ms-1"></i></button>
+                                <button id="btn-publicar" class="btn btn-brand px-4 shadow-sm fw-bold" type="button" onclick="publicarNota()">
+                                    Publicar <i class="fas fa-paper-plane ms-1"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div id="feed-notas"><div class="text-center text-muted mt-5" id="cargando-notas"><i class="fas fa-spinner fa-spin fa-2x mb-2"></i><br>Cargando publicaciones...</div></div>
+                <div id="feed-notas">
+                    <div class="text-center text-muted mt-5" id="cargando-notas">
+                        <i class="fas fa-spinner fa-spin fa-2x mb-2"></i><br>Cargando publicaciones...
+                    </div>
+                </div>
             </div>
 
-            <!-- COLUMNA 3: PANELES DERECHOS -->
-            <div class="col-lg-4">
+            <!-- COLUMNA 3: PANELES DERECHOS (Sala Voz y Bibliografía) -->
+            <div class="col-lg-4" id="col-paneles">
                 <div class="card card-custom border-0 shadow-sm mb-4" style="border-top: 4px solid #198754 !important;">
                     <div class="card-header bg-white border-bottom fw-bold text-dark py-3 d-flex justify-content-between align-items-center">
-                        <span><i class="fas fa-headset me-2 text-success"></i> Sala de Voz</span><span id="estado-voz" class="badge bg-secondary" style="font-size: 0.6rem;">DESCONECTADO</span>
+                        <span><i class="fas fa-headset me-2 text-success"></i> Sala de Voz</span>
+                        <span id="estado-voz" class="badge bg-secondary" style="font-size: 0.6rem;">DESCONECTADO</span>
                     </div>
                     <div class="card-body p-3">
-                        <div id="lista-usuarios-voz" class="mb-3 min-vh-25"><div class="text-muted small fst-italic text-center py-2" id="mensaje-vacio-voz">Nadie en la sala</div></div>
+                        <div id="lista-usuarios-voz" class="mb-3 min-vh-25">
+                            <div class="text-muted small fst-italic text-center py-2" id="mensaje-vacio-voz">Nadie en la sala</div>
+                        </div>
+                        
                         <div id="audio-elements" style="display: none;"></div>
-                        <div id="controles-voz" class="mt-2"><button class="btn btn-success btn-sm w-100 fw-bold shadow-sm" onclick="conectarVoz()"><i class="fas fa-phone-alt me-1"></i> Conectarse a Voz</button></div>
+                        
+                        <div id="controles-voz" class="mt-2">
+                            <button class="btn btn-success btn-sm w-100 fw-bold shadow-sm" onclick="conectarVoz()">
+                                <i class="fas fa-phone-alt me-1"></i> Conectarse a Voz
+                            </button>
+                        </div>
                         <div class="d-none mt-2" id="controles-activo-voz">
                             <div class="d-flex gap-2">
-                                <button id="btn-mute" class="btn btn-light border btn-sm flex-fill fw-bold shadow-sm text-dark" onclick="toggleMute()"><i class="fas fa-microphone"></i></button>
-                                <button class="btn btn-danger btn-sm flex-fill fw-bold shadow-sm" onclick="desconectarVoz()"><i class="fas fa-phone-slash"></i> Salir</button>
+                                <button id="btn-mute" class="btn btn-light border btn-sm flex-fill fw-bold shadow-sm text-dark" onclick="toggleMute()">
+                                    <i class="fas fa-microphone"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm flex-fill fw-bold shadow-sm" onclick="desconectarVoz()">
+                                    <i class="fas fa-phone-slash"></i> Salir
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -183,24 +409,51 @@
                 <div class="card card-custom mb-4 border-0 shadow-sm">
                     <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3">
                         <span class="fw-bold text-dark"><i class="fas fa-bookmark me-1 text-brand"></i> Bibliografía</span>
-                        <button class="btn btn-sm btn-light border text-brand rounded-circle" type="button" onclick="agregarBibliografia()"><i class="fas fa-plus"></i></button>
+                        <button class="btn btn-sm btn-light border text-brand rounded-circle" type="button" onclick="agregarBibliografia()">
+                            <i class="fas fa-plus"></i>
+                        </button>
                     </div>
-                    <div class="card-body p-0 px-3"><ul class="list-group list-group-flush" id="lista-biblio"></ul></div>
+                    <div class="card-body p-0 px-3">
+                        <ul class="list-group list-group-flush" id="lista-biblio"></ul>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- MENÚ DE NAVEGACIÓN INFERIOR (Solo visible en Celulares) -->
+<div id="mobile-bottom-nav" class="d-lg-none">
+    <button class="nav-btn" onclick="switchMobileTab('col-canales', this)">
+        <i class="fas fa-hashtag"></i>
+        <span>Canales</span>
+    </button>
+    <button class="nav-btn active" onclick="switchMobileTab('col-feed', this)">
+        <i class="fas fa-stream"></i>
+        <span>Muro</span>
+    </button>
+    <button class="nav-btn" onclick="switchMobileTab('col-paneles', this)">
+        <i class="fas fa-headset"></i>
+        <span>Sala & Más</span>
+    </button>
+</div>
+
 <!-- WIDGET DE CHAT FLOTANTE -->
-<button id="btn-toggle-chat" class="btn btn-brand rounded-circle shadow-lg position-fixed bottom-0 end-0 m-4 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; z-index: 1050;" onclick="toggleChat()"><i class="fas fa-comments fa-lg"></i></button>
+<button id="btn-toggle-chat" class="btn btn-brand rounded-circle shadow-lg position-fixed bottom-0 end-0 m-4 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; z-index: 1050;" onclick="toggleChat()">
+    <i class="fas fa-comments fa-lg"></i>
+</button>
 <div id="chat-floating-panel" class="card border-0 shadow-lg">
-    <div class="card-header bg-brand text-white py-2 d-flex justify-content-between align-items-center"><span class="fw-bold small"><i class="fas fa-comments me-1"></i> Chat del Equipo</span><button class="btn btn-sm text-white p-0" onclick="toggleChat()"><i class="fas fa-times"></i></button></div>
+    <div class="card-header bg-brand text-white py-2 d-flex justify-content-between align-items-center">
+        <span class="fw-bold small"><i class="fas fa-comments me-1"></i> Chat del Equipo</span>
+        <button class="btn btn-sm text-white p-0" onclick="toggleChat()"><i class="fas fa-times"></i></button>
+    </div>
     <div id="chat-messages"></div>
     <div class="card-footer bg-white border-top p-2">
         <div class="input-group input-group-sm">
             <input type="text" id="chat-input" class="form-control" placeholder="Escribe un mensaje..." onkeypress="manejarEnterChat(event)">
-            <button class="btn btn-brand" type="button" onclick="enviarMensaje()"><i class="fas fa-paper-plane"></i></button>
+            <button class="btn btn-brand" type="button" onclick="enviarMensaje()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
         </div>
     </div>
 </div>
@@ -240,7 +493,9 @@
 
                 <!-- PANEL DERECHO: Última Publicación -->
                 <div class="col-md-7 p-4" style="background-color: #f8f9fa;">
-                    <h6 class="fw-bold text-muted mb-3 pb-2 border-bottom" style="font-size: 0.85rem;"><i class="fas fa-history me-1"></i> Última publicación en General</h6>
+                    <h6 class="fw-bold text-muted mb-3 pb-2 border-bottom" style="font-size: 0.85rem;">
+                        <i class="fas fa-history me-1"></i> Última publicación en General
+                    </h6>
                     <div id="perfil-latest-post">
                         <!-- El post dinámico irá aquí -->
                     </div>
@@ -252,35 +507,141 @@
 
 <script>
     // ==========================================
+    // SISTEMA DE NAVEGACIÓN MÓVIL (TABS)
+    // ==========================================
+    function switchMobileTab(targetId, btnElement) {
+        if (window.innerWidth >= 992) return; // Si es PC, no hacer nada
+        
+        // Ocultar todas las columnas
+        document.getElementById('col-canales').style.display = 'none';
+        document.getElementById('col-feed').style.display = 'none';
+        document.getElementById('col-paneles').style.display = 'none';
+        
+        // Mostrar la columna seleccionada
+        document.getElementById(targetId).style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        // Actualizar el color del botón activo
+        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+        btnElement.classList.add('active');
+    }
+
+    // Restaurar vista de PC si se redimensiona la pantalla
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 992) {
+            document.getElementById('col-canales').style.display = 'block';
+            document.getElementById('col-feed').style.display = 'block';
+            document.getElementById('col-paneles').style.display = 'block';
+        } else {
+            // Asegurarnos de que en móvil solo se vea uno (Forzamos al Muro si hay conflicto)
+            let visibles = 0;
+            ['col-canales', 'col-feed', 'col-paneles'].forEach(id => {
+                if (document.getElementById(id).style.display === 'block') visibles++;
+            });
+            if (visibles > 1 || visibles === 0) {
+                switchMobileTab('col-feed', document.querySelectorAll('.nav-btn')[1]);
+            }
+        }
+    });
+
+    // ==========================================
     // CONFIGURACIÓN DE FIREBASE Y AUTH
     // ==========================================
-    const firebaseConfig = { apiKey: "AIzaSyBlz5QoMwyp5oEJOXbocwFYuypxiIa-udI", authDomain: "tesis-b4554.firebaseapp.com", projectId: "tesis-b4554", storageBucket: "tesis-b4554.firebasestorage.app", messagingSenderId: "145791282196", appId: "1:145791282196:web:a73cecae9c93100371cb01", measurementId: "G-VK5VEPFD9R" };
+    const firebaseConfig = { 
+        apiKey: "AIzaSyBlz5QoMwyp5oEJOXbocwFYuypxiIa-udI", 
+        authDomain: "tesis-b4554.firebaseapp.com", 
+        projectId: "tesis-b4554", 
+        storageBucket: "tesis-b4554.firebasestorage.app", 
+        messagingSenderId: "145791282196", 
+        appId: "1:145791282196:web:a73cecae9c93100371cb01", 
+        measurementId: "G-VK5VEPFD9R" 
+    };
 
-    let db, auth, googleProvider, usuarioActual = "Invitado_" + Math.floor(Math.random() * 1000), usuarioUid = null, avatarUrlActual = "";
-    let voiceSessionId = localStorage.getItem('unp_voice_session_id'); if (!voiceSessionId) { voiceSessionId = 'vsession_' + Math.random().toString(36).substring(2, 10); localStorage.setItem('unp_voice_session_id', voiceSessionId); }
-    const urlParams = new URLSearchParams(window.location.search); let currentInvId = urlParams.get('inv') || 'general-unp';
+    let db, auth, googleProvider;
+    let usuarioActual = "Invitado_" + Math.floor(Math.random() * 1000);
+    let usuarioUid = null;
+    let avatarUrlActual = "";
+    let voiceSessionId = localStorage.getItem('unp_voice_session_id'); 
+    
+    if (!voiceSessionId) { 
+        voiceSessionId = 'vsession_' + Math.random().toString(36).substring(2, 10); 
+        localStorage.setItem('unp_voice_session_id', voiceSessionId); 
+    }
+    
+    const urlParams = new URLSearchParams(window.location.search); 
+    let currentInvId = urlParams.get('inv') || 'general-unp';
 
-    try { firebase.initializeApp(firebaseConfig); db = firebase.firestore(); auth = firebase.auth(); googleProvider = new firebase.auth.GoogleAuthProvider(); auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); } catch (e) { console.error("Error Firebase", e); }
+    try { 
+        firebase.initializeApp(firebaseConfig); 
+        db = firebase.firestore(); 
+        auth = firebase.auth(); 
+        googleProvider = new firebase.auth.GoogleAuthProvider(); 
+        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); 
+    } catch (e) { 
+        console.error("Error Firebase", e); 
+    }
 
     // --- GOOGLE SIGN-IN ---
     function iniciarSesionGoogle() {
-        auth.signInWithPopup(googleProvider).then((r) => manejarUsuarioLogueado(r.user)).catch((err) => {
-            if (err.code === 'auth/popup-blocked' || err.code === 'auth/cancelled-popup-request') auth.signInWithRedirect(googleProvider).catch(e => alert("Error: " + e.message)); else alert("Error: " + err.message);
+        auth.signInWithPopup(googleProvider).then((r) => {
+            manejarUsuarioLogueado(r.user);
+        }).catch((err) => {
+            if (err.code === 'auth/popup-blocked' || err.code === 'auth/cancelled-popup-request') {
+                auth.signInWithRedirect(googleProvider).catch(e => alert("Error: " + e.message)); 
+            } else {
+                alert("Error: " + err.message);
+            }
         });
     }
-    function cerrarSesion() { desconectarVoz(); auth.signOut().then(() => window.location.reload()).catch(() => window.location.reload()); }
-    auth.getRedirectResult().then((r) => { if (r && r.user) manejarUsuarioLogueado(r.user); }).catch(console.error);
+
+    function cerrarSesion() { 
+        desconectarVoz(); 
+        auth.signOut().then(() => {
+            window.location.reload();
+        }).catch(() => {
+            window.location.reload();
+        }); 
+    }
+
+    auth.getRedirectResult().then((r) => { 
+        if (r && r.user) manejarUsuarioLogueado(r.user); 
+    }).catch(console.error);
+    
     auth.onAuthStateChanged(async (user) => {
-        if (user) manejarUsuarioLogueado(user); else { usuarioActual = "Invitado_" + Math.floor(Math.random() * 1000); usuarioUid = null; document.getElementById('logged-in-view').classList.replace('d-flex', 'd-none'); document.getElementById('logged-out-view').classList.remove('d-none'); cargarListaInvestigaciones(null); }
+        if (user) {
+            manejarUsuarioLogueado(user); 
+        } else { 
+            usuarioActual = "Invitado_" + Math.floor(Math.random() * 1000); 
+            usuarioUid = null; 
+            document.getElementById('logged-in-view').classList.replace('d-flex', 'd-none'); 
+            document.getElementById('logged-out-view').classList.remove('d-none'); 
+            cargarListaInvestigaciones(null); 
+        }
         inicializarCanalInvestigacion();
     });
 
     async function manejarUsuarioLogueado(user) {
-        usuarioUid = user.uid; usuarioActual = user.displayName || "Investigador"; avatarUrlActual = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(usuarioActual)}`;
-        try { const doc = await db.collection('users').doc(usuarioUid).get(); if (doc.exists) { if (doc.data().foto) avatarUrlActual = doc.data().foto; if (doc.data().nombre) usuarioActual = doc.data().nombre; } } catch(e) {}
-        document.getElementById('user-avatar').src = avatarUrlActual; document.getElementById('user-name').innerText = usuarioActual;
-        document.getElementById('logged-in-view').classList.replace('d-none', 'd-flex'); document.getElementById('logged-out-view').classList.add('d-none');
-        await registrarAccesoInvestigacion(user.uid, currentInvId, usuarioActual, avatarUrlActual); cargarListaInvestigaciones(user.uid);
+        usuarioUid = user.uid; 
+        usuarioActual = user.displayName || "Investigador"; 
+        avatarUrlActual = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(usuarioActual)}`;
+        
+        try { 
+            const doc = await db.collection('users').doc(usuarioUid).get(); 
+            if (doc.exists) { 
+                if (doc.data().foto) avatarUrlActual = doc.data().foto; 
+                if (doc.data().nombre) usuarioActual = doc.data().nombre; 
+            } 
+        } catch(e) {
+            console.error(e);
+        }
+        
+        document.getElementById('user-avatar').src = avatarUrlActual; 
+        document.getElementById('user-name').innerText = usuarioActual;
+        document.getElementById('logged-in-view').classList.replace('d-none', 'd-flex'); 
+        document.getElementById('logged-out-view').classList.add('d-none');
+        
+        await registrarAccesoInvestigacion(user.uid, currentInvId, usuarioActual, avatarUrlActual); 
+        cargarListaInvestigaciones(user.uid);
     }
 
     // ==========================================
@@ -290,181 +651,685 @@
 
     async function abrirPerfil(uid, fallbackNombre = '', fallbackFoto = '') {
         document.getElementById('perfil-modal').classList.remove('d-none');
-        document.getElementById('perfil-bio-display').classList.remove('d-none'); document.getElementById('perfil-bio-edit').classList.add('d-none');
-        document.getElementById('btn-edit-foto').classList.add('d-none'); document.getElementById('btn-edit-perfil').classList.add('d-none'); document.getElementById('btn-save-perfil').classList.add('d-none');
+        document.getElementById('perfil-bio-display').classList.remove('d-none'); 
+        document.getElementById('perfil-bio-edit').classList.add('d-none');
+        document.getElementById('btn-edit-foto').classList.add('d-none'); 
+        document.getElementById('btn-edit-perfil').classList.add('d-none'); 
+        document.getElementById('btn-save-perfil').classList.add('d-none');
         document.getElementById('perfil-latest-post').innerHTML = '<div class="text-center text-muted small mt-4"><i class="fas fa-spinner fa-spin mb-2"></i><br>Buscando publicación...</div>';
         perfilEditandoBase64 = null;
 
-        let nFinal = fallbackNombre || 'Anónimo', fFinal = fallbackFoto || `https://ui-avatars.com/api/?name=${encodeURIComponent(nFinal)}`, bFinal = "Sin información.", esMio = false;
+        let nFinal = fallbackNombre || 'Anónimo';
+        let fFinal = fallbackFoto || `https://ui-avatars.com/api/?name=${encodeURIComponent(nFinal)}`;
+        let bFinal = "Sin información.";
+        let esMio = false;
 
         if (uid && db) {
             try {
-                // Obtener datos del perfil
+                // Obtener datos del perfil de la base de datos
                 const doc = await db.collection('users').doc(uid).get();
-                if (doc.exists) { const d = doc.data(); if(d.nombre) nFinal=d.nombre; if(d.foto) fFinal=d.foto; if(d.bio) bFinal=d.bio; }
+                if (doc.exists) { 
+                    const d = doc.data(); 
+                    if(d.nombre) nFinal = d.nombre; 
+                    if(d.foto) fFinal = d.foto; 
+                    if(d.bio) bFinal = d.bio; 
+                }
                 esMio = (uid === usuarioUid);
 
-                // Obtener última publicación en 'general-unp' (búsqueda local sin requerir índice compuesto en Firebase)
+                // Buscar la última publicación en el canal General ('general-unp')
                 let latestHTML = '<div class="text-center text-muted small mt-5 pt-3"><i class="fas fa-comment-slash fa-2x mb-3 opacity-25"></i><br>No hay publicaciones recientes en General.</div>';
                 const pSnap = await db.collection('investigaciones').doc('general-unp').collection('notas').where('autorUid', '==', uid).get();
-                let lastNota = null; let maxT = 0;
-                pSnap.forEach(postDoc => { const d = postDoc.data(); const m = d.timestamp ? d.timestamp.toMillis() : 0; if (m > maxT) { maxT = m; lastNota = d; } });
+                
+                let lastNota = null; 
+                let maxT = 0;
+                
+                pSnap.forEach(postDoc => { 
+                    const d = postDoc.data(); 
+                    const m = d.timestamp ? d.timestamp.toMillis() : 0; 
+                    if (m > maxT) { 
+                        maxT = m; 
+                        lastNota = d; 
+                    } 
+                });
                 
                 if (lastNota) {
                     let imH = lastNota.imagen ? `<img src="${lastNota.imagen}" class="img-fluid rounded mt-2 border w-100 shadow-sm" style="max-height: 180px; object-fit: cover;">` : '';
                     latestHTML = `
                         <div class="card bg-white p-1 border-0 shadow-sm" style="border-left: 4px solid #712cf9 !important;">
                             <div class="card-body p-3">
-                                <div class="badge bg-light text-secondary border fw-normal small mb-2"><i class="fas fa-clock me-1"></i> <span class="tiempo-relativo" data-timestamp="${maxT}">${tiempoRelativo(maxT)}</span></div>
+                                <div class="badge bg-light text-secondary border fw-normal small mb-2">
+                                    <i class="fas fa-clock me-1"></i> <span class="tiempo-relativo" data-timestamp="${maxT}">${tiempoRelativo(maxT)}</span>
+                                </div>
                                 <div class="text-dark" style="font-size: 0.85rem; line-height: 1.5; max-height: 220px; overflow-y: auto; word-break: break-word;">${lastNota.texto}</div>
                                 ${imH}
                             </div>
                         </div>`;
                 }
                 document.getElementById('perfil-latest-post').innerHTML = latestHTML;
-            } catch(e) { document.getElementById('perfil-latest-post').innerHTML = '<div class="text-danger small mt-4">Error al cargar la publicación.</div>'; }
+            } catch(e) { 
+                document.getElementById('perfil-latest-post').innerHTML = '<div class="text-danger small mt-4">Error al cargar la publicación.</div>'; 
+            }
         } else {
             document.getElementById('perfil-latest-post').innerHTML = '<div class="text-center text-muted small mt-5 pt-3"><i class="fas fa-user-secret fa-2x mb-3 opacity-25"></i><br>Perfil de invitado no guardado.</div>';
         }
 
-        document.getElementById('perfil-foto').src = fFinal; document.getElementById('perfil-nombre').innerText = nFinal; document.getElementById('perfil-bio-display').innerHTML = bFinal.replace(/\n/g, '<br>');
-        if (esMio) { document.getElementById('perfil-actions').classList.remove('d-none'); document.getElementById('btn-edit-perfil').classList.remove('d-none'); document.getElementById('perfil-bio-edit').value = bFinal !== "Sin información." ? bFinal : ""; } 
-        else { document.getElementById('perfil-actions').classList.add('d-none'); }
+        document.getElementById('perfil-foto').src = fFinal; 
+        document.getElementById('perfil-nombre').innerText = nFinal; 
+        document.getElementById('perfil-bio-display').innerHTML = bFinal.replace(/\n/g, '<br>');
+        
+        if (esMio) { 
+            document.getElementById('perfil-actions').classList.remove('d-none'); 
+            document.getElementById('btn-edit-perfil').classList.remove('d-none'); 
+            document.getElementById('perfil-bio-edit').value = bFinal !== "Sin información." ? bFinal : ""; 
+        } else { 
+            document.getElementById('perfil-actions').classList.add('d-none'); 
+        }
     }
 
-    function cerrarPerfil() { document.getElementById('perfil-modal').classList.add('d-none'); }
-    function habilitarEdicionPerfil() { document.getElementById('perfil-bio-display').classList.add('d-none'); document.getElementById('perfil-bio-edit').classList.remove('d-none'); document.getElementById('btn-edit-foto').classList.remove('d-none'); document.getElementById('btn-edit-perfil').classList.add('d-none'); document.getElementById('btn-save-perfil').classList.remove('d-none'); }
-    function subirFotoPerfil(event) {
-        const file = event.target.files[0]; if (!file) return; const reader = new FileReader();
-        reader.onload = function(e) {
-            const img = new Image(); img.onload = function() {
-                const cv = document.createElement('canvas'); const sz = 300; cv.width = sz; cv.height = sz; const ctx = cv.getContext('2d');
-                const sc = Math.max(sz / img.width, sz / img.height); const x = (sz - img.width * sc) / 2; const y = (sz - img.height * sc) / 2;
-                ctx.drawImage(img, x, y, img.width * sc, img.height * sc); perfilEditandoBase64 = cv.toDataURL('image/jpeg', 0.85); document.getElementById('perfil-foto').src = perfilEditandoBase64;
-            }; img.src = e.target.result;
-        }; reader.readAsDataURL(file);
+    function cerrarPerfil() { 
+        document.getElementById('perfil-modal').classList.add('d-none'); 
     }
+
+    function habilitarEdicionPerfil() { 
+        document.getElementById('perfil-bio-display').classList.add('d-none'); 
+        document.getElementById('perfil-bio-edit').classList.remove('d-none'); 
+        document.getElementById('btn-edit-foto').classList.remove('d-none'); 
+        document.getElementById('btn-edit-perfil').classList.add('d-none'); 
+        document.getElementById('btn-save-perfil').classList.remove('d-none'); 
+    }
+
+    function subirFotoPerfil(event) {
+        const file = event.target.files[0]; 
+        if (!file) return; 
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            const img = new Image(); 
+            img.onload = function() {
+                const cv = document.createElement('canvas'); 
+                const sz = 300; 
+                cv.width = sz; 
+                cv.height = sz; 
+                const ctx = cv.getContext('2d');
+                const sc = Math.max(sz / img.width, sz / img.height); 
+                const x = (sz - img.width * sc) / 2; 
+                const y = (sz - img.height * sc) / 2;
+                ctx.drawImage(img, x, y, img.width * sc, img.height * sc); 
+                perfilEditandoBase64 = cv.toDataURL('image/jpeg', 0.85); 
+                document.getElementById('perfil-foto').src = perfilEditandoBase64;
+            }; 
+            img.src = e.target.result;
+        }; 
+        reader.readAsDataURL(file);
+    }
+
     async function guardarPerfil() {
-        const bio = document.getElementById('perfil-bio-edit').value.trim(); const btn = document.getElementById('btn-save-perfil'); btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        const bio = document.getElementById('perfil-bio-edit').value.trim(); 
+        const btn = document.getElementById('btn-save-perfil'); 
+        btn.disabled = true; 
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        
         try {
-            let u = { bio: bio }; if (perfilEditandoBase64) { u.foto = perfilEditandoBase64; avatarUrlActual = perfilEditandoBase64; document.getElementById('user-avatar').src = avatarUrlActual; }
+            let u = { bio: bio }; 
+            if (perfilEditandoBase64) { 
+                u.foto = perfilEditandoBase64; 
+                avatarUrlActual = perfilEditandoBase64; 
+                document.getElementById('user-avatar').src = avatarUrlActual; 
+            }
             await db.collection('users').doc(usuarioUid).update(u);
+            
             document.getElementById('perfil-bio-display').innerHTML = bio.replace(/\n/g, '<br>') || "Sin información.";
-            document.getElementById('perfil-bio-display').classList.remove('d-none'); document.getElementById('perfil-bio-edit').classList.add('d-none'); document.getElementById('btn-edit-foto').classList.add('d-none'); document.getElementById('btn-edit-perfil').classList.remove('d-none'); document.getElementById('btn-save-perfil').classList.add('d-none');
-        } catch(e) { alert("Error al guardar."); } finally { btn.disabled = false; btn.innerHTML = 'Guardar Cambios <i class="fas fa-check ms-1"></i>'; }
+            document.getElementById('perfil-bio-display').classList.remove('d-none'); 
+            document.getElementById('perfil-bio-edit').classList.add('d-none'); 
+            document.getElementById('btn-edit-foto').classList.add('d-none'); 
+            document.getElementById('btn-edit-perfil').classList.remove('d-none'); 
+            document.getElementById('btn-save-perfil').classList.add('d-none');
+        } catch(e) { 
+            alert("Error al guardar."); 
+        } finally { 
+            btn.disabled = false; 
+            btn.innerHTML = 'Guardar Cambios <i class="fas fa-check ms-1"></i>'; 
+        }
     }
 
     // ==========================================
-    // CANALES, TITULOS Y NOTAS (Voz, Post, etc)
+    // CANALES, TITULOS Y NOTAS
     // ==========================================
     async function registrarAccesoInvestigacion(uid, invId, nombre, foto) {
         if (!uid || !db) return;
-        try { const uR = db.collection('users').doc(uid); const d = await uR.get(); let dt = {};
-            if (d.exists) { let is = d.data().investigaciones || ['general-unp']; if (!is.includes(invId)) { is.push(invId); dt.investigaciones = is; } if (!d.data().foto) dt.foto = foto; if (!d.data().nombre) dt.nombre = nombre; } 
-            else { dt = { investigaciones: ['general-unp', invId], nombre: nombre, foto: foto, bio: "" }; }
+        try { 
+            const uR = db.collection('users').doc(uid); 
+            const d = await uR.get(); 
+            let dt = {};
+            
+            if (d.exists) { 
+                let is = d.data().investigaciones || ['general-unp']; 
+                if (!is.includes(invId)) { 
+                    is.push(invId); 
+                    dt.investigaciones = is; 
+                } 
+                if (!d.data().foto) dt.foto = foto; 
+                if (!d.data().nombre) dt.nombre = nombre; 
+            } else { 
+                dt = { investigaciones: ['general-unp', invId], nombre: nombre, foto: foto, bio: "" }; 
+            }
             if (Object.keys(dt).length > 0) await uR.set(dt, { merge: true });
         } catch(e) {}
     }
-    async function crearNuevaInvestigacion() {
-        if (!usuarioUid) return alert("Inicia sesión para crear canales."); const t = prompt("Título:"); if (!t) return; const s = prompt("Subtítulo:") || "";
-        try { const n = await db.collection('investigaciones').add({ titulo: t.trim(), subtitulo: s.trim(), creadorUid: usuarioUid, timestamp: firebase.firestore.FieldValue.serverTimestamp() }); await registrarAccesoInvestigacion(usuarioUid, n.id, usuarioActual, avatarUrlActual); window.location.href = window.location.pathname + '?inv=' + n.id; } catch (e) { alert("Error: " + e.message); }
-    }
-    function copiarEnlaceInvitacion() { navigator.clipboard.writeText(window.location.href).then(() => alert("¡Copiado!")); }
-    function cargarListaInvestigaciones(uid) {
-        const c = document.getElementById('lista-investigaciones'); let i = ['general-unp'];
-        if (uid) { db.collection('users').doc(uid).onSnapshot(async (d) => { if (d.exists && d.data().investigaciones) { i = d.data().investigaciones; if (!i.includes('general-unp')) i.unshift('general-unp'); } await rndLinks(i, c); }); } else { rndLinks(i, c); }
-    }
-    async function rndLinks(is, c) {
-        c.innerHTML = ''; for (let id of is) { let tm = "Investigación General"; if (id !== 'general-unp') { const d = await db.collection('investigaciones').doc(id).get(); if (d.exists) tm = d.data().titulo; else continue; }
-        const aC = (id === currentInvId) ? 'nav-item-active' : ''; c.innerHTML += `<a href="?inv=${id}" class="nav-item-channel ${aC} shadow-sm"><span class="text-truncate"><i class="fas fa-hashtag me-2"></i>${tm}</span></a>`; }
-    }
-    const eT = document.getElementById('titulo-doc'); const eS = document.getElementById('subtitulo-doc'); const bC = document.getElementById('btn-compartir-inv');
-    function inicializarCanalInvestigacion() {
-        if (currentInvId === 'general-unp') { bC.classList.add('d-none'); eT.innerText = "Dinámica de la morosidad"; eS.innerText = "Y sus determinantes macrofinancieros en la banca múltiple del Perú (2018-2026)"; } else {
-            bC.classList.remove('d-none'); db.collection('investigaciones').doc(currentInvId).onSnapshot((d) => { if (d.exists) { eT.innerText = d.data().titulo; eS.innerText = d.data().subtitulo; } else { eT.innerText = "No encontrada"; } }); }
-        escucharNotasCanal(); escucharBibliografiaCanal();
-    }
-    function guardarTitulos() { if (currentInvId === 'general-unp') return; db.collection("investigaciones").doc(currentInvId).set({ titulo: eT.innerText.trim(), subtitulo: eS.innerText.trim() }, { merge: true }).catch(console.error); }
-    eT.addEventListener('blur', guardarTitulos); eS.addEventListener('blur', guardarTitulos); eT.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } }); eS.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } });
 
-    // --- SISTEMA VOZ ---
+    async function crearNuevaInvestigacion() {
+        if (!usuarioUid) return alert("Inicia sesión para crear canales."); 
+        const t = prompt("Título:"); 
+        if (!t) return; 
+        const s = prompt("Subtítulo:") || "";
+        
+        try { 
+            const n = await db.collection('investigaciones').add({ 
+                titulo: t.trim(), 
+                subtitulo: s.trim(), 
+                creadorUid: usuarioUid, 
+                timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+            }); 
+            await registrarAccesoInvestigacion(usuarioUid, n.id, usuarioActual, avatarUrlActual); 
+            window.location.href = window.location.pathname + '?inv=' + n.id; 
+        } catch (e) { 
+            alert("Error: " + e.message); 
+        }
+    }
+
+    function copiarEnlaceInvitacion() { 
+        navigator.clipboard.writeText(window.location.href).then(() => alert("¡Enlace copiado al portapapeles!")); 
+    }
+
+    function cargarListaInvestigaciones(uid) {
+        const c = document.getElementById('lista-investigaciones'); 
+        let i = ['general-unp'];
+        
+        if (uid) { 
+            db.collection('users').doc(uid).onSnapshot(async (d) => { 
+                if (d.exists && d.data().investigaciones) { 
+                    i = d.data().investigaciones; 
+                    if (!i.includes('general-unp')) i.unshift('general-unp'); 
+                } 
+                await rndLinks(i, c); 
+            }); 
+        } else { 
+            rndLinks(i, c); 
+        }
+    }
+
+    async function rndLinks(is, c) {
+        c.innerHTML = ''; 
+        for (let id of is) { 
+            let tm = "Investigación General"; 
+            if (id !== 'general-unp') { 
+                const d = await db.collection('investigaciones').doc(id).get(); 
+                if (d.exists) tm = d.data().titulo; 
+                else continue; 
+            }
+            const aC = (id === currentInvId) ? 'nav-item-active' : ''; 
+            c.innerHTML += `<a href="?inv=${id}" class="nav-item-channel ${aC} shadow-sm"><span class="text-truncate"><i class="fas fa-hashtag me-2"></i>${tm}</span></a>`; 
+        }
+    }
+
+    const eT = document.getElementById('titulo-doc'); 
+    const eS = document.getElementById('subtitulo-doc'); 
+    const bC = document.getElementById('btn-compartir-inv');
+
+    function inicializarCanalInvestigacion() {
+        if (currentInvId === 'general-unp') { 
+            bC.classList.add('d-none'); 
+            eT.innerText = "Dinámica de la morosidad"; 
+            eS.innerText = "Y sus determinantes macrofinancieros en la banca múltiple del Perú (2018-2026)"; 
+        } else {
+            bC.classList.remove('d-none'); 
+            db.collection('investigaciones').doc(currentInvId).onSnapshot((d) => { 
+                if (d.exists) { 
+                    eT.innerText = d.data().titulo; 
+                    eS.innerText = d.data().subtitulo; 
+                } else { 
+                    eT.innerText = "Investigación no encontrada"; 
+                } 
+            }); 
+        }
+        escucharNotasCanal(); 
+        escucharBibliografiaCanal();
+    }
+
+    function guardarTitulos() { 
+        if (currentInvId === 'general-unp') return; 
+        db.collection("investigaciones").doc(currentInvId).set({ 
+            titulo: eT.innerText.trim(), 
+            subtitulo: eS.innerText.trim() 
+        }, { merge: true }).catch(console.error); 
+    }
+
+    eT.addEventListener('blur', guardarTitulos); 
+    eS.addEventListener('blur', guardarTitulos); 
+    eT.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } }); 
+    eS.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } });
+
+    // --- SISTEMA VOZ ANTI-ECO ESTILO MEET ---
     let localS = null, peer = null, voiceHeart = null, actC = {}, isM = false, aCtx = null;
+    
     async function conectarVoz() {
         try {
-            if (window.AudioContext || window.webkitAudioContext) if (!aCtx) aCtx = new (window.AudioContext || window.webkitAudioContext)(); if (aCtx && aCtx.state === 'suspended') await aCtx.resume();
-            localS = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, googEchoCancellation: true, googAutoGainControl: true, googNoiseSuppression: true, googHighpassFilter: true }, video: false });
-            peer = new Peer(); peer.on('open', (id) => {
+            if (window.AudioContext || window.webkitAudioContext) {
+                if (!aCtx) aCtx = new (window.AudioContext || window.webkitAudioContext)(); 
+                if (aCtx && aCtx.state === 'suspended') await aCtx.resume();
+            }
+            
+            // Filtros de calidad y anti-eco
+            localS = await navigator.mediaDevices.getUserMedia({ 
+                audio: { 
+                    echoCancellation: true, 
+                    noiseSuppression: true, 
+                    autoGainControl: true, 
+                    googEchoCancellation: true, 
+                    googAutoGainControl: true, 
+                    googNoiseSuppression: true, 
+                    googHighpassFilter: true 
+                }, 
+                video: false 
+            });
+            
+            peer = new Peer(); 
+            peer.on('open', (id) => {
                 const vR = db.collection('investigaciones').doc(currentInvId).collection('voice_room').doc(voiceSessionId);
-                vR.set({ nombre: usuarioActual, avatar: avatarUrlActual, peerId: id, lastSeen: Date.now() }).then(() => {
-                    document.getElementById('estado-voz').className = 'badge bg-success'; document.getElementById('estado-voz').innerText = 'EN LÍNEA'; document.getElementById('controles-voz').classList.add('d-none'); document.getElementById('controles-activo-voz').classList.remove('d-none');
-                    if (voiceHeart) clearInterval(voiceHeart); voiceHeart = setInterval(() => { vR.set({ lastSeen: Date.now() }, { merge: true }).catch(()=>{}); }, 10000);
+                vR.set({ 
+                    nombre: usuarioActual, 
+                    avatar: avatarUrlActual, 
+                    peerId: id, 
+                    lastSeen: Date.now() 
+                }).then(() => {
+                    document.getElementById('estado-voz').className = 'badge bg-success'; 
+                    document.getElementById('estado-voz').innerText = 'EN LÍNEA'; 
+                    document.getElementById('controles-voz').classList.add('d-none'); 
+                    document.getElementById('controles-activo-voz').classList.remove('d-none');
+                    
+                    if (voiceHeart) clearInterval(voiceHeart); 
+                    voiceHeart = setInterval(() => { 
+                        vR.set({ lastSeen: Date.now() }, { merge: true }).catch(()=>{}); 
+                    }, 10000);
                 });
             });
-            peer.on('call', (c) => { c.answer(localS); c.on('stream', (rs) => addAudio(c.peer, rs)); c.on('close', () => remAudio(c.peer)); });
-        } catch (e) { alert("Sin micrófono."); }
+            
+            peer.on('call', (c) => { 
+                c.answer(localS); 
+                c.on('stream', (rs) => addAudio(c.peer, rs)); 
+                c.on('close', () => remAudio(c.peer)); 
+            });
+        } catch (e) { 
+            alert("No se pudo acceder al micrófono."); 
+        }
     }
-    document.addEventListener('visibilitychange', async () => { if (!document.hidden) { if (aCtx && aCtx.state === 'suspended') await aCtx.resume(); if (localS) localS.getAudioTracks().forEach(t => { if (!isM) t.enabled = true; }); } });
-    function toggleMute() { if (localS) { isM = !isM; localS.getAudioTracks()[0].enabled = !isM; document.getElementById('btn-mute').innerHTML = isM ? '<i class="fas fa-microphone-slash text-danger"></i>' : '<i class="fas fa-microphone"></i>'; } }
+
+    document.addEventListener('visibilitychange', async () => { 
+        if (!document.hidden) { 
+            if (aCtx && aCtx.state === 'suspended') await aCtx.resume(); 
+            if (localS) localS.getAudioTracks().forEach(t => { if (!isM) t.enabled = true; }); 
+        } 
+    });
+
+    function toggleMute() { 
+        if (localS) { 
+            isM = !isM; 
+            localS.getAudioTracks()[0].enabled = !isM; 
+            document.getElementById('btn-mute').innerHTML = isM ? '<i class="fas fa-microphone-slash text-danger"></i>' : '<i class="fas fa-microphone"></i>'; 
+        } 
+    }
+
     function desconectarVoz() {
-        if (voiceHeart) { clearInterval(voiceHeart); voiceHeart = null; } if (voiceSessionId && db) db.collection('investigaciones').doc(currentInvId).collection('voice_room').doc(voiceSessionId).delete().catch(()=>{});
-        if (peer) { peer.destroy(); peer = null; } if (localS) { localS.getTracks().forEach(t => t.stop()); localS = null; } if (aCtx) { aCtx.close().catch(()=>{}); aCtx = null; }
-        document.getElementById('audio-elements').innerHTML = ''; actC = {}; document.getElementById('estado-voz').className = 'badge bg-secondary'; document.getElementById('estado-voz').innerText = 'DESCONECTADO'; document.getElementById('controles-voz').classList.remove('d-none'); document.getElementById('controles-activo-voz').classList.add('d-none'); if(isM) toggleMute(); 
+        if (voiceHeart) { clearInterval(voiceHeart); voiceHeart = null; } 
+        if (voiceSessionId && db) db.collection('investigaciones').doc(currentInvId).collection('voice_room').doc(voiceSessionId).delete().catch(()=>{});
+        if (peer) { peer.destroy(); peer = null; } 
+        if (localS) { localS.getTracks().forEach(t => t.stop()); localS = null; } 
+        if (aCtx) { aCtx.close().catch(()=>{}); aCtx = null; }
+        
+        document.getElementById('audio-elements').innerHTML = ''; 
+        actC = {}; 
+        
+        document.getElementById('estado-voz').className = 'badge bg-secondary'; 
+        document.getElementById('estado-voz').innerText = 'DESCONECTADO'; 
+        document.getElementById('controles-voz').classList.remove('d-none'); 
+        document.getElementById('controles-activo-voz').classList.add('d-none'); 
+        if(isM) toggleMute(); 
     }
-    function addAudio(p, s) { if (!document.getElementById('audio-'+p)) { const a = document.createElement('audio'); a.id = 'audio-'+p; a.className = 'peer-audio'; a.srcObject = s; a.autoplay = true; a.playsInline = true; a.controls = false; document.getElementById('audio-elements').appendChild(a); } }
-    function remAudio(p) { const a = document.getElementById('audio-'+p); if (a) a.remove(); if (actC[p]) { try { actC[p].close(); } catch(e){} delete actC[p]; } }
+
+    function addAudio(p, s) { 
+        if (!document.getElementById('audio-'+p)) { 
+            const a = document.createElement('audio'); 
+            a.id = 'audio-'+p; 
+            a.className = 'peer-audio'; 
+            a.srcObject = s; 
+            a.autoplay = true; 
+            a.playsInline = true; 
+            a.controls = false; 
+            document.getElementById('audio-elements').appendChild(a); 
+        } 
+    }
+
+    function remAudio(p) { 
+        const a = document.getElementById('audio-'+p); 
+        if (a) a.remove(); 
+        if (actC[p]) { 
+            try { actC[p].close(); } catch(e){} 
+            delete actC[p]; 
+        } 
+    }
+
     if (db) {
         db.collection('investigaciones').doc(currentInvId).collection('voice_room').onSnapshot((s) => {
-            const list = document.getElementById('lista-usuarios-voz'); list.innerHTML = ''; let act = []; let pr = new Set(); const now = Date.now();
+            const list = document.getElementById('lista-usuarios-voz'); 
+            list.innerHTML = ''; 
+            let act = []; 
+            let pr = new Set(); 
+            const now = Date.now();
+            
             s.forEach((d) => {
-                const cD = d.data(); if (!cD.lastSeen || (now - cD.lastSeen > 30000)) { d.ref.delete().catch(()=>{}); return; }
-                if (pr.has(cD.peerId)) return; pr.add(cD.peerId); act.push(cD.peerId);
-                const isMe = peer && cD.peerId === peer.id; const nm = isMe ? `${cD.nombre} (Tú)` : cD.nombre; const col = isMe ? "text-success" : "text-secondary"; const vAv = cD.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(cD.nombre)}&background=random&color=fff`;
-                list.innerHTML += `<div class="voice-user-item mb-2 shadow-sm"><img src="${vAv}" class="rounded-circle me-2 border shadow-sm" width="24" height="24" style="object-fit: cover;"><i class="fas fa-microphone ${col} me-2" style="font-size:0.75rem;"></i><span class="text-dark text-truncate" style="font-weight: 500;">${nm}</span></div>`;
-                if (peer && peer.id && !isMe && !actC[cD.peerId] && peer.id < cD.peerId) { const call = peer.call(cD.peerId, localS); actC[cD.peerId] = call; call.on('stream', (rs) => addAudio(cD.peerId, rs)); call.on('close', () => remAudio(cD.peerId)); }
+                const cD = d.data(); 
+                
+                if (!cD.lastSeen || (now - cD.lastSeen > 30000)) { 
+                    d.ref.delete().catch(()=>{}); 
+                    return; 
+                }
+                if (pr.has(cD.peerId)) return; 
+                
+                pr.add(cD.peerId); 
+                act.push(cD.peerId);
+                
+                const isMe = peer && cD.peerId === peer.id; 
+                const nm = isMe ? `${cD.nombre} (Tú)` : cD.nombre; 
+                const col = isMe ? "text-success" : "text-secondary"; 
+                const vAv = cD.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(cD.nombre)}&background=random&color=fff`;
+                
+                list.innerHTML += `
+                    <div class="voice-user-item mb-2 shadow-sm">
+                        <img src="${vAv}" class="rounded-circle me-2 border shadow-sm" width="24" height="24" style="object-fit: cover;">
+                        <i class="fas fa-microphone ${col} me-2" style="font-size:0.75rem;"></i>
+                        <span class="text-dark text-truncate" style="font-weight: 500;">${nm}</span>
+                    </div>`;
+                
+                if (peer && peer.id && !isMe && !actC[cD.peerId] && peer.id < cD.peerId) { 
+                    const call = peer.call(cD.peerId, localS); 
+                    actC[cD.peerId] = call; 
+                    call.on('stream', (rs) => addAudio(cD.peerId, rs)); 
+                    call.on('close', () => remAudio(cD.peerId)); 
+                }
             });
+            
             if (list.innerHTML === '') list.innerHTML = '<div class="text-muted small fst-italic text-center py-2">Nadie en la sala</div>';
-            document.querySelectorAll('audio.peer-audio').forEach(a => { const pId = a.id.replace('audio-', ''); if (!act.includes(pId)) remAudio(pId); });
+            
+            document.querySelectorAll('audio.peer-audio').forEach(a => { 
+                const pId = a.id.replace('audio-', ''); 
+                if (!act.includes(pId)) remAudio(pId); 
+            });
         });
     }
-    window.addEventListener('beforeunload', () => { if (voiceSessionId && db) db.collection('investigaciones').doc(currentInvId).collection('voice_room').doc(voiceSessionId).delete().catch(()=>{}); });
+    
+    window.addEventListener('beforeunload', () => { 
+        if (voiceSessionId && db) {
+            db.collection('investigaciones').doc(currentInvId).collection('voice_room').doc(voiceSessionId).delete().catch(()=>{}); 
+        }
+    });
 
-    // --- NOTAS Y TIEMPO ---
-    function tiempoRelativo(ms) { const s = Math.floor((Date.now()-ms)/1000); if (s<10) return `hace segundos`; if (s<60) return `hace ${s} seg`; const m = Math.floor(s/60); if (m<60) return `hace ${m} min`; const h = Math.floor(m/60); if (h<24) return `hace ${h} h`; const d = Math.floor(h/24); if (d<30) return `hace ${d} d`; return `hace un mes`; }
-    setInterval(() => { document.querySelectorAll('.tiempo-relativo').forEach(e => { const ms = parseInt(e.getAttribute('data-timestamp')); if(ms) e.innerText = tiempoRelativo(ms); }); }, 30000);
+    // --- NOTAS Y TIEMPO RELATIVO ---
+    function tiempoRelativo(ms) { 
+        const s = Math.floor((Date.now()-ms)/1000); 
+        if (s<10) return `hace unos segundos`; 
+        if (s<60) return `hace ${s} segundos`; 
+        const m = Math.floor(s/60); 
+        if (m<60) return `hace ${m} minuto${m !== 1 ? 's' : ''}`; 
+        const h = Math.floor(m/60); 
+        if (h<24) return `hace ${h} hora${h !== 1 ? 's' : ''}`; 
+        const d = Math.floor(h/24); 
+        if (d<30) return `hace ${d} día${d !== 1 ? 's' : ''}`; 
+        return `hace más de un mes`; 
+    }
+
+    setInterval(() => { 
+        document.querySelectorAll('.tiempo-relativo').forEach(e => { 
+            const ms = parseInt(e.getAttribute('data-timestamp')); 
+            if(ms) e.innerText = tiempoRelativo(ms); 
+        }); 
+    }, 30000);
 
     let imgB64 = null, nData = {}, idEd = null;
-    function cargarImagen(ev) { const f = ev.target.files[0]; if(!f) return; const r = new FileReader(); r.onload=function(e){ const im = new Image(); im.onload=function(){ const cv=document.createElement('canvas'); let w=im.width, h=im.height; if(w>h){if(w>800){h*=800/w; w=800;}}else{if(h>800){w*=800/h; h=800;}} cv.width=w; cv.height=h; cv.getContext('2d').drawImage(im,0,0,w,h); imgB64=cv.toDataURL('image/jpeg',0.7); document.getElementById('preview-img').src=imgB64; document.getElementById('preview-container').style.display='inline-block'; }; im.src=e.target.result; }; r.readAsDataURL(f); }
-    function quitarImagen() { imgB64 = null; document.getElementById('preview-img').src = ""; document.getElementById('preview-container').style.display = 'none'; document.getElementById('input-foto').value = ""; }
-    function publicarNota() {
-        const ed = document.getElementById('editor-nota'); const ht = ed.innerHTML.trim(); const pl = ed.innerText.trim(); if (pl === "" && !imgB64) return alert("Escribe o sube foto.");
-        const btn = document.getElementById('btn-publicar'); btn.disabled = true; const r = db.collection('investigaciones').doc(currentInvId).collection('notas');
-        if (idEd) { r.doc(idEd).update({ texto: ht, imagen: imgB64, editado: true }).then(() => { cancelarEdicion(); btn.disabled = false; }); } 
-        else { r.add({ autor: usuarioActual, autorUid: usuarioUid, autorAvatar: avatarUrlActual, texto: ht, imagen: imgB64, timestamp: firebase.firestore.FieldValue.serverTimestamp() }).then(() => { ed.innerHTML = ""; quitarImagen(); btn.disabled = false; }); }
+    
+    function cargarImagen(ev) { 
+        const f = ev.target.files[0]; 
+        if(!f) return; 
+        const r = new FileReader(); 
+        r.onload = function(e){ 
+            const im = new Image(); 
+            im.onload = function(){ 
+                const cv = document.createElement('canvas'); 
+                let w = im.width, h = im.height; 
+                if(w>h){
+                    if(w>800){ h*=800/w; w=800; }
+                }else{
+                    if(h>800){ w*=800/h; h=800; }
+                } 
+                cv.width = w; 
+                cv.height = h; 
+                cv.getContext('2d').drawImage(im,0,0,w,h); 
+                imgB64 = cv.toDataURL('image/jpeg',0.7); 
+                document.getElementById('preview-img').src = imgB64; 
+                document.getElementById('preview-container').style.display='inline-block'; 
+            }; 
+            im.src = e.target.result; 
+        }; 
+        r.readAsDataURL(f); 
     }
-    function iniciarEdicionNota(id) { idEd = id; const n = nData[id]; document.getElementById('editor-nota').innerHTML = n.texto; if (n.imagen) { imgB64 = n.imagen; document.getElementById('preview-img').src = imgB64; document.getElementById('preview-container').style.display = 'inline-block'; } else { quitarImagen(); } document.getElementById('titulo-panel-edicion').innerHTML = '<i class="fas fa-edit me-1 text-warning"></i> Editando Publicación'; document.getElementById('btn-publicar').innerHTML = 'Guardar <i class="fas fa-save ms-1"></i>'; document.getElementById('btn-publicar').classList.replace('btn-brand', 'btn-warning'); document.getElementById('btn-cancelar-edicion').classList.remove('d-none'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-    function cancelarEdicion() { idEd = null; document.getElementById('editor-nota').innerHTML = ""; quitarImagen(); document.getElementById('titulo-panel-edicion').innerHTML = '<i class="fas fa-pen me-1 text-brand"></i> Nueva Publicación'; document.getElementById('btn-publicar').innerHTML = 'Publicar <i class="fas fa-paper-plane ms-1"></i>'; document.getElementById('btn-publicar').classList.replace('btn-warning', 'btn-brand'); document.getElementById('btn-cancelar-edicion').classList.add('d-none'); }
-    function eliminarNota(id) { if (confirm("¿Eliminar?")) { db.collection('investigaciones').doc(currentInvId).collection('notas').doc(id).delete(); if (idEd === id) cancelarEdicion(); } }
+
+    function quitarImagen() { 
+        imgB64 = null; 
+        document.getElementById('preview-img').src = ""; 
+        document.getElementById('preview-container').style.display = 'none'; 
+        document.getElementById('input-foto').value = ""; 
+    }
+
+    function publicarNota() {
+        const ed = document.getElementById('editor-nota'); 
+        const ht = ed.innerHTML.trim(); 
+        const pl = ed.innerText.trim(); 
+        
+        if (pl === "" && !imgB64) return alert("Escribe un texto o sube una foto.");
+        
+        const btn = document.getElementById('btn-publicar'); 
+        btn.disabled = true; 
+        const r = db.collection('investigaciones').doc(currentInvId).collection('notas');
+        
+        if (idEd) { 
+            r.doc(idEd).update({ texto: ht, imagen: imgB64, editado: true }).then(() => { 
+                cancelarEdicion(); 
+                btn.disabled = false; 
+            }); 
+        } else { 
+            r.add({ 
+                autor: usuarioActual, 
+                autorUid: usuarioUid, 
+                autorAvatar: avatarUrlActual, 
+                texto: ht, 
+                imagen: imgB64, 
+                timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+            }).then(() => { 
+                ed.innerHTML = ""; 
+                quitarImagen(); 
+                btn.disabled = false; 
+            }); 
+        }
+    }
+
+    function iniciarEdicionNota(id) { 
+        idEd = id; 
+        const n = nData[id]; 
+        document.getElementById('editor-nota').innerHTML = n.texto; 
+        
+        if (n.imagen) { 
+            imgB64 = n.imagen; 
+            document.getElementById('preview-img').src = imgB64; 
+            document.getElementById('preview-container').style.display = 'inline-block'; 
+        } else { 
+            quitarImagen(); 
+        } 
+        
+        document.getElementById('titulo-panel-edicion').innerHTML = '<i class="fas fa-edit me-1 text-warning"></i> Editando Publicación'; 
+        document.getElementById('btn-publicar').innerHTML = 'Guardar <i class="fas fa-save ms-1"></i>'; 
+        document.getElementById('btn-publicar').classList.replace('btn-brand', 'btn-warning'); 
+        document.getElementById('btn-cancelar-edicion').classList.remove('d-none'); 
+        window.scrollTo({ top: 0, behavior: 'smooth' }); 
+    }
+
+    function cancelarEdicion() { 
+        idEd = null; 
+        document.getElementById('editor-nota').innerHTML = ""; 
+        quitarImagen(); 
+        document.getElementById('titulo-panel-edicion').innerHTML = '<i class="fas fa-pen me-1 text-brand"></i> Nueva Publicación'; 
+        document.getElementById('btn-publicar').innerHTML = 'Publicar <i class="fas fa-paper-plane ms-1"></i>'; 
+        document.getElementById('btn-publicar').classList.replace('btn-warning', 'btn-brand'); 
+        document.getElementById('btn-cancelar-edicion').classList.add('d-none'); 
+    }
+
+    function eliminarNota(id) { 
+        if (confirm("¿Estás seguro de eliminar esta publicación?")) { 
+            db.collection('investigaciones').doc(currentInvId).collection('notas').doc(id).delete(); 
+            if (idEd === id) cancelarEdicion(); 
+        } 
+    }
 
     function escucharNotasCanal() {
         db.collection('investigaciones').doc(currentInvId).collection('notas').orderBy("timestamp", "desc").onSnapshot((sn) => {
-            const feed = document.getElementById('feed-notas'); feed.innerHTML = ""; nData = {}; 
+            const feed = document.getElementById('feed-notas'); 
+            feed.innerHTML = ""; 
+            nData = {}; 
+            
             sn.forEach((d) => {
-                const n = d.data(); nData[d.id] = n; let ig = n.imagen ? `<img src="${n.imagen}" class="note-img mt-2">` : ''; let ed = n.editado ? `<span class="text-muted ms-1 fst-italic" style="font-size:0.6rem;">(Editado)</span>` : ''; let ms = n.timestamp ? n.timestamp.toMillis() : Date.now();
-                let ac = (n.autorUid && n.autorUid === usuarioUid) ? `<div class="action-buttons"><button class="btn-icon text-primary" onclick="iniciarEdicionNota('${d.id}')"><i class="fas fa-pencil-alt"></i></button><button class="btn-icon text-danger" onclick="eliminarNota('${d.id}')"><i class="fas fa-trash-alt"></i></button></div>` : '';
-                let fbNm = (n.autor || 'Anónimo').replace(/'/g, "\\'"); let av = n.autorAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(n.autor || 'A')}&background=random&color=fff`;
-                feed.innerHTML += `<div class="card card-custom note-card p-1">${ac}<div class="card-body p-3 mt-1"><div class="d-flex justify-content-between align-items-center text-muted small mb-3" style="padding-right: 40px;"><div class="fw-bold text-dark fs-6 d-flex align-items-center hover-perfil" onclick="abrirPerfil('${n.autorUid}', '${fbNm}', '${av}')" style="cursor:pointer;" title="Ver perfil"><img src="${av}" width="28" height="28" class="rounded-circle me-2 border shadow-sm" style="object-fit:cover;"><span class="text-brand">${n.autor || 'Anónimo'}</span></div><span class="badge bg-light text-secondary border fw-normal"><span class="tiempo-relativo" data-timestamp="${ms}">${tiempoRelativo(ms)}</span>${ed}</span></div><div class="card-text mb-0 text-dark" style="word-break: break-word; line-height: 1.6; font-size: 0.95rem;">${n.texto}</div>${ig}</div></div>`;
+                const n = d.data(); 
+                nData[d.id] = n; 
+                
+                let ig = n.imagen ? `<img src="${n.imagen}" class="note-img mt-2">` : ''; 
+                let ed = n.editado ? `<span class="text-muted ms-1 fst-italic" style="font-size:0.6rem;">(Editado)</span>` : ''; 
+                let ms = n.timestamp ? n.timestamp.toMillis() : Date.now();
+                
+                let ac = (n.autorUid && n.autorUid === usuarioUid) ? `
+                    <div class="action-buttons">
+                        <button class="btn-icon text-primary" onclick="iniciarEdicionNota('${d.id}')"><i class="fas fa-pencil-alt"></i></button>
+                        <button class="btn-icon text-danger" onclick="eliminarNota('${d.id}')"><i class="fas fa-trash-alt"></i></button>
+                    </div>` : '';
+                
+                let fbNm = (n.autor || 'Anónimo').replace(/'/g, "\\'"); 
+                let av = n.autorAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(n.autor || 'A')}&background=random&color=fff`;
+                
+                feed.innerHTML += `
+                    <div class="card card-custom note-card p-1">
+                        ${ac}
+                        <div class="card-body p-3 mt-1">
+                            <div class="d-flex justify-content-between align-items-center text-muted small mb-3" style="padding-right: 40px;">
+                                <div class="fw-bold text-dark fs-6 d-flex align-items-center hover-perfil" onclick="abrirPerfil('${n.autorUid}', '${fbNm}', '${av}')" style="cursor:pointer;" title="Ver perfil">
+                                    <img src="${av}" width="28" height="28" class="rounded-circle me-2 border shadow-sm" style="object-fit:cover;">
+                                    <span class="text-brand">${n.autor || 'Anónimo'}</span>
+                                </div>
+                                <span class="badge bg-light text-secondary border fw-normal">
+                                    <span class="tiempo-relativo" data-timestamp="${ms}">${tiempoRelativo(ms)}</span>${ed}
+                                </span>
+                            </div>
+                            <div class="card-text mb-0 text-dark" style="word-break: break-word; line-height: 1.6; font-size: 0.95rem;">${n.texto}</div>
+                            ${ig}
+                        </div>
+                    </div>`;
             });
         });
     }
 
-    // --- CHAT Y FORMATO ---
-    function agregarBibliografia() { const t=prompt("Título:"); if(!t) return; let u=prompt("URL:")||"#"; if(u!=="#" && !u.startsWith('http')) u='https://'+u; db.collection('investigaciones').doc(currentInvId).collection('bibliografia').add({ titulo: t, url: u, timestamp: firebase.firestore.FieldValue.serverTimestamp() }); }
-    function escucharBibliografiaCanal() { db.collection('investigaciones').doc(currentInvId).collection('bibliografia').orderBy("timestamp", "desc").onSnapshot((s) => { const l = document.getElementById('lista-biblio'); l.innerHTML = ""; s.forEach((d) => { const b = d.data(); l.innerHTML += `<li class="list-group-item border-0 border-bottom py-3"><div class="fw-semibold text-dark">${b.titulo}</div><a href="${b.url}" target="_blank" class="text-decoration-none small text-primary"><i class="fas fa-external-link-alt me-1"></i> Ver recurso</a></li>`; }); }); }
-    function toggleChat() { const p = document.getElementById('chat-floating-panel'); p.style.display = (p.style.display === 'none' || p.style.display === '') ? 'block' : 'none'; }
-    function enviarMensaje() { const m = document.getElementById('chat-input').value.trim(); if (!m) return; db.collection('investigaciones').doc(currentInvId).collection('chat').add({ autor: usuarioActual, mensaje: m, timestamp: firebase.firestore.FieldValue.serverTimestamp() }); document.getElementById('chat-input').value = ""; }
-    function manejarEnterChat(e) { if (e.key === "Enter") enviarMensaje(); }
-    db.collection('investigaciones').doc(currentInvId).collection('chat').orderBy("timestamp", "asc").onSnapshot((s) => { const b = document.getElementById('chat-messages'); b.innerHTML = ""; s.forEach((d) => { const c = d.data(); const me = (c.autor === usuarioActual); b.innerHTML += `<div class="chat-bubble ${me ? 'chat-me' : 'chat-other'}">${!me ? `<div class="chat-author text-brand">${c.autor}</div>` : ''}${c.mensaje}</div>`; }); b.scrollTop = b.scrollHeight; });
-    function insertarFormato(t) { document.getElementById('editor-nota').focus(); if (t==='bold') document.execCommand('bold'); else if(t==='italic') document.execCommand('italic'); else if(t==='color') { const c=prompt("Color:","#712cf9"); if(c) document.execCommand('foreColor',false,c); } else if(t==='list') document.execCommand('insertUnorderedList'); else if(t==='link') { let u=prompt("URL:","https://"); if(u) document.execCommand('createLink',false,u.startsWith('http')?u:'https://'+u); } }
+    // --- CHAT Y FORMATO DE TEXTO ---
+    function agregarBibliografia() { 
+        const t = prompt("Título de la fuente:"); 
+        if(!t) return; 
+        
+        let u = prompt("URL o Enlace:") || "#"; 
+        if(u !== "#" && !u.startsWith('http')) u = 'https://' + u; 
+        
+        db.collection('investigaciones').doc(currentInvId).collection('bibliografia').add({ 
+            titulo: t, 
+            url: u, 
+            timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+        }); 
+    }
+
+    function escucharBibliografiaCanal() { 
+        db.collection('investigaciones').doc(currentInvId).collection('bibliografia').orderBy("timestamp", "desc").onSnapshot((s) => { 
+            const l = document.getElementById('lista-biblio'); 
+            l.innerHTML = ""; 
+            
+            s.forEach((d) => { 
+                const b = d.data(); 
+                l.innerHTML += `
+                    <li class="list-group-item border-0 border-bottom py-3">
+                        <div class="fw-semibold text-dark">${b.titulo}</div>
+                        <a href="${b.url}" target="_blank" class="text-decoration-none small text-primary">
+                            <i class="fas fa-external-link-alt me-1"></i> Ver recurso
+                        </a>
+                    </li>`; 
+            }); 
+        }); 
+    }
+
+    function toggleChat() { 
+        const p = document.getElementById('chat-floating-panel'); 
+        p.style.display = (p.style.display === 'none' || p.style.display === '') ? 'block' : 'none'; 
+    }
+
+    function enviarMensaje() { 
+        const m = document.getElementById('chat-input').value.trim(); 
+        if (!m) return; 
+        
+        db.collection('investigaciones').doc(currentInvId).collection('chat').add({ 
+            autor: usuarioActual, 
+            mensaje: m, 
+            timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+        }); 
+        
+        document.getElementById('chat-input').value = ""; 
+    }
+
+    function manejarEnterChat(e) { 
+        if (e.key === "Enter") enviarMensaje(); 
+    }
+
+    db.collection('investigaciones').doc(currentInvId).collection('chat').orderBy("timestamp", "asc").onSnapshot((s) => { 
+        const b = document.getElementById('chat-messages'); 
+        b.innerHTML = ""; 
+        
+        s.forEach((d) => { 
+            const c = d.data(); 
+            const me = (c.autor === usuarioActual); 
+            b.innerHTML += `
+                <div class="chat-bubble ${me ? 'chat-me' : 'chat-other'}">
+                    ${!me ? `<div class="chat-author text-brand">${c.autor}</div>` : ''}
+                    ${c.mensaje}
+                </div>`; 
+        }); 
+        
+        b.scrollTop = b.scrollHeight; 
+    });
+
+    function insertarFormato(t) { 
+        document.getElementById('editor-nota').focus(); 
+        if (t === 'bold') {
+            document.execCommand('bold'); 
+        } else if (t === 'italic') {
+            document.execCommand('italic'); 
+        } else if (t === 'color') { 
+            const c = prompt("Escribe el color (ej. #712cf9, red, blue):", "#712cf9"); 
+            if(c) document.execCommand('foreColor', false, c); 
+        } else if (t === 'list') {
+            document.execCommand('insertUnorderedList'); 
+        } else if (t === 'link') { 
+            let u = prompt("URL del enlace:", "https://"); 
+            if(u) document.execCommand('createLink', false, u.startsWith('http') ? u : 'https://' + u); 
+        } 
+    }
 </script>
 </body>
 </html>
