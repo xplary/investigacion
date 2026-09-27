@@ -311,6 +311,13 @@
     let usuarioUid = localStorage.getItem('unp_uid_usuario') || ('local_' + Math.random().toString(36).substring(2, 9));
     let avatarUrlActual = localStorage.getItem('unp_avatar_usuario') || `https://ui-avatars.com/api/?name=${encodeURIComponent(usuarioActual)}&background=random&color=fff`;
 
+    // ID de sesión persistente en localStorage para evitar duplicados al recargar
+    let voiceSessionId = localStorage.getItem('unp_voice_session_id');
+    if (!voiceSessionId) {
+        voiceSessionId = 'vsession_' + Math.random().toString(36).substring(2, 10);
+        localStorage.setItem('unp_voice_session_id', voiceSessionId);
+    }
+
     const urlParams = new URLSearchParams(window.location.search);
     let currentInvId = urlParams.get('inv') || 'general-unp';
 
@@ -534,23 +541,36 @@
     elementSubtitulo.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } });
 
     // ==========================================
-    // SISTEMA DE VOZ P2P SIN DUPLICADOS Y SEGUNDO PLANO
+    // SISTEMA DE VOZ P2P CON MOTOR AUDIO PERSISTENTE
     // ==========================================
     let localStream = null;
     let peer = null;
     let voiceHeartbeatInterval = null;
     let activeCalls = {};
     let isMuted = false;
+    let audioCtx = null;
 
     async function conectarVoz() {
         try {
-            localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+            // Inicializar AudioContext para forzar al navegador a mantener activo el canal de voz en segundo plano
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (AudioContextClass && !audioCtx) {
+                audioCtx = new AudioContextClass();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                await audioCtx.resume();
+            }
+
+            localStream = await navigator.mediaDevices.getUserMedia({ 
+                audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }, 
+                video: false 
+            });
+
             peer = new Peer();
             
             peer.on('open', (id) => {
-                const voiceRef = db.collection('investigaciones').doc(currentInvId).collection('voice_room').doc(usuarioUid);
+                const voiceRef = db.collection('investigaciones').doc(currentInvId).collection('voice_room').doc(voiceSessionId);
                 
-                // Usar el UID como ID de documento previene duplicados y sobreescribe sesiones previas
                 voiceRef.set({
                     nombre: usuarioActual,
                     peerId: id,
@@ -561,7 +581,6 @@
                     document.getElementById('controles-voz').classList.add('d-none');
                     document.getElementById('controles-activo-voz').classList.remove('d-none');
 
-                    // Latido (Heartbeat) cada 10 segundos. Tolera hasta 45s en segundo plano en celular.
                     if (voiceHeartbeatInterval) clearInterval(voiceHeartbeatInterval);
                     voiceHeartbeatInterval = setInterval(() => {
                         voiceRef.set({ lastSeen: Date.now() }, { merge: true }).catch(() => {});
@@ -580,6 +599,20 @@
             alert("No se pudo acceder al micrófono. Por favor, concede los permisos en tu navegador.");
         }
     }
+
+    // Mantener activo el flujo al cambiar de pestaña o minimizar en celulares
+    document.addEventListener('visibilitychange', async () => {
+        if (!document.hidden) {
+            if (audioCtx && audioCtx.state === 'suspended') {
+                await audioCtx.resume();
+            }
+            if (localStream) {
+                localStream.getAudioTracks().forEach(track => {
+                    if (!isMuted) track.enabled = true;
+                });
+            }
+        }
+    });
 
     function toggleMute() {
         if (localStream) {
@@ -600,8 +633,8 @@
             clearInterval(voiceHeartbeatInterval);
             voiceHeartbeatInterval = null;
         }
-        if (usuarioUid && db) {
-            db.collection('investigaciones').doc(currentInvId).collection('voice_room').doc(usuarioUid).delete().catch(() => {});
+        if (voiceSessionId && db) {
+            db.collection('investigaciones').doc(currentInvId).collection('voice_room').doc(voiceSessionId).delete().catch(() => {});
         }
         if (peer) {
             peer.destroy();
@@ -610,6 +643,10 @@
         if (localStream) {
             localStream.getTracks().forEach(track => track.stop());
             localStream = null;
+        }
+        if (audioCtx) {
+            audioCtx.close().catch(() => {});
+            audioCtx = null;
         }
         
         document.getElementById('audio-elements').innerHTML = '';
@@ -630,6 +667,16 @@
             audio.className = 'peer-audio';
             audio.srcObject = stream;
             audio.autoplay = true;
+            audio.controls = false;
+            
+            // Conectar al contexto de audio para persistencia en segundo plano
+            if (audioCtx) {
+                try {
+                    const source = audioCtx.createMediaStreamSource(stream);
+                    source.connect(audioCtx.destination);
+                } catch(e) {}
+            }
+
             document.getElementById('audio-elements').appendChild(audio);
         }
     }
@@ -640,15 +687,19 @@
             listaUI.innerHTML = '';
             
             let usuariosActivos = [];
+            let peerIdsProcesados = new Set();
             const ahora = Date.now();
 
             snapshot.forEach((doc) => {
                 const data = doc.data();
                 
-                // Si pasaron más de 45 segundos sin latido (usuario cerró navegador sin salir), se ignora (limpieza de fantasmas)
+                // Limpieza de fantasmas (más de 45s sin latido)
                 if (data.lastSeen && (ahora - data.lastSeen > 45000)) {
                     return; 
                 }
+
+                if (peerIdsProcesados.has(data.peerId)) return;
+                peerIdsProcesados.add(data.peerId);
 
                 usuariosActivos.push(data.peerId);
                 
@@ -689,8 +740,8 @@
     }
 
     window.addEventListener('beforeunload', () => {
-        if (usuarioUid && db) {
-            db.collection('investigaciones').doc(currentInvId).collection('voice_room').doc(usuarioUid).delete().catch(() => {});
+        if (voiceSessionId && db) {
+            db.collection('investigaciones').doc(currentInvId).collection('voice_room').doc(voiceSessionId).delete().catch(() => {});
         }
     });
 
