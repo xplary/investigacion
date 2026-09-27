@@ -540,7 +540,7 @@
     elementSubtitulo.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } });
 
     // ==========================================
-    // SISTEMA DE VOZ P2P ANTIECO Y PERSISTENTE
+    // SISTEMA DE VOZ P2P ESTILO MEET (SIN ECO)
     // ==========================================
     let localStream = null;
     let peer = null;
@@ -559,14 +559,16 @@
                 await audioCtx.resume();
             }
 
-            // Restricciones estrictas para cancelación de eco y ruido de fondo
+            // Restricciones de audio profesionales estilo Meet (cancelación de eco agresiva)
             localStream = await navigator.mediaDevices.getUserMedia({ 
                 audio: { 
                     echoCancellation: true, 
                     noiseSuppression: true, 
                     autoGainControl: true,
                     googEchoCancellation: true,
-                    googNoiseSuppression: true
+                    googAutoGainControl: true,
+                    googNoiseSuppression: true,
+                    googHighpassFilter: true
                 }, 
                 video: false 
             });
@@ -674,15 +676,10 @@
             audio.className = 'peer-audio';
             audio.srcObject = stream;
             audio.autoplay = true;
+            audio.playsInline = true;
             audio.controls = false;
             
-            if (audioCtx) {
-                try {
-                    const source = audioCtx.createMediaStreamSource(stream);
-                    source.connect(audioCtx.destination);
-                } catch(e) {}
-            }
-
+            // Nota: Se elimina la conexión manual a AudioContext.destination para evitar duplicación de audio y eco.
             document.getElementById('audio-elements').appendChild(audio);
         }
     }
@@ -730,8 +727,7 @@
                     </div>
                 `;
 
-                // 🛡️ REGLA ANTI-ECO Y DOBLE LLAMADA: Solo llama si tu ID es menor al del otro usuario.
-                // Así se evita abrir canales cruzados duplicados entre la misma pareja.
+                // Regla anti-eco: evita conexiones duplicadas cruzadas entre pares
                 if (peer && peer.id && !isMe && !activeCalls[data.peerId]) {
                     if (peer.id < data.peerId) {
                         const call = peer.call(data.peerId, localStream);
