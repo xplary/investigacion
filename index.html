@@ -311,7 +311,6 @@
     let usuarioUid = localStorage.getItem('unp_uid_usuario') || ('local_' + Math.random().toString(36).substring(2, 9));
     let avatarUrlActual = localStorage.getItem('unp_avatar_usuario') || `https://ui-avatars.com/api/?name=${encodeURIComponent(usuarioActual)}&background=random&color=fff`;
 
-    // ID de sesión persistente en localStorage para evitar duplicados al recargar
     let voiceSessionId = localStorage.getItem('unp_voice_session_id');
     if (!voiceSessionId) {
         voiceSessionId = 'vsession_' + Math.random().toString(36).substring(2, 10);
@@ -552,7 +551,6 @@
 
     async function conectarVoz() {
         try {
-            // Inicializar AudioContext para forzar al navegador a mantener activo el canal de voz en segundo plano
             const AudioContextClass = window.AudioContext || window.webkitAudioContext;
             if (AudioContextClass && !audioCtx) {
                 audioCtx = new AudioContextClass();
@@ -600,7 +598,6 @@
         }
     }
 
-    // Mantener activo el flujo al cambiar de pestaña o minimizar en celulares
     document.addEventListener('visibilitychange', async () => {
         if (!document.hidden) {
             if (audioCtx && audioCtx.state === 'suspended') {
@@ -669,7 +666,6 @@
             audio.autoplay = true;
             audio.controls = false;
             
-            // Conectar al contexto de audio para persistencia en segundo plano
             if (audioCtx) {
                 try {
                     const source = audioCtx.createMediaStreamSource(stream);
@@ -693,8 +689,10 @@
             snapshot.forEach((doc) => {
                 const data = doc.data();
                 
-                // Limpieza de fantasmas (más de 45s sin latido)
-                if (data.lastSeen && (ahora - data.lastSeen > 45000)) {
+                // 🧹 FILTRADO ESTRICTO DE LIMPIEZA: Si no tiene lastSeen o pasaron más de 30 segundos sin señal, se purga y borra de Firestore automáticamente
+                if (!data.lastSeen || (ahora - data.lastSeen > 30000)) {
+                    // Borramos el documento fantasma obsoleto de la base de datos en segundo plano
+                    doc.ref.delete().catch(() => {});
                     return; 
                 }
 
