@@ -143,12 +143,11 @@
         
         <div class="row g-4">
             
-            <!-- COLUMNA 1: SIDEBAR IZQUIERDA (ENTORNO DE TRABAJO Y CANALES) -->
+            <!-- COLUMNA 1: SIDEBAR IZQUIERDA -->
             <div class="col-lg-3">
                 <div class="card card-custom border-0 shadow-sm mb-4">
                     <div class="card-header bg-white border-bottom fw-bold text-dark py-3 d-flex justify-content-between align-items-center">
                         <span><i class="fas fa-folder-open me-2 text-brand"></i> Investigaciones</span>
-                        <!-- BOTÓN COMPARTIR (OCULTO EN GENERAL) -->
                         <button id="btn-compartir-inv" class="btn btn-sm btn-light border text-brand rounded-circle d-none" onclick="copiarEnlaceInvitacion()" title="Copiar enlace de invitación">
                             <i class="fas fa-share-alt"></i>
                         </button>
@@ -158,14 +157,12 @@
                             Mis Canales
                         </div>
                         
-                        <!-- LISTA DINÁMICA DE INVESTIGACIONES -->
                         <div id="lista-investigaciones" class="mb-3">
                             <div class="text-muted small fst-italic text-center py-2">Cargando canales...</div>
                         </div>
 
                         <hr class="border-secondary opacity-10 my-3">
 
-                        <!-- BOTÓN CREAR NUEVA INVESTIGACIÓN -->
                         <button class="btn btn-light btn-sm w-100 fw-bold shadow-sm d-flex justify-content-center align-items-center gap-2 border text-secondary" onclick="crearNuevaInvestigacion()">
                             <i class="fas fa-plus"></i> Crear investigación
                         </button>
@@ -173,7 +170,7 @@
                 </div>
             </div>
 
-            <!-- COLUMNA 2: FEED CENTRAL (EDITOR + NOTAS) -->
+            <!-- COLUMNA 2: FEED CENTRAL -->
             <div class="col-lg-5">
                 
                 <div class="card card-custom mb-4 border-0 shadow-sm" style="border-top: 4px solid #712cf9 !important;">
@@ -219,7 +216,7 @@
                 </div>
             </div>
 
-            <!-- COLUMNA 3: PANELES DERECHOS (VOZ + BIBLIOGRAFÍA) -->
+            <!-- COLUMNA 3: PANELES DERECHOS -->
             <div class="col-lg-4">
                 
                 <div class="card card-custom border-0 shadow-sm mb-4" style="border-top: 4px solid #198754 !important;">
@@ -315,11 +312,14 @@
         db = firebase.firestore();
         auth = firebase.auth();
         googleProvider = new firebase.auth.GoogleAuthProvider();
+
+        // ⚠️ FORZAR PERSISTENCIA LOCAL (Vital para evitar pérdida de sesión en celulares)
+        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
     } catch (e) {
         console.error("Error al conectar Firebase", e);
     }
 
-    // --- GOOGLE SIGN-IN CON REDIRECCIÓN (OPTIMIZADO MÓVIL) ---
+    // --- GOOGLE SIGN-IN CON REDIRECCIÓN ---
     function iniciarSesionGoogle() {
         auth.signInWithRedirect(googleProvider).catch((error) => {
             alert("Error al iniciar sesión: " + error.message);
@@ -327,16 +327,18 @@
     }
 
     function cerrarSesion() {
-        auth.signOut();
+        auth.signOut().then(() => {
+            window.location.reload();
+        });
     }
 
-    // RESOLUCIÓN DE ESTADO DE AUTENTICACIÓN (ESPECIAL PARA MÓVILES)
+    // GESTIÓN DE SESIÓN PARA MÓVILES
     auth.getRedirectResult().then((result) => {
-        if (result.user) {
+        if (result && result.user) {
             manejarUsuarioLogueado(result.user);
         }
     }).catch((error) => {
-        console.error("Error en redirect result:", error);
+        console.error("Error en getRedirectResult:", error);
     });
 
     auth.onAuthStateChanged(async (user) => {
@@ -401,7 +403,6 @@
             });
 
             await registrarAccesoInvestigacion(usuarioUid, nuevaInvRef.id);
-
             window.location.href = window.location.pathname + '?inv=' + nuevaInvRef.id;
         } catch (e) {
             alert("Error al crear la investigación: " + e.message);
@@ -498,7 +499,6 @@
     elementSubtitulo.addEventListener('blur', guardarTitulos);
     elementTitulo.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } });
     elementSubtitulo.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } });
-
 
     // ==========================================
     // TIEMPO RELATIVO Y VOZ P2P
