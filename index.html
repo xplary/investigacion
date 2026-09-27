@@ -540,7 +540,7 @@
     elementSubtitulo.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } });
 
     // ==========================================
-    // SISTEMA DE VOZ P2P CON MOTOR AUDIO PERSISTENTE
+    // SISTEMA DE VOZ P2P ANTIECO Y PERSISTENTE
     // ==========================================
     let localStream = null;
     let peer = null;
@@ -559,8 +559,15 @@
                 await audioCtx.resume();
             }
 
+            // Restricciones estrictas para cancelación de eco y ruido de fondo
             localStream = await navigator.mediaDevices.getUserMedia({ 
-                audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }, 
+                audio: { 
+                    echoCancellation: true, 
+                    noiseSuppression: true, 
+                    autoGainControl: true,
+                    googEchoCancellation: true,
+                    googNoiseSuppression: true
+                }, 
                 video: false 
             });
 
@@ -590,6 +597,9 @@
                 call.answer(localStream);
                 call.on('stream', (remoteStream) => {
                     agregarAudio(call.peer, remoteStream);
+                });
+                call.on('close', () => {
+                    removerAudio(call.peer);
                 });
             });
 
@@ -677,6 +687,15 @@
         }
     }
 
+    function removerAudio(peerId) {
+        const audioEl = document.getElementById('audio-' + peerId);
+        if (audioEl) audioEl.remove();
+        if (activeCalls[peerId]) {
+            try { activeCalls[peerId].close(); } catch(e){}
+            delete activeCalls[peerId];
+        }
+    }
+
     if (db) {
         db.collection('investigaciones').doc(currentInvId).collection('voice_room').onSnapshot((snapshot) => {
             const listaUI = document.getElementById('lista-usuarios-voz');
@@ -689,9 +708,7 @@
             snapshot.forEach((doc) => {
                 const data = doc.data();
                 
-                // 🧹 FILTRADO ESTRICTO DE LIMPIEZA: Si no tiene lastSeen o pasaron más de 30 segundos sin señal, se purga y borra de Firestore automáticamente
                 if (!data.lastSeen || (ahora - data.lastSeen > 30000)) {
-                    // Borramos el documento fantasma obsoleto de la base de datos en segundo plano
                     doc.ref.delete().catch(() => {});
                     return; 
                 }
@@ -713,13 +730,20 @@
                     </div>
                 `;
 
+                // 🛡️ REGLA ANTI-ECO Y DOBLE LLAMADA: Solo llama si tu ID es menor al del otro usuario.
+                // Así se evita abrir canales cruzados duplicados entre la misma pareja.
                 if (peer && peer.id && !isMe && !activeCalls[data.peerId]) {
-                    const call = peer.call(data.peerId, localStream);
-                    activeCalls[data.peerId] = call;
-                    
-                    call.on('stream', (remoteStream) => {
-                        agregarAudio(data.peerId, remoteStream);
-                    });
+                    if (peer.id < data.peerId) {
+                        const call = peer.call(data.peerId, localStream);
+                        activeCalls[data.peerId] = call;
+                        
+                        call.on('stream', (remoteStream) => {
+                            agregarAudio(data.peerId, remoteStream);
+                        });
+                        call.on('close', () => {
+                            removerAudio(data.peerId);
+                        });
+                    }
                 }
             });
 
@@ -730,8 +754,7 @@
             document.querySelectorAll('audio.peer-audio').forEach(audioTag => {
                 const pId = audioTag.id.replace('audio-', '');
                 if (!usuariosActivos.includes(pId)) {
-                    audioTag.remove();
-                    delete activeCalls[pId];
+                    removerAudio(pId);
                 }
             });
         });
