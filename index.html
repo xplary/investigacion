@@ -319,9 +319,9 @@
         console.error("Error al conectar Firebase", e);
     }
 
-    // --- GOOGLE SIGN-IN ---
+    // --- GOOGLE SIGN-IN CON REDIRECCIÓN (OPTIMIZADO PARA MÓVILES) ---
     function iniciarSesionGoogle() {
-        auth.signInWithPopup(googleProvider).catch((error) => {
+        auth.signInWithRedirect(googleProvider).catch((error) => {
             alert("Error al iniciar sesión: " + error.message);
         });
     }
@@ -329,6 +329,11 @@
     function cerrarSesion() {
         auth.signOut();
     }
+
+    // Manejar el resultado al regresar de la redirección de Google
+    auth.getRedirectResult().catch((error) => {
+        console.error("Error en redirect:", error);
+    });
 
     auth.onAuthStateChanged(async (user) => {
         const loggedOutView = document.getElementById('logged-out-view');
@@ -394,7 +399,6 @@
 
             await registrarAccesoInvestigacion(usuarioUid, nuevaInvRef.id);
 
-            // Redirigir de inmediato al nuevo canal creado
             window.location.href = window.location.pathname + '?inv=' + nuevaInvRef.id;
         } catch (e) {
             alert("Error al crear la investigación: " + e.message);
@@ -457,7 +461,6 @@
     const btnCompartir = document.getElementById('btn-compartir-inv');
 
     function inicializarCanalInvestigacion() {
-        // Mostrar u ocultar el botón de compartir según el canal
         if (currentInvId === 'general-unp') {
             btnCompartir.classList.add('d-none');
             elementTitulo.innerText = "Dinámica de la morosidad";
