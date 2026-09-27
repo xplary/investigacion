@@ -301,7 +301,7 @@
     };
 
     let db, auth, googleProvider;
-    let usuarioActual = "Invitado";
+    let usuarioActual = "Invitado_" + Math.floor(Math.random() * 1000);
     let usuarioUid = null;
     
     const urlParams = new URLSearchParams(window.location.search);
@@ -312,16 +312,18 @@
         db = firebase.firestore();
         auth = firebase.auth();
         googleProvider = new firebase.auth.GoogleAuthProvider();
-
-        // ⚠️ FORZAR PERSISTENCIA LOCAL (Vital para evitar pérdida de sesión en celulares)
         auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
     } catch (e) {
         console.error("Error al conectar Firebase", e);
     }
 
-    // --- GOOGLE SIGN-IN CON REDIRECCIÓN ---
+    // --- GOOGLE SIGN-IN CON POPUP SÍNCRONO (OPTIMIZADO PARA MÓVILES) ---
     function iniciarSesionGoogle() {
-        auth.signInWithRedirect(googleProvider).catch((error) => {
+        // Ejecución síncrona directa para evitar que el navegador móvil bloquee el popup
+        auth.signInWithPopup(googleProvider).then((result) => {
+            const user = result.user;
+            manejarUsuarioLogueado(user);
+        }).catch((error) => {
             alert("Error al iniciar sesión: " + error.message);
         });
     }
@@ -329,17 +331,10 @@
     function cerrarSesion() {
         auth.signOut().then(() => {
             window.location.reload();
+        }).catch((error) => {
+            console.error("Error al cerrar sesión", error);
         });
     }
-
-    // GESTIÓN DE SESIÓN PARA MÓVILES
-    auth.getRedirectResult().then((result) => {
-        if (result && result.user) {
-            manejarUsuarioLogueado(result.user);
-        }
-    }).catch((error) => {
-        console.error("Error en getRedirectResult:", error);
-    });
 
     auth.onAuthStateChanged(async (user) => {
         if (user) {
@@ -373,15 +368,16 @@
     // GESTIÓN DE INVESTIGACIONES Y CANALES
     // ==========================================
     async function registrarAccesoInvestigacion(uid, invId) {
-        if (!uid) return;
-        const userRef = db.collection('users').doc(uid);
-        const doc = await userRef.get();
-        
-        let invs = doc.exists && doc.data().investigaciones ? doc.data().investigaciones : ['general-unp'];
-        if (!invs.includes(invId)) {
-            invs.push(invId);
-            await userRef.set({ investigaciones: invs }, { merge: true });
-        }
+        if (!uid || !db) return;
+        try {
+            const userRef = db.collection('users').doc(uid);
+            const doc = await userRef.get();
+            let invs = doc.exists && doc.data().investigaciones ? doc.data().investigaciones : ['general-unp'];
+            if (!invs.includes(invId)) {
+                invs.push(invId);
+                await userRef.set({ investigaciones: invs }, { merge: true });
+            }
+        } catch(e) { console.error(e); }
     }
 
     async function crearNuevaInvestigacion() {
@@ -412,7 +408,7 @@
     function copiarEnlaceInvitacion() {
         const urlActual = window.location.href;
         navigator.clipboard.writeText(urlActual).then(() => {
-            alert("¡Enlace de invitación copiado al portapapeles! Compártelo con tus compañeros.");
+            alert("¡Enlace de invitación copiado al portapapeles!");
         });
     }
 
@@ -654,7 +650,7 @@
         } else {
             notasRef.add({
                 autor: usuarioActual,
-                autorUid: usuarioUid || 'anonimo',
+                autorUid: usuarioUid,
                 texto: contenidoHTML,
                 imagen: imagenActualBase64,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
@@ -708,7 +704,7 @@
                 let ms = nota.timestamp ? nota.timestamp.toMillis() : Date.now();
                 let tiempoTexto = tiempoRelativo(ms);
                 
-                let esMiPublicacion = (usuarioUid && nota.autorUid && nota.autorUid === usuarioUid);
+                let esMiPublicacion = (nota.autorUid && nota.autorUid === usuarioUid);
                 let botonesAccionHTML = esMiPublicacion ? `
                     <div class="action-buttons">
                         <button class="btn-icon text-primary" onclick="iniciarEdicionNota('${doc.id}')" title="Editar"><i class="fas fa-pencil-alt"></i></button>
