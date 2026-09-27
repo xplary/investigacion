@@ -116,19 +116,25 @@
             <h2 id="subtitulo-doc" class="text-muted fs-6 fw-normal mb-0" contenteditable="true" title="Clic para editar subtítulo">Cargando detalles...</h2>
         </div>
         
-        <!-- IDENTIDAD ACTIVA -->
+        <!-- IDENTIDAD ACTIVA HÍBRIDA -->
         <div class="p-2 rounded bg-white shadow-sm border border-brand" style="min-width: 250px;">
-            <label class="form-label small fw-bold text-brand mb-1"><i class="fas fa-user-astronaut me-1"></i> Identidad Activa</label>
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <label class="form-label small fw-bold text-brand mb-0"><i class="fas fa-user-astronaut me-1"></i> Identidad Activa</label>
+                <button class="btn btn-link btn-sm text-secondary p-0 text-decoration-none" style="font-size: 0.75rem;" onclick="cambiarNombreManual()" title="Editar tu nombre manualmente">
+                    <i class="fas fa-pen"></i> Editar nombre
+                </button>
+            </div>
+            
             <div id="auth-container">
                 <div id="logged-out-view">
-                    <button class="btn btn-outline-dark btn-sm w-100 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2 py-1" onclick="iniciarSesionGoogle()">
+                    <button class="btn btn-outline-dark btn-sm w-100 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2 py-1 mb-1" onclick="iniciarSesionGoogle()">
                         <img src="https://www.svgrepo.com/show/475656/google-color.svg" width="16" height="16"> Iniciar sesión con Google
                     </button>
                 </div>
-                <div id="logged-in-view" class="d-none align-items-center justify-content-between">
+                <div id="logged-in-view" class="d-flex align-items-center justify-content-between">
                     <div class="d-flex align-items-center gap-2 text-truncate">
                         <img id="user-avatar" src="" class="rounded-circle border" width="24" height="24">
-                        <span id="user-name" class="small fw-bold text-dark text-truncate"></span>
+                        <span id="user-name" class="small fw-bold text-dark text-truncate" title="Clic para editar" style="cursor: pointer;" onclick="cambiarNombreManual()"></span>
                     </div>
                     <button class="btn btn-sm btn-light text-danger border-0 p-1" onclick="cerrarSesion()" title="Cerrar sesión">
                         <i class="fas fa-sign-out-alt"></i>
@@ -301,9 +307,10 @@
     };
 
     let db, auth, googleProvider;
-    let usuarioActual = "Invitado_" + Math.floor(Math.random() * 1000);
-    let usuarioUid = null;
-    
+    let usuarioActual = localStorage.getItem('unp_nombre_usuario') || ("Investigador_" + Math.floor(Math.random() * 1000));
+    let usuarioUid = localStorage.getItem('unp_uid_usuario') || ('local_' + Math.random().toString(36).substring(2, 9));
+    let avatarUrlActual = localStorage.getItem('unp_avatar_usuario') || `https://ui-avatars.com/api/?name=${encodeURIComponent(usuarioActual)}&background=random&color=fff`;
+
     const urlParams = new URLSearchParams(window.location.search);
     let currentInvId = urlParams.get('inv') || 'general-unp';
 
@@ -317,50 +324,85 @@
         console.error("Error al conectar Firebase", e);
     }
 
-    // --- GOOGLE SIGN-IN CON POPUP SÍNCRONO (OPTIMIZADO PARA MÓVILES) ---
+    // --- GOOGLE SIGN-IN ---
     function iniciarSesionGoogle() {
-        // Ejecución síncrona directa para evitar que el navegador móvil bloquee el popup
-        auth.signInWithPopup(googleProvider).then((result) => {
-            const user = result.user;
-            manejarUsuarioLogueado(user);
-        }).catch((error) => {
+        auth.signInWithRedirect(googleProvider).catch((error) => {
             alert("Error al iniciar sesión: " + error.message);
         });
     }
 
     function cerrarSesion() {
+        desconectarVoz();
         auth.signOut().then(() => {
+            localStorage.removeItem('unp_nombre_usuario');
+            localStorage.removeItem('unp_uid_usuario');
+            localStorage.removeItem('unp_avatar_usuario');
             window.location.reload();
-        }).catch((error) => {
-            console.error("Error al cerrar sesión", error);
+        }).catch(() => {
+            localStorage.removeItem('unp_nombre_usuario');
+            localStorage.removeItem('unp_uid_usuario');
+            localStorage.removeItem('unp_avatar_usuario');
+            window.location.reload();
         });
     }
 
+    function cambiarNombreManual() {
+        const nuevoNombre = prompt("Ingresa tu nombre y apellido real para identificarte:", usuarioActual);
+        if (nuevoNombre && nuevoNombre.trim()) {
+            usuarioActual = nuevoNombre.trim();
+            avatarUrlActual = `https://ui-avatars.com/api/?name=${encodeURIComponent(usuarioActual)}&background=712cf9&color=fff`;
+            
+            localStorage.setItem('unp_nombre_usuario', usuarioActual);
+            localStorage.setItem('unp_uid_usuario', usuarioUid);
+            localStorage.setItem('unp_avatar_usuario', avatarUrlActual);
+
+            actualizarVistaUsuarioUI();
+            registrarAccesoInvestigacion(usuarioUid, currentInvId);
+            alert("¡Identidad actualizada con éxito!");
+        }
+    }
+
+    function actualizarVistaUsuarioUI() {
+        document.getElementById('user-avatar').src = avatarUrlActual;
+        document.getElementById('user-name').innerText = usuarioActual;
+        document.getElementById('logged-in-view').classList.replace('d-none', 'd-flex');
+        document.getElementById('logged-out-view').classList.add('d-none');
+    }
+
+    auth.getRedirectResult().then((result) => {
+        if (result && result.user) {
+            guardarUsuarioGoogle(result.user);
+        }
+    }).catch((error) => {
+        console.error("Error en getRedirectResult:", error);
+    });
+
     auth.onAuthStateChanged(async (user) => {
         if (user) {
-            manejarUsuarioLogueado(user);
-        } else {
-            usuarioActual = "Invitado_" + Math.floor(Math.random() * 1000);
-            usuarioUid = null;
-            
+            guardarUsuarioGoogle(user);
+        } else if (!localStorage.getItem('unp_nombre_usuario')) {
             document.getElementById('logged-in-view').classList.replace('d-flex', 'd-none');
             document.getElementById('logged-out-view').classList.remove('d-none');
             cargarListaInvestigaciones(null);
+        } else {
+            actualizarVistaUsuarioUI();
+            await registrarAccesoInvestigacion(usuarioUid, currentInvId);
+            cargarListaInvestigaciones(usuarioUid);
         }
         inicializarCanalInvestigacion();
     });
 
-    async function manejarUsuarioLogueado(user) {
+    function guardarUsuarioGoogle(user) {
         usuarioActual = user.displayName || "Investigador";
         usuarioUid = user.uid;
-        
-        document.getElementById('user-avatar').src = user.photoURL || "https://ui-avatars.com/api/?name=" + encodeURIComponent(usuarioActual);
-        document.getElementById('user-name').innerText = usuarioActual;
-        
-        document.getElementById('logged-in-view').classList.replace('d-none', 'd-flex');
-        document.getElementById('logged-out-view').classList.add('d-none');
+        avatarUrlActual = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(usuarioActual)}`;
 
-        await registrarAccesoInvestigacion(user.uid, currentInvId);
+        localStorage.setItem('unp_nombre_usuario', usuarioActual);
+        localStorage.setItem('unp_uid_usuario', usuarioUid);
+        localStorage.setItem('unp_avatar_usuario', avatarUrlActual);
+
+        actualizarVistaUsuarioUI();
+        registrarAccesoInvestigacion(user.uid, currentInvId);
         cargarListaInvestigaciones(user.uid);
     }
 
@@ -381,11 +423,6 @@
     }
 
     async function crearNuevaInvestigacion() {
-        if (!usuarioUid) {
-            alert("Debes iniciar sesión con Google para crear y guardar investigaciones en tu cuenta.");
-            return;
-        }
-
         const titulo = prompt("Título de la nueva investigación:");
         if (!titulo || !titulo.trim()) return;
         const subtitulo = prompt("Subtítulo o descripción breve:") || "";
@@ -416,7 +453,7 @@
         const contenedor = document.getElementById('lista-investigaciones');
         let invsPorMostrar = ['general-unp'];
 
-        if (uid) {
+        if (uid && !uid.startsWith('local_')) {
             db.collection('users').doc(uid).onSnapshot(async (doc) => {
                 if (doc.exists && doc.data().investigaciones) {
                     invsPorMostrar = doc.data().investigaciones;
@@ -497,7 +534,168 @@
     elementSubtitulo.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } });
 
     // ==========================================
-    // TIEMPO RELATIVO Y VOZ P2P
+    // SISTEMA DE VOZ P2P SIN DUPLICADOS Y SEGUNDO PLANO
+    // ==========================================
+    let localStream = null;
+    let peer = null;
+    let voiceHeartbeatInterval = null;
+    let activeCalls = {};
+    let isMuted = false;
+
+    async function conectarVoz() {
+        try {
+            localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+            peer = new Peer();
+            
+            peer.on('open', (id) => {
+                const voiceRef = db.collection('investigaciones').doc(currentInvId).collection('voice_room').doc(usuarioUid);
+                
+                // Usar el UID como ID de documento previene duplicados y sobreescribe sesiones previas
+                voiceRef.set({
+                    nombre: usuarioActual,
+                    peerId: id,
+                    lastSeen: Date.now()
+                }).then(() => {
+                    document.getElementById('estado-voz').className = 'badge bg-success';
+                    document.getElementById('estado-voz').innerText = 'EN LÍNEA';
+                    document.getElementById('controles-voz').classList.add('d-none');
+                    document.getElementById('controles-activo-voz').classList.remove('d-none');
+
+                    // Latido (Heartbeat) cada 10 segundos. Tolera hasta 45s en segundo plano en celular.
+                    if (voiceHeartbeatInterval) clearInterval(voiceHeartbeatInterval);
+                    voiceHeartbeatInterval = setInterval(() => {
+                        voiceRef.set({ lastSeen: Date.now() }, { merge: true }).catch(() => {});
+                    }, 10000);
+                });
+            });
+
+            peer.on('call', (call) => {
+                call.answer(localStream);
+                call.on('stream', (remoteStream) => {
+                    agregarAudio(call.peer, remoteStream);
+                });
+            });
+
+        } catch (err) {
+            alert("No se pudo acceder al micrófono. Por favor, concede los permisos en tu navegador.");
+        }
+    }
+
+    function toggleMute() {
+        if (localStream) {
+            isMuted = !isMuted;
+            localStream.getAudioTracks()[0].enabled = !isMuted;
+            
+            const btnMute = document.getElementById('btn-mute');
+            if (isMuted) {
+                btnMute.innerHTML = '<i class="fas fa-microphone-slash text-danger"></i>';
+            } else {
+                btnMute.innerHTML = '<i class="fas fa-microphone"></i>';
+            }
+        }
+    }
+
+    function desconectarVoz() {
+        if (voiceHeartbeatInterval) {
+            clearInterval(voiceHeartbeatInterval);
+            voiceHeartbeatInterval = null;
+        }
+        if (usuarioUid && db) {
+            db.collection('investigaciones').doc(currentInvId).collection('voice_room').doc(usuarioUid).delete().catch(() => {});
+        }
+        if (peer) {
+            peer.destroy();
+            peer = null;
+        }
+        if (localStream) {
+            localStream.getTracks().forEach(track => track.stop());
+            localStream = null;
+        }
+        
+        document.getElementById('audio-elements').innerHTML = '';
+        activeCalls = {};
+        
+        document.getElementById('estado-voz').className = 'badge bg-secondary';
+        document.getElementById('estado-voz').innerText = 'DESCONECTADO';
+        document.getElementById('controles-voz').classList.remove('d-none');
+        document.getElementById('controles-activo-voz').classList.add('d-none');
+        
+        if(isMuted) toggleMute(); 
+    }
+
+    function agregarAudio(peerId, stream) {
+        if (!document.getElementById('audio-' + peerId)) {
+            const audio = document.createElement('audio');
+            audio.id = 'audio-' + peerId;
+            audio.className = 'peer-audio';
+            audio.srcObject = stream;
+            audio.autoplay = true;
+            document.getElementById('audio-elements').appendChild(audio);
+        }
+    }
+
+    if (db) {
+        db.collection('investigaciones').doc(currentInvId).collection('voice_room').onSnapshot((snapshot) => {
+            const listaUI = document.getElementById('lista-usuarios-voz');
+            listaUI.innerHTML = '';
+            
+            let usuariosActivos = [];
+            const ahora = Date.now();
+
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                
+                // Si pasaron más de 45 segundos sin latido (usuario cerró navegador sin salir), se ignora (limpieza de fantasmas)
+                if (data.lastSeen && (ahora - data.lastSeen > 45000)) {
+                    return; 
+                }
+
+                usuariosActivos.push(data.peerId);
+                
+                const isMe = peer && data.peerId === peer.id;
+                const nombreMostrar = isMe ? `${data.nombre} (Tú)` : data.nombre;
+                const colorAcento = isMe ? "text-success" : "text-secondary";
+                
+                listaUI.innerHTML += `
+                    <div class="voice-user-item mb-2 shadow-sm">
+                        <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(data.nombre)}&background=random&color=fff&size=24" class="rounded-circle me-2 border">
+                        <i class="fas fa-microphone ${colorAcento} me-2" style="font-size:0.75rem;"></i>
+                        <span class="text-dark text-truncate" style="font-weight: 500;">${nombreMostrar}</span>
+                    </div>
+                `;
+
+                if (peer && peer.id && !isMe && !activeCalls[data.peerId]) {
+                    const call = peer.call(data.peerId, localStream);
+                    activeCalls[data.peerId] = call;
+                    
+                    call.on('stream', (remoteStream) => {
+                        agregarAudio(data.peerId, remoteStream);
+                    });
+                }
+            });
+
+            if (listaUI.innerHTML === '') {
+                listaUI.innerHTML = '<div class="text-muted small fst-italic text-center py-2" id="mensaje-vacio-voz">Nadie en la sala</div>';
+            }
+
+            document.querySelectorAll('audio.peer-audio').forEach(audioTag => {
+                const pId = audioTag.id.replace('audio-', '');
+                if (!usuariosActivos.includes(pId)) {
+                    audioTag.remove();
+                    delete activeCalls[pId];
+                }
+            });
+        });
+    }
+
+    window.addEventListener('beforeunload', () => {
+        if (usuarioUid && db) {
+            db.collection('investigaciones').doc(currentInvId).collection('voice_room').doc(usuarioUid).delete().catch(() => {});
+        }
+    });
+
+    // ==========================================
+    // TIEMPO RELATIVO
     // ==========================================
     function tiempoRelativo(ms) {
         const segundos = Math.floor((Date.now() - ms) / 1000);
@@ -518,85 +716,6 @@
             if(ms) el.innerText = tiempoRelativo(ms);
         });
     }, 30000);
-
-    let localStream = null, peer = null, myVoiceDocId = null, activeCalls = {}, isMuted = false;
-
-    async function conectarVoz() {
-        try {
-            localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-            peer = new Peer();
-            
-            peer.on('open', (id) => {
-                db.collection('investigaciones').doc(currentInvId).collection('voice_room').add({
-                    nombre: usuarioActual, peerId: id, timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                }).then(docRef => {
-                    myVoiceDocId = docRef.id;
-                    document.getElementById('estado-voz').className = 'badge bg-success';
-                    document.getElementById('estado-voz').innerText = 'EN LÍNEA';
-                    document.getElementById('controles-voz').classList.add('d-none');
-                    document.getElementById('controles-activo-voz').classList.remove('d-none');
-                });
-            });
-
-            peer.on('call', (call) => {
-                call.answer(localStream);
-                call.on('stream', (remoteStream) => { agregarAudio(call.peer, remoteStream); });
-            });
-        } catch (err) {
-            alert("No se pudo acceder al micrófono.");
-        }
-    }
-
-    function toggleMute() {
-        if (localStream) {
-            isMuted = !isMuted;
-            localStream.getAudioTracks()[0].enabled = !isMuted;
-            document.getElementById('btn-mute').innerHTML = isMuted ? '<i class="fas fa-microphone-slash text-danger"></i>' : '<i class="fas fa-microphone"></i>';
-        }
-    }
-
-    function desconectarVoz() {
-        if (myVoiceDocId) { db.collection('investigaciones').doc(currentInvId).collection('voice_room').doc(myVoiceDocId).delete(); myVoiceDocId = null; }
-        if (peer) { peer.destroy(); peer = null; }
-        if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
-        document.getElementById('audio-elements').innerHTML = '';
-        activeCalls = {};
-        document.getElementById('estado-voz').className = 'badge bg-secondary';
-        document.getElementById('estado-voz').innerText = 'DESCONECTADO';
-        document.getElementById('controles-voz').classList.remove('d-none');
-        document.getElementById('controles-activo-voz').classList.add('d-none');
-    }
-
-    function agregarAudio(peerId, stream) {
-        if (!document.getElementById('audio-' + peerId)) {
-            const audio = document.createElement('audio');
-            audio.id = 'audio-' + peerId; audio.className = 'peer-audio'; audio.srcObject = stream; audio.autoplay = true;
-            document.getElementById('audio-elements').appendChild(audio);
-        }
-    }
-
-    db.collection('investigaciones').doc(currentInvId).collection('voice_room').onSnapshot((snapshot) => {
-        const listaUI = document.getElementById('lista-usuarios-voz');
-        listaUI.innerHTML = '';
-        let usuariosActivos = [];
-        if(snapshot.empty) { listaUI.innerHTML = '<div class="text-muted small fst-italic text-center py-2">Nadie en la sala</div>'; }
-        snapshot.forEach((doc) => {
-            const data = doc.data();
-            usuariosActivos.push(data.peerId);
-            const isMe = peer && data.peerId === peer.id;
-            listaUI.innerHTML += `
-                <div class="voice-user-item mb-2 shadow-sm">
-                    <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(data.nombre)}&background=random&color=fff&size=24" class="rounded-circle me-2 border">
-                    <span class="text-dark text-truncate fw-500">${isMe ? data.nombre + ' (Tú)' : data.nombre}</span>
-                </div>
-            `;
-            if (peer && peer.id && !isMe && !activeCalls[data.peerId]) {
-                const call = peer.call(data.peerId, localStream);
-                activeCalls[data.peerId] = call;
-                call.on('stream', (remoteStream) => { agregarAudio(data.peerId, remoteStream); });
-            }
-        });
-    });
 
     // ==========================================
     // PUBLICACIONES (NOTAS) Y PERMISOS
