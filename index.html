@@ -2,21 +2,26 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script><script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script><script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script><script src="https://unpkg.com/peerjs@1.5.1/dist/peerjs.min.js"></script>
 <style>
-body{background-color:#f8f9fa;color:#212529;font-family:system-ui,sans-serif;padding-bottom:30px;}.text-brand{color:#712cf9;}.bg-brand{background-color:#712cf9;color:white;}.border-brand{border-color:#712cf9 !important;}.btn-brand{background-color:#712cf9;color:white;border:none;}.btn-brand:hover{background-color:#5a23c8;color:white;}
-.card-custom{border:1px solid rgba(0,0,0,.08);border-radius:0.75rem;box-shadow:0 0.125rem 0.25rem rgba(0,0,0,.04);background:#fff;}
-[contenteditable="true"]{padding:2px 4px;border-radius:4px;transition:0.2s;border:1px dashed transparent;margin-left:-4px;}[contenteditable="true"]:hover{background-color:#e9ecef;border-color:#adb5bd;outline:none;}[contenteditable="true"]:focus{background-color:#fff;border-color:#712cf9;box-shadow:0 0 0 0.2rem rgba(113,44,249,.25);outline:none;}
-@media (min-width:992px){.main-content-wrapper{padding-left:4%;padding-right:4%;}}@media (min-width:1200px){.main-content-wrapper{padding-left:10%;padding-right:10%;}}@media (min-width:1600px){.main-content-wrapper{padding-left:12%;padding-right:12%;}}
-.note-card{border:1px solid #e2e8f0 !important;border-left:5px solid #712cf9 !important;border-radius:1rem;background:#fff;transition:all 0.25s ease;margin-bottom:1.8rem !important;box-shadow:0 4px 6px -1px rgba(0,0,0,0.05),0 2px 4px -1px rgba(0,0,0,0.03) !important;}
-.note-card:hover{background-color:#fcfcfd;transform:translateY(-3px);box-shadow:0 10px 15px -3px rgba(0,0,0,0.08),0 4px 6px -2px rgba(0,0,0,0.04) !important;}
-.editor-custom{border:1px solid #dee2e6;border-radius:0.5rem;padding:12px;min-height:110px;max-height:350px;overflow-y:auto;background:#fff;font-size:0.95rem;}.editor-custom:focus{border-color:#712cf9;box-shadow:0 0 0 0.25rem rgba(113,44,249,0.25);outline:none;}
-.note-img{max-width:100%;border-radius:0.5rem;margin-top:15px;border:1px solid #e9ecef;box-shadow:0 2px 4px rgba(0,0,0,0.05);}
-.btn-icon{background:none;border:none;cursor:pointer;font-size:1rem;padding:0;transition:0.2s;}.btn-icon:hover{transform:scale(1.1);}
-.action-buttons{position:absolute;top:15px;right:20px;display:flex;gap:10px;opacity:0.7;transition:0.2s;}.note-card:hover .action-buttons{opacity:1;}
-.voice-user-item{padding:6px 10px;border-radius:6px;font-size:0.85rem;display:flex;align-items:center;background:#f8f9fa;border:1px solid #e9ecef;color:#212529;}
-.nav-item-channel{padding:8px 12px;border-radius:6px;font-size:0.85rem;display:flex;align-items:center;justify-content:space-between;color:#495057;text-decoration:none;transition:0.2s;margin-bottom:5px;}.nav-item-channel:hover{background-color:#e9ecef;color:#712cf9;}.nav-item-active{background-color:#f3f0ff !important;color:#712cf9 !important;border-left:4px solid #712cf9;font-weight:600;}
-#chat-floating-panel{position:fixed;bottom:90px;right:25px;width:340px;max-width:90vw;z-index:1050;display:none;box-shadow:0 0.5rem 1.5rem rgba(0,0,0,0.15);border-radius:1rem;overflow:hidden;background:#fff;animation:fadeIn 0.3s ease;}
-.chat-bubble{max-width:85%;padding:8px 12px;border-radius:12px;font-size:0.85rem;line-height:1.3;}.chat-me{background-color:#712cf9;color:white;border-bottom-right-radius:2px;align-self:flex-end;}.chat-other{background-color:#fff;border:1px solid #dee2e6;color:#212529;border-bottom-left-radius:2px;align-self:flex-start;}.chat-author{font-size:0.65rem;font-weight:bold;margin-bottom:3px;opacity:0.8;}
+:root{--brand:#712cf9;--brand-hover:#5a23c8;--bg:#f4f6f9;} body{background-color:var(--bg);color:#1c1e21;font-family:system-ui,sans-serif;padding-bottom:30px;}
+.text-brand{color:var(--brand) !important;}.bg-brand{background-color:var(--brand) !important;color:white;}.border-brand{border-color:var(--brand) !important;}
+.btn-brand{background-color:var(--brand);color:white;border:none;font-weight:600;}.btn-brand:hover{background-color:var(--brand-hover);color:white;}
+.vest-logo {background: linear-gradient(135deg, #712cf9, #d63384); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1px;}
+.card-custom{border:1px solid #e1e4e8;border-radius:10px;box-shadow:0 2px 4px rgba(0,0,0,0.04);background:#fff;margin-bottom:1rem;}
+[contenteditable="true"]{padding:2px 4px;border-radius:4px;transition:0.2s;border:1px dashed transparent;margin-left:-4px;}
+[contenteditable="true"]:focus{background-color:#f0f2f5;border-color:#ccd0d5;outline:none;}
+.note-card{border-radius:10px;background:#fff;margin-bottom:1rem;box-shadow:0 2px 4px rgba(0,0,0,0.04) !important;}
+.editor-custom{border:none;border-radius:8px;padding:12px;min-height:90px;max-height:350px;overflow-y:auto;background:#f8f9fa;font-size:0.95rem; border: 1px solid #e1e4e8;}
+.editor-custom:focus{outline:none;background:#fff; border-color:var(--brand);}
+.note-img{max-width:100%;border-radius:8px;margin-top:10px;border:1px solid #e9ecef;}
+.btn-icon{background:none;border:none;cursor:pointer;font-size:1rem;padding:0;color:#6c757d; transition:0.2s;}.btn-icon:hover{transform:scale(1.1);}
+.action-buttons{position:absolute;top:15px;right:20px;display:flex;gap:10px;}
+.voice-user-item,.nav-item-channel{padding:8px 12px;border-radius:6px;font-size:0.85rem;display:flex;align-items:center;background:#fff;color:#1c1e21;text-decoration:none;margin-bottom:5px;}
+.nav-item-channel:hover{background-color:var(--bg);}.nav-item-active{background-color:#f3f0ff !important;color:var(--brand) !important;font-weight:600; border-left:3px solid var(--brand);}
+#chat-floating-panel{position:fixed;bottom:90px;right:25px;width:340px;max-width:90vw;z-index:1050;display:none;box-shadow:0 0.5rem 1.5rem rgba(0,0,0,0.2);border-radius:10px;overflow:hidden;background:#fff;}
+.chat-bubble{max-width:85%;padding:8px 12px;border-radius:18px;font-size:0.85rem;line-height:1.3;}.chat-me{background-color:var(--brand);color:white;align-self:flex-end; border-bottom-right-radius: 4px;}.chat-other{background-color:#f1f3f5;color:#1c1e21;align-self:flex-start; border-bottom-left-radius: 4px;}
 .modal-overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.6);z-index:2000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);padding:15px;}
+
+/* ESTILOS DEL PERFIL (DISEÑO ORIGINAL INSTAGRAM) */
 .perfil-card{width:95vw;max-width:1050px;height:92vh;max-height:95vh;border-radius:1rem;overflow:hidden;animation:scaleIn 0.2s ease-out;display:flex;flex-direction:column;background:#fff;}
 @keyframes scaleIn{from{transform:scale(0.95);opacity:0;}to{transform:scale(1);opacity:1;}}
 .insta-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:700px;margin:0 auto;}
@@ -24,34 +29,80 @@ body{background-color:#f8f9fa;color:#212529;font-family:system-ui,sans-serif;pad
 .insta-tile:hover{opacity:0.9;transform:scale(1.01);}
 .insta-tile img{width:100%;height:100%;object-fit:cover;}
 .insta-tile-text{padding:12px;font-size:0.8rem;color:#495057;text-align:center;overflow:hidden;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;}
-@media (max-width:991.98px){body{padding-bottom:80px;}#col-canales,#col-paneles{display:none;}#mobile-bottom-nav{position:fixed;bottom:0;left:0;width:100%;background:white;border-top:1px solid #dee2e6;display:flex;justify-content:space-around;align-items:center;z-index:1040;height:65px;box-shadow:0 -4px 10px rgba(0,0,0,0.05);}.nav-btn{background:transparent;border:none;color:#adb5bd;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;transition:0.2s;}.nav-btn i{font-size:1.3rem;margin-bottom:4px;}.nav-btn span{font-size:0.65rem;font-weight:700;}.nav-btn.active{color:#712cf9;}.nav-btn.active i{transform:scale(1.15);}#btn-toggle-chat,#chat-floating-panel{bottom:85px !important;}.perfil-card{height:95vh;width:100vw;max-width:100%;border-radius:0;}}
+
+/* HISTORIAS FUNCIONALES Y RESPONSIVAS */
+.stories-wrapper{display:flex;gap:8px;overflow-x:auto;padding:10px;scrollbar-width:none;background:#fff;border-radius:10px;box-shadow:0 2px 4px rgba(0,0,0,0.04);margin-bottom:1rem; border:1px solid #e1e4e8;}
+.stories-wrapper::-webkit-scrollbar{display:none;}
+.story-card{flex:0 0 100px;height:170px;border-radius:10px;background:#f8f9fa;position:relative;cursor:pointer;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,0.1);border:1px solid #e1e4e8;}
+.story-card::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0) 50%,rgba(0,0,0,0.7) 100%);pointer-events:none;}
+.story-avatar{position:absolute;top:8px;left:8px;width:32px;height:32px;border-radius:50%;border:2px solid var(--brand);z-index:2;object-fit:cover;background:#fff;}
+.story-author{position:absolute;bottom:8px;left:4px;right:4px;color:#fff;font-size:0.7rem;font-weight:600;z-index:2;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.story-add-btn{width:32px;height:32px;border-radius:50%;background:var(--brand);color:white;display:flex;justify-content:center;align-items:center;position:absolute;top:100px;left:50%;transform:translate(-50%,0);border:3px solid #fff;z-index:3;}
+#story-view-modal img{object-fit:contain;width:100%;height:100%;background:#111;}
+.story-progress{position:absolute;top:10px;left:10px;right:10px;height:3px;background:rgba(255,255,255,0.3);border-radius:2px;z-index:10;}
+.story-progress-bar{height:100%;background:#fff;width:0%;animation:storyFill 5s linear forwards;}
+@keyframes storyFill{to{width:100%;}}
+
+@media (max-width:991.98px){body{padding-bottom:80px;}#col-canales,#col-paneles{display:none;}#mobile-bottom-nav{position:fixed;bottom:0;left:0;width:100%;background:white;border-top:1px solid #ddd;display:flex;justify-content:space-around;align-items:center;z-index:1040;height:65px;box-shadow: 0 -2px 10px rgba(0,0,0,0.05);}.nav-btn{background:transparent;border:none;color:#6c757d;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;}.nav-btn i{font-size:1.3rem; margin-bottom: 2px;}.nav-btn span{font-size:0.65rem;font-weight:600;}.nav-btn.active{color:var(--brand);}#btn-toggle-chat,#chat-floating-panel{bottom:75px !important;}.perfil-card{height:95vh;width:100vw;max-width:100%;border-radius:0;}}
 </style></head><body>
 
-<div class="container-fluid px-4 py-4">
-    <header class="pb-3 mb-4 border-bottom d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-        <div style="margin-left: 10%;"><h1 class="fw-bold fs-3 mb-0 text-dark" style="letter-spacing:-1px;">VEST</h1><h2 id="subtitulo-doc" class="text-muted fs-6 fw-normal mb-0 mt-1" contenteditable="true" title="Clic para editar subtítulo">Cargando detalles...</h2></div>
-        
-        <div class="p-2 rounded bg-white shadow-sm border border-brand" style="min-width:200px;"><div id="auth-container"><div id="logged-out-view"><button class="btn btn-outline-dark btn-sm w-100 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2 py-1" onclick="iniciarSesionGoogle()"><img src="https://www.svgrepo.com/show/475656/google-color.svg" width="16" height="16"> Iniciar sesión con Google</button></div><div id="logged-in-view" class="d-none align-items-center justify-content-between"><div class="d-flex align-items-center gap-2 text-truncate cursor-pointer" onclick="abrirPerfil(usuarioUid, usuarioActual, avatarUrlActual)" style="cursor:pointer;" title="Ver mi perfil"><img id="user-avatar" src="" class="rounded-circle border" width="32" height="32" style="object-fit:cover;"><span id="user-name" class="small fw-bold text-dark text-truncate"></span></div><button class="btn btn-sm btn-light text-danger border-0 p-1 ms-2" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i></button></div></div></div>
-    </header>
+<header class="bg-white shadow-sm position-sticky top-0 z-3 border-bottom py-2 mb-4">
+    <div class="container-fluid px-4 d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-2"><h1 class="fw-bold fs-3 mb-0 vest-logo m-0">VEST</h1><div class="vr mx-2"></div><h2 id="subtitulo-doc" class="text-muted fs-6 fw-normal mb-0" contenteditable="true" title="Clic para editar">Cargando...</h2></div>
+        <div id="auth-container"><div id="logged-out-view"><button class="btn btn-light border btn-sm fw-bold shadow-sm d-flex align-items-center gap-2" onclick="iniciarSesionGoogle()"><img src="https://www.svgrepo.com/show/475656/google-color.svg" width="16" height="16"> Entrar</button></div><div id="logged-in-view" class="d-none align-items-center"><div class="d-flex align-items-center gap-2" onclick="abrirPerfil(usuarioUid, usuarioActual, avatarUrlActual)" style="cursor:pointer;"><img id="user-avatar" src="" class="rounded-circle border" width="36" height="36" style="object-fit:cover;"><span id="user-name" class="small fw-bold text-dark d-none d-md-block"></span></div><button class="btn btn-sm btn-light text-danger border-0 p-1 ms-3 bg-transparent" onclick="cerrarSesion()" title="Cerrar sesión"><i class="fas fa-sign-out-alt fa-lg"></i></button></div></div>
+    </div>
+</header>
 
-    <div class="main-content-wrapper"><div class="row g-4">
-        <!-- CANALES -->
-        <div class="col-lg-3" id="col-canales"><div class="card card-custom border-0 shadow-sm mb-4"><div class="card-header bg-white border-bottom fw-bold text-dark py-3 d-flex justify-content-between align-items-center"><span><i class="fas fa-folder-open me-2 text-brand"></i> Investigaciones</span><button id="btn-compartir-inv" class="btn btn-sm btn-light border text-brand rounded-circle d-none" onclick="navigator.clipboard.writeText(window.location.href);alert('¡Copiado!');"><i class="fas fa-share-alt"></i></button></div><div class="card-body p-3"><div class="text-uppercase small text-muted fw-bold mb-2" style="font-size:0.7rem;">Mis Canales</div><div id="lista-investigaciones" class="mb-3"><div class="text-center text-muted small py-2">Cargando...</div></div><hr class="opacity-10 my-3"><button class="btn btn-light btn-sm w-100 fw-bold shadow-sm d-flex justify-content-center align-items-center gap-2 border text-secondary" onclick="crearNuevaInvestigacion()"><i class="fas fa-plus"></i> Crear investigación</button></div></div></div>
+<div class="container-fluid px-lg-5"><div class="row g-4">
+    <!-- CANALES -->
+    <div class="col-lg-3" id="col-canales"><div class="card-custom p-3"><div class="d-flex justify-content-between align-items-center mb-3"><span class="fw-bold text-secondary"><i class="fas fa-folder text-brand me-2"></i> Investigaciones</span><button id="btn-compartir-inv" class="btn btn-sm text-brand d-none p-0" onclick="navigator.clipboard.writeText(window.location.href);alert('¡Enlace copiado!');"><i class="fas fa-share-alt"></i></button></div><div id="lista-investigaciones" class="mb-3">Cargando...</div><button class="btn btn-light btn-sm w-100 fw-bold border text-secondary mt-2" onclick="crearNuevaInvestigacion()"><i class="fas fa-plus"></i> Nuevo Canal</button></div></div>
 
-        <!-- FEED PRINCIPAL -->
-        <div class="col-lg-5" id="col-feed"><div class="card card-custom mb-4 border-0 shadow-sm" style="border-top:4px solid #712cf9 !important;"><div class="card-header bg-white border-bottom fw-bold text-dark py-3" id="titulo-panel-edicion"><i class="fas fa-pen me-1 text-brand"></i> Nueva Publicación</div><div class="card-body"><div class="btn-group btn-group-sm mb-2 w-100 shadow-sm"><button class="btn btn-outline-secondary" onclick="insertarFormato('bold')"><i class="fas fa-bold"></i></button><button class="btn btn-outline-secondary" onclick="insertarFormato('italic')"><i class="fas fa-italic"></i></button><button class="btn btn-outline-secondary" onclick="insertarFormato('color')"><i class="fas fa-palette"></i></button><button class="btn btn-outline-secondary" onclick="insertarFormato('list')"><i class="fas fa-list-ul"></i></button><button class="btn btn-outline-secondary" onclick="insertarFormato('link')"><i class="fas fa-link"></i></button></div><div id="editor-nota" class="editor-custom mb-2" contenteditable="true" placeholder="Redacta un hallazgo..."></div><div id="preview-container" style="display:none;position:relative;margin-bottom:10px;"><img id="preview-img" style="max-height:100px;border-radius:5px;"><button class="btn btn-danger btn-sm rounded-circle position-absolute" style="top:-10px;left:-10px;padding:2px 8px;" onclick="quitarImagen()"><i class="fas fa-times"></i></button></div><div class="d-flex justify-content-between align-items-center mt-3"><input type="file" id="input-foto" accept="image/*" style="display:none;" onchange="cargarImagen(event)"><button class="btn btn-sm btn-light border shadow-sm" onclick="document.getElementById('input-foto').click()"><i class="fas fa-camera me-1 text-muted"></i> Foto</button><div><button id="btn-cancelar-edicion" class="btn btn-sm btn-secondary d-none me-1" onclick="cancelarEdicion()">Cancelar</button><button id="btn-publicar" class="btn btn-brand px-4 shadow-sm fw-bold" onclick="publicarNota()">Publicar <i class="fas fa-paper-plane ms-1"></i></button></div></div></div></div><div id="feed-notas"><div class="text-center text-muted mt-5"><i class="fas fa-spinner fa-spin fa-2x mb-2"></i><br>Cargando...</div></div></div>
+    <!-- FEED PRINCIPAL -->
+    <div class="col-lg-6" id="col-feed">
+        <!-- Historias -->
+        <div class="stories-wrapper" id="stories-list">
+            <div class="story-card" style="background:#fff;" onclick="document.getElementById('input-story').click()">
+                <img id="my-story-avatar" src="" style="width:100%;height:110px;object-fit:cover;border-radius:10px 10px 0 0;">
+                <div class="story-add-btn"><i class="fas fa-plus"></i></div>
+                <span class="story-author text-dark" style="bottom:6px;">Crear historia</span>
+            </div>
+            <!-- Historias dinámicas aquí -->
+        </div>
+        <input type="file" id="input-story" accept="image/*" class="d-none" onchange="subirHistoria(event)">
 
-        <!-- PANELES DERECHOS -->
-        <div class="col-lg-4" id="col-paneles"><div class="card card-custom border-0 shadow-sm mb-4" style="border-top:4px solid #198754 !important;"><div class="card-header bg-white border-bottom fw-bold text-dark py-3 d-flex justify-content-between align-items-center"><span><i class="fas fa-headset me-2 text-success"></i> Sala de Voz</span><span id="estado-voz" class="badge bg-secondary" style="font-size:0.6rem;">DESCONECTADO</span></div><div class="card-body p-3"><div id="lista-usuarios-voz" class="mb-3"><div class="text-muted small text-center py-2">Nadie en la sala</div></div><div id="audio-elements" style="display:none;"></div><div id="controles-voz" class="mt-2"><button class="btn btn-success btn-sm w-100 fw-bold shadow-sm" onclick="conectarVoz()"><i class="fas fa-phone-alt me-1"></i> Conectarse</button></div><div class="d-none mt-2" id="controles-activo-voz"><div class="d-flex gap-2"><button id="btn-mute" class="btn btn-light border btn-sm flex-fill fw-bold shadow-sm" onclick="toggleMute()"><i class="fas fa-microphone"></i></button><button class="btn btn-danger btn-sm flex-fill fw-bold shadow-sm" onclick="desconectarVoz()"><i class="fas fa-phone-slash"></i> Salir</button></div></div></div></div><div class="card card-custom mb-4 border-0 shadow-sm"><div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3"><span class="fw-bold text-dark"><i class="fas fa-bookmark me-1 text-brand"></i> Bibliografía</span><button class="btn btn-sm btn-light border text-brand rounded-circle" onclick="agregarBibliografia()"><i class="fas fa-plus"></i></button></div><div class="card-body p-0 px-3"><ul class="list-group list-group-flush" id="lista-biblio"></ul></div></div></div>
-    </div></div>
+        <!-- Editor Publicación -->
+        <div class="card-custom p-3 mb-3"><div class="d-flex gap-2 mb-2"><img id="editor-avatar" src="" class="rounded-circle border" width="40" height="40" style="object-fit:cover;display:none;"><div id="editor-nota" class="editor-custom w-100" contenteditable="true" placeholder="¿Qué hallazgos tienes hoy?"></div></div>
+        <div id="preview-container" style="display:none;position:relative;margin-bottom:10px;margin-left:48px;"><img id="preview-img" style="max-height:100px;border-radius:8px;"><button class="btn btn-dark btn-sm rounded-circle position-absolute" style="top:5px;left:5px;padding:2px 8px;opacity:0.7;" onclick="quitarImagen()"><i class="fas fa-times"></i></button></div>
+        <div class="d-flex justify-content-between align-items-center mt-2 border-top pt-2"><div class="d-flex gap-2"><input type="file" id="input-foto" accept="image/*" class="d-none" onchange="cargarImagen(event)"><button class="btn btn-light border btn-sm text-secondary fw-bold" onclick="document.getElementById('input-foto').click()"><i class="fas fa-image text-success"></i> Foto</button><div class="btn-group btn-group-sm"><button class="btn btn-light border text-secondary" onclick="insertarFormato('bold')"><i class="fas fa-bold"></i></button><button class="btn btn-light border text-secondary" onclick="insertarFormato('list')"><i class="fas fa-list-ul"></i></button></div></div><div><button id="btn-cancelar-edicion" class="btn btn-sm btn-secondary d-none me-1" onclick="cancelarEdicion()">Cancelar</button><button id="btn-publicar" class="btn btn-brand px-4 shadow-sm rounded-pill" onclick="publicarNota()">Publicar</button></div></div></div>
+        <!-- Feed -->
+        <div id="feed-notas"><div class="text-center text-muted mt-5"><i class="fas fa-spinner fa-spin fa-2x mb-2"></i><br>Cargando muro...</div></div>
+    </div>
+
+    <!-- PANELES DERECHOS -->
+    <div class="col-lg-3" id="col-paneles">
+        <div class="card-custom p-3 mb-3"><div class="d-flex justify-content-between align-items-center mb-3"><span class="fw-bold text-secondary"><i class="fas fa-headset text-success me-2"></i> Sala de Voz</span><span id="estado-voz" class="badge bg-secondary" style="font-size:0.65rem;">OFFLINE</span></div><div id="lista-usuarios-voz" class="mb-3"><div class="text-muted small">Nadie en la sala</div></div><div id="audio-elements" class="d-none"></div><div id="controles-voz"><button class="btn btn-light border text-success btn-sm w-100 fw-bold" onclick="conectarVoz()"><i class="fas fa-phone-alt me-1"></i> Entrar a sala</button></div><div class="d-none mt-2" id="controles-activo-voz"><div class="d-flex gap-2"><button id="btn-mute" class="btn btn-light border btn-sm flex-fill fw-bold" onclick="toggleMute()"><i class="fas fa-microphone"></i></button><button class="btn btn-danger btn-sm flex-fill fw-bold" onclick="desconectarVoz()">Salir</button></div></div></div>
+        <div class="card-custom p-0"><div class="border-bottom p-3 d-flex justify-content-between align-items-center"><span class="fw-bold text-secondary"><i class="fas fa-bookmark text-warning me-2"></i> Bibliografía</span><button class="btn btn-sm text-brand p-0" onclick="agregarBibliografia()"><i class="fas fa-plus"></i></button></div><ul class="list-group list-group-flush" id="lista-biblio"></ul></div>
+    </div>
+</div></div>
+
+<!-- Mobile Nav & Chat -->
+<div id="mobile-bottom-nav" class="d-lg-none"><button class="nav-btn" onclick="switchMobileTab('col-canales',this)"><i class="fas fa-hashtag"></i><span>Canales</span></button><button class="nav-btn active" onclick="switchMobileTab('col-feed',this)"><i class="fas fa-home"></i><span>Inicio</span></button><button class="nav-btn" onclick="switchMobileTab('col-paneles',this)"><i class="fas fa-bars"></i><span>Menú</span></button></div>
+<button id="btn-toggle-chat" class="btn btn-brand rounded-circle shadow-lg position-fixed bottom-0 end-0 m-4 d-flex align-items-center justify-content-center" style="width:60px;height:60px;z-index:1050;" onclick="toggleChat()"><i class="fas fa-comments fa-lg"></i></button>
+<div id="chat-floating-panel" class="card border-0"><div class="card-header bg-brand text-white py-2 d-flex justify-content-between align-items-center"><span class="fw-bold small"><i class="fas fa-comments me-1"></i> Chat del Equipo</span><button class="btn btn-sm text-white p-0" onclick="toggleChat()"><i class="fas fa-times"></i></button></div><div id="chat-messages" style="height:280px;overflow-y:auto;background:#fff;padding:15px;display:flex;flex-direction:column;gap:10px;"></div><div class="card-footer bg-white border-top p-2"><div class="input-group input-group-sm"><input type="text" id="chat-input" class="form-control rounded-pill bg-light border-0 px-3" placeholder="Escribe un mensaje..." onkeypress="if(event.key==='Enter') enviarMensaje()"><button class="btn text-brand ms-1" onclick="enviarMensaje()"><i class="fas fa-paper-plane"></i></button></div></div></div>
+
+<!-- MODAL VISOR DE HISTORIAS -->
+<div id="story-view-modal" class="modal-overlay d-none" style="z-index: 2050;">
+    <div style="width:100%;max-width:400px;height:85vh;background:#000;border-radius:12px;position:relative;overflow:hidden;display:flex;align-items:center;">
+        <div class="story-progress"><div class="story-progress-bar" id="sv-progress"></div></div>
+        <div class="position-absolute top-0 w-100 p-3 d-flex justify-content-between align-items-center z-3 mt-3">
+            <div class="d-flex align-items-center gap-2"><img id="sv-avatar" src="" class="rounded-circle border border-white" width="36" height="36" style="object-fit:cover;"><span id="sv-name" class="text-white fw-bold shadow-sm" style="text-shadow:1px 1px 3px #000;"></span></div>
+            <div class="d-flex gap-3"><button id="sv-del" class="btn-icon text-white d-none shadow-sm" style="text-shadow:1px 1px 3px #000;"><i class="fas fa-trash"></i></button><button class="btn-icon text-white shadow-sm" style="text-shadow:1px 1px 3px #000;font-size:1.5rem;" onclick="cerrarHistoria()"><i class="fas fa-times"></i></button></div>
+        </div>
+        <img id="sv-img" src="">
+    </div>
 </div>
 
-<div id="mobile-bottom-nav" class="d-lg-none"><button class="nav-btn" onclick="switchMobileTab('col-canales',this)"><i class="fas fa-hashtag"></i><span>Canales</span></button><button class="nav-btn active" onclick="switchMobileTab('col-feed',this)"><i class="fas fa-stream"></i><span>Muro</span></button><button class="nav-btn" onclick="switchMobileTab('col-paneles',this)"><i class="fas fa-headset"></i><span>Sala & Más</span></button></div>
-
-<button id="btn-toggle-chat" class="btn btn-brand rounded-circle shadow-lg position-fixed bottom-0 end-0 m-4 d-flex align-items-center justify-content-center" style="width:60px;height:60px;z-index:1050;" onclick="toggleChat()"><i class="fas fa-comments fa-lg"></i></button>
-<div id="chat-floating-panel" class="card border-0 shadow-lg"><div class="card-header bg-brand text-white py-2 d-flex justify-content-between align-items-center"><span class="fw-bold small"><i class="fas fa-comments me-1"></i> Chat del Equipo</span><button class="btn btn-sm text-white p-0" onclick="toggleChat()"><i class="fas fa-times"></i></button></div><div id="chat-messages" style="height:260px;overflow-y:auto;background:#f8f9fa;padding:15px;display:flex;flex-direction:column;gap:10px;"></div><div class="card-footer bg-white border-top p-2"><div class="input-group input-group-sm"><input type="text" id="chat-input" class="form-control" placeholder="Escribe..." onkeypress="if(event.key==='Enter') enviarMensaje()"><button class="btn btn-brand" onclick="enviarMensaje()"><i class="fas fa-paper-plane"></i></button></div></div></div>
-
-<!-- MODAL PERFIL INSTAGRAM STYLE -->
+<!-- MODAL PERFIL RESTAURADO A DISEÑO ORIGINAL (INSTAGRAM) -->
 <div id="perfil-modal" class="modal-overlay d-none">
     <div class="perfil-card card shadow-lg border-0 bg-white">
         <div class="card-header bg-white border-bottom px-4 py-2 d-flex justify-content-between align-items-center">
@@ -62,7 +113,7 @@ body{background-color:#f8f9fa;color:#212529;font-family:system-ui,sans-serif;pad
             <!-- Header Centrado -->
             <div class="py-2 px-4 bg-white border-bottom d-flex flex-column align-items-center text-center gap-2">
                 <div class="position-relative">
-                    <img id="perfil-foto" src="" class="rounded-circle border shadow-sm p-1 bg-white" width="75" height="75" style="object-fit:cover;border:2px solid #712cf9 !important;">
+                    <img id="perfil-foto" src="" class="rounded-circle border shadow-sm p-1 bg-white" width="75" height="75" style="object-fit:cover;border:2px solid var(--brand) !important;">
                     <button id="btn-edit-foto" class="btn btn-sm btn-light border shadow-sm position-absolute bottom-0 end-0 rounded-circle d-none" style="width:28px;height:28px;padding:0;" onclick="document.getElementById('input-perfil-foto').click()"><i class="fas fa-camera text-brand" style="font-size:0.75rem;"></i></button>
                     <input type="file" id="input-perfil-foto" accept="image/*" class="d-none" onchange="subirFotoPerfil(event)">
                 </div>
@@ -139,46 +190,60 @@ body{background-color:#f8f9fa;color:#212529;font-family:system-ui,sans-serif;pad
 </div>
 
 <script>
-// --- RESPONSIVE MOBILE TABS ---
-function switchMobileTab(t,b){if(window.innerWidth>=992)return;document.getElementById('col-canales').style.display='none';document.getElementById('col-feed').style.display='none';document.getElementById('col-paneles').style.display='none';document.getElementById(t).style.display='block';window.scrollTo({top:0,behavior:'smooth'});document.querySelectorAll('.nav-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');} window.addEventListener('resize',()=>{if(window.innerWidth>=992){document.getElementById('col-canales').style.display='block';document.getElementById('col-feed').style.display='block';document.getElementById('col-paneles').style.display='block';}else{let v=0;['col-canales','col-feed','col-paneles'].forEach(id=>{if(document.getElementById(id).style.display==='block')v++;});if(v>1||v===0)switchMobileTab('col-feed',document.querySelectorAll('.nav-btn')[1]);}});
+// UI RESPONSIVE
+function switchMobileTab(t,b){if(window.innerWidth>=992)return;['col-canales','col-feed','col-paneles'].forEach(id=>document.getElementById(id).style.display='none');document.getElementById(t).style.display='block';window.scrollTo(0,0);document.querySelectorAll('.nav-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');} window.addEventListener('resize',()=>{if(window.innerWidth>=992){['col-canales','col-feed','col-paneles'].forEach(id=>document.getElementById(id).style.display='block');}});
 
-// --- FIREBASE INIT ---
-const fc={apiKey:"AIzaSyBlz5QoMwyp5oEJOXbocwFYuypxiIa-udI",authDomain:"tesis-b4554.firebaseapp.com",projectId:"tesis-b4554",storageBucket:"tesis-b4554.firebasestorage.app",messagingSenderId:"145791282196",appId:"1:145791282196:web:a73cecae9c93100371cb01",measurementId:"G-VK5VEPFD9R"};
-let db,auth,gProv,usuarioActual="Invitado_"+Math.floor(Math.random()*1000),usuarioUid=null,avatarUrlActual="",esVerificadoActual=false;
-let vSid=localStorage.getItem('unp_vsid');if(!vSid){vSid='vs_'+Math.random().toString(36).substring(2,10);localStorage.setItem('unp_vsid',vSid);}
+// FIREBASE INIT
+const fc={apiKey:"AIzaSyBlz5QoMwyp5oEJOXbocwFYuypxiIa-udI",authDomain:"tesis-b4554.firebaseapp.com",projectId:"tesis-b4554",storageBucket:"tesis-b4554.firebasestorage.app",messagingSenderId:"145791282196",appId:"1:145791282196:web:a73cecae9c93100371cb01"};
+let db,auth,gProv,usuarioActual="Invitado",usuarioUid=null,avatarUrlActual="",esVerificadoActual=false;
+let vSid=localStorage.getItem('unp_vsid')||(localStorage.setItem('unp_vsid','vs_'+Math.random().toString(36).substr(2,10)),localStorage.getItem('unp_vsid'));
 let curInv=new URLSearchParams(window.location.search).get('inv')||'general-unp';
 try{firebase.initializeApp(fc);db=firebase.firestore();auth=firebase.auth();gProv=new firebase.auth.GoogleAuthProvider();auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);}catch(e){}
 
-// --- AUTH ---
+// AUTH & LOGIC
 function iniciarSesionGoogle(){auth.signInWithPopup(gProv).then(r=>manLog(r.user)).catch(e=>{if(e.code.includes('popup'))auth.signInWithRedirect(gProv);});}
 function cerrarSesion(){desconectarVoz();auth.signOut().then(()=>window.location.reload());}
-auth.getRedirectResult().then(r=>{if(r&&r.user)manLog(r.user);});
-auth.onAuthStateChanged(u=>{if(u)manLog(u);else{usuarioActual="Invitado_"+Math.floor(Math.random()*1000);usuarioUid=null;esVerificadoActual=false;document.getElementById('logged-in-view').classList.replace('d-flex','d-none');document.getElementById('logged-out-view').classList.remove('d-none');cListInvs(null);}iniCanal();});
+auth.onAuthStateChanged(u=>{if(u)manLog(u);else{cListInvs(null);iniCanal();}});
+async function manLog(u){usuarioUid=u.uid;usuarioActual=u.displayName||"Inv";avatarUrlActual=u.photoURL||`https://ui-avatars.com/api/?name=${usuarioActual}`;try{const d=await db.collection('users').doc(u.uid).get();if(d.exists){avatarUrlActual=d.data().foto||avatarUrlActual;usuarioActual=d.data().nombre||usuarioActual;esVerificadoActual=d.data().verificado===true;}}catch(e){}
+    document.getElementById('user-avatar').src=avatarUrlActual;document.getElementById('editor-avatar').src=avatarUrlActual;document.getElementById('editor-avatar').style.display='block';document.getElementById('my-story-avatar').src=avatarUrlActual;document.getElementById('user-name').innerHTML=usuarioActual+(esVerificadoActual?' <i class="fas fa-check-circle text-primary"></i>':'');document.getElementById('logged-in-view').classList.replace('d-none','d-flex');document.getElementById('logged-out-view').classList.add('d-none');await regAcc(u.uid,curInv,usuarioActual,avatarUrlActual);cListInvs(u.uid);}
 
-async function manLog(u){
-    usuarioUid=u.uid;
-    usuarioActual=u.displayName||"Inv";
-    avatarUrlActual=u.photoURL||`https://ui-avatars.com/api/?name=${usuarioActual}`;
-    esVerificadoActual=false;
-    try{
-        const d=await db.collection('users').doc(usuarioUid).get();
-        if(d.exists){
-            if(d.data().foto)avatarUrlActual=d.data().foto;
-            if(d.data().nombre)usuarioActual=d.data().nombre;
-            if(d.data().verificado===true)esVerificadoActual=true;
-        }
-    }catch(e){}
-    
-    let badgeHtml = esVerificadoActual ? `&nbsp;<i class="fas fa-square-check text-primary" title="Cuenta Verificada"></i>` : '';
-    document.getElementById('user-avatar').src=avatarUrlActual;
-    document.getElementById('user-name').innerHTML=usuarioActual + badgeHtml;
-    document.getElementById('logged-in-view').classList.replace('d-none','d-flex');
-    document.getElementById('logged-out-view').classList.add('d-none');
-    await regAcc(u.uid,curInv,usuarioActual,avatarUrlActual);
-    cListInvs(u.uid);
-}
+// HISTORIAS
+let histMap={},stTimer;
+function subirHistoria(e){const f=e.target.files[0];if(!f||!usuarioUid)return;const r=new FileReader();r.onload=e2=>{const im=new Image();im.onload=()=>{const cv=document.createElement('canvas');let w=im.width,h=im.height;if(h>800){w*=800/h;h=800;} cv.width=w;cv.height=h;cv.getContext('2d').drawImage(im,0,0,w,h);const b64=cv.toDataURL('image/jpeg',0.7);db.collection('investigaciones').doc(curInv).collection('historias').add({autorUid:usuarioUid,autor:usuarioActual,avatar:avatarUrlActual,imagen:b64,timestamp:firebase.firestore.FieldValue.serverTimestamp()});document.getElementById('input-story').value='';};im.src=e2.target.result;};r.readAsDataURL(f);}
+function escHistorias(){db.collection('investigaciones').doc(curInv).collection('historias').onSnapshot(s=>{let act=[];histMap={};const h24=Date.now()-86400000;s.forEach(d=>{const t=d.data();const ms=t.timestamp?t.timestamp.toMillis():Date.now();if(ms>h24){act.push({id:d.id,...t});histMap[d.id]=t;}else d.ref.delete();});act.sort((a,b)=>b.timestamp-a.timestamp);let h=`<div class="story-card" style="background:#fff;" onclick="document.getElementById('input-story').click()"><img id="my-story-avatar" src="${avatarUrlActual||'https://ui-avatars.com/api/?name=Yo'}" style="width:100%;height:110px;object-fit:cover;border-radius:10px 10px 0 0;"><div class="story-add-btn"><i class="fas fa-plus"></i></div><span class="story-author text-dark" style="bottom:6px;">Crear historia</span></div>`;act.forEach(st=>{h+=`<div class="story-card" onclick="verHistoria('${st.id}')"><img src="${st.imagen}" style="width:100%;height:100%;object-fit:cover;"><img src="${st.avatar}" class="story-avatar"><span class="story-author">${st.autor}</span></div>`;});document.getElementById('stories-list').innerHTML=h;});}
+function verHistoria(id){const st=histMap[id];if(!st)return;document.getElementById('sv-img').src=st.imagen;document.getElementById('sv-avatar').src=st.avatar;document.getElementById('sv-name').innerText=st.autor;document.getElementById('story-view-modal').classList.remove('d-none');document.getElementById('sv-progress').style.animation='none';setTimeout(()=>document.getElementById('sv-progress').style.animation='storyFill 5s linear forwards',50);const delBtn=document.getElementById('sv-del');if(st.autorUid===usuarioUid){delBtn.classList.remove('d-none');delBtn.onclick=()=>{db.collection('investigaciones').doc(curInv).collection('historias').doc(id).delete();cerrarHistoria();};}else delBtn.classList.add('d-none');clearTimeout(stTimer);stTimer=setTimeout(cerrarHistoria,5000);}
+function cerrarHistoria(){document.getElementById('story-view-modal').classList.add('d-none');clearTimeout(stTimer);}
 
-// --- PERFIL Y MURO INSTAGRAM STYLE ---
+// FEED Y NOTAS
+function tRel(ms){const s=Math.floor((Date.now()-ms)/1000);if(s<60)return `${s}s`;const m=Math.floor(s/60);if(m<60)return `${m}m`;const h=Math.floor(m/60);if(h<24)return `${h}h`;return `${Math.floor(h/24)}d`;}setInterval(()=>document.querySelectorAll('.t-rel').forEach(e=>e.innerText=tRel(parseInt(e.getAttribute('dt')))),30000);
+let iB=null,nD={},iE=null;
+function cargarImagen(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{const im=new Image();im.onload=()=>{const cv=document.createElement('canvas');let w=im.width,h=im.height;if(w>h){if(w>800){h*=800/w;w=800;}}else{if(h>800){w*=800/h;h=800;}}cv.width=w;cv.height=h;cv.getContext('2d').drawImage(im,0,0,w,h);iB=cv.toDataURL('image/jpeg',0.7);document.getElementById('preview-img').src=iB;document.getElementById('preview-container').style.display='block';};im.src=e.target.result;};r.readAsDataURL(f);}
+function quitarImagen(){iB=null;document.getElementById('preview-img').src="";document.getElementById('preview-container').style.display='none';document.getElementById('input-foto').value="";}
+function publicarNota(){const ed=document.getElementById('editor-nota'),ht=ed.innerHTML.trim();if(ed.innerText.trim()===""&&!iB)return;const btn=document.getElementById('btn-publicar');btn.disabled=true;const r=db.collection('investigaciones').doc(curInv).collection('notas');if(iE)r.doc(iE).update({texto:ht,imagen:iB,editado:true}).then(()=>{cancelarEdicion();btn.disabled=false;});else r.add({autor:usuarioActual,autorUid:usuarioUid,autorAvatar:avatarUrlActual,texto:ht,imagen:iB,timestamp:firebase.firestore.FieldValue.serverTimestamp(),likes:[]}).then(()=>{ed.innerHTML="";quitarImagen();btn.disabled=false;});}
+function iniciarEdicionNota(id){iE=id;const n=nD[id];document.getElementById('editor-nota').innerHTML=n.texto;if(n.imagen){iB=n.imagen;document.getElementById('preview-img').src=iB;document.getElementById('preview-container').style.display='block';}else quitarImagen();document.getElementById('btn-cancelar-edicion').classList.remove('d-none');window.scrollTo(0,0);}
+function cancelarEdicion(){iE=null;document.getElementById('editor-nota').innerHTML="";quitarImagen();document.getElementById('btn-cancelar-edicion').classList.add('d-none');}
+async function toggleLike(id){if(!usuarioUid)return;const r=db.collection('investigaciones').doc(curInv).collection('notas').doc(id),d=await r.get();if(d.exists){let l=d.data().likes||[];l.includes(usuarioUid)?l=l.filter(u=>u!==usuarioUid):l.push(usuarioUid);await r.update({likes:l});}}
+function escNotas(){db.collection('investigaciones').doc(curInv).collection('notas').orderBy("timestamp","desc").onSnapshot(async sn=>{const fd=document.getElementById('feed-notas');fd.innerHTML="";nD={};for(let d of sn.docs){const n=d.data();nD[d.id]=n;let aVer=false;if(n.autorUid){try{const uD=await db.collection('users').doc(n.autorUid).get();if(uD.exists&&uD.data().verificado)aVer=true;}catch(e){}}let bdg=aVer?` <i class="fas fa-check-circle text-primary" style="font-size:0.8rem"></i>`:'';let ig=n.imagen?`<img src="${n.imagen}" class="note-img">`:'',ms=n.timestamp?n.timestamp.toMillis():Date.now(),ac=(n.autorUid===usuarioUid)?`<div class="action-buttons"><button class="btn-icon" onclick="iniciarEdicionNota('${d.id}')"><i class="fas fa-pen"></i></button><button class="btn-icon text-danger" onclick="if(confirm('¿Eliminar?'))db.collection('investigaciones').doc(curInv).collection('notas').doc('${d.id}').delete()"><i class="fas fa-trash"></i></button></div>`:'',av=n.autorAvatar||`https://ui-avatars.com/api/?name=${n.autor}`,lk=n.likes||[],lkd=lk.includes(usuarioUid);fd.innerHTML+=`<div class="card-custom note-card p-3 position-relative">${ac}<div class="d-flex align-items-center mb-2"><img src="${av}" width="40" height="40" class="rounded-circle me-2 border" style="cursor:pointer;" onclick="abrirPerfil('${n.autorUid}','${n.autor}','${av}')"><div><div class="fw-bold text-dark" style="cursor:pointer;font-size:0.95rem" onclick="abrirPerfil('${n.autorUid}','${n.autor}','${av}')">${n.autor}${bdg}</div><div class="text-muted small"><span class="t-rel" dt="${ms}">${tRel(ms)}</span>${n.editado?' · Editado':''}</div></div></div><div class="text-dark" style="font-size:0.95rem;line-height:1.5;">${n.texto}</div>${ig}<div class="border-top mt-3 pt-2"><button class="btn-icon text-decoration-none fw-bold ${lkd?'text-danger':'text-secondary'}" onclick="toggleLike('${d.id}')"><i class="${lkd?'fas':'far'} fa-heart me-1"></i> ${lk.length||'Me gusta'}</button></div></div>`;}});}
+
+// CANALES Y RECURSOS
+async function regAcc(uid,iId,nm,ft){if(!uid||!db)return;try{const ur=db.collection('users').doc(uid),d=await ur.get();let dt={};if(d.exists){let is=d.data().investigaciones||['general-unp'];if(!is.includes(iId)){is.push(iId);dt.investigaciones=is;}if(!d.data().foto)dt.foto=ft;if(!d.data().nombre)dt.nombre=nm;}else dt={investigaciones:['general-unp',iId],nombre:nm,foto:ft,bio:""};if(Object.keys(dt).length>0)await ur.set(dt,{merge:true});}catch(e){}}
+async function crearNuevaInvestigacion(){if(!usuarioUid)return alert("Inicia sesión.");const t=prompt("Nombre del canal:");if(!t)return;const n=await db.collection('investigaciones').add({titulo:t.trim(),subtitulo:"",creadorUid:usuarioUid,timestamp:firebase.firestore.FieldValue.serverTimestamp()});await regAcc(usuarioUid,n.id,usuarioActual,avatarUrlActual);window.location.href='?inv='+n.id;}
+function cListInvs(uid){const c=document.getElementById('lista-investigaciones');let i=['general-unp'];if(uid)db.collection('users').doc(uid).onSnapshot(async d=>{if(d.exists&&d.data().investigaciones){i=d.data().investigaciones;if(!i.includes('general-unp'))i.unshift('general-unp');}await rLks([...new Set(i)],c);});else rLks(i,c);}
+let rId=0;async function rLks(is,c){const cR=++rId;let h='';for(let id of is){let tm="Principal";if(id!=='general-unp'){const d=await db.collection('investigaciones').doc(id).get();if(d.exists)tm=d.data().titulo;else continue;}h+=`<a href="?inv=${id}" class="nav-item-channel ${id===curInv?'nav-item-active':''}"><span class="text-truncate"><i class="fas fa-hashtag me-2"></i>${tm}</span></a>`;}if(cR===rId)c.innerHTML=h;}
+function iniCanal(){if(curInv==='general-unp'){document.getElementById('subtitulo-doc').innerText="Panel principal";}else{document.getElementById('btn-compartir-inv').classList.remove('d-none');db.collection('investigaciones').doc(curInv).onSnapshot(d=>{if(d.exists)document.getElementById('subtitulo-doc').innerText=d.data().subtitulo||"Descripción...";});}escNotas();escHistorias();db.collection('investigaciones').doc(curInv).collection('bibliografia').onSnapshot(s=>{let h='';s.forEach(d=>{const b=d.data();h+=`<li class="list-group-item px-3 py-2"><div class="fw-semibold text-dark fs-6">${b.titulo}</div><a href="${b.url}" target="_blank" class="text-decoration-none small text-primary"><i class="fas fa-link me-1"></i> Abrir enlace</a></li>`;});document.getElementById('lista-biblio').innerHTML=h;});}
+document.getElementById('subtitulo-doc').addEventListener('blur',e=>curInv!=='general-unp'&&db.collection("investigaciones").doc(curInv).set({subtitulo:e.target.innerText.trim()},{merge:true}));
+
+// VOZ
+let lS=null,pr=null,vH=null,aC={},iM=false,aX=null;
+async function conectarVoz(){try{if(!aX)aX=new(window.AudioContext||window.webkitAudioContext)();if(aX.state==='suspended')await aX.resume();lS=await navigator.mediaDevices.getUserMedia({audio:true});pr=new Peer();pr.on('open',id=>{const vr=db.collection('investigaciones').doc(curInv).collection('voice_room').doc(vSid);vr.set({nombre:usuarioActual,avatar:avatarUrlActual,peerId:id,lastSeen:Date.now()}).then(()=>{document.getElementById('estado-voz').className='badge bg-success';document.getElementById('estado-voz').innerText='ON';document.getElementById('controles-voz').classList.add('d-none');document.getElementById('controles-activo-voz').classList.remove('d-none');vH=setInterval(()=>vr.set({lastSeen:Date.now()},{merge:true}),10000);});});pr.on('call',c=>{c.answer(lS);c.on('stream',rs=>addAud(c.peer,rs));c.on('close',()=>remAud(c.peer));});}catch(e){alert("Micrófono denegado.");}}
+function toggleMute(){if(lS){iM=!iM;lS.getAudioTracks()[0].enabled=!iM;document.getElementById('btn-mute').innerHTML=iM?'<i class="fas fa-microphone-slash text-danger"></i>':'<i class="fas fa-microphone"></i>';}}
+function desconectarVoz(){if(vH)clearInterval(vH);if(db)db.collection('investigaciones').doc(curInv).collection('voice_room').doc(vSid).delete().catch(()=>{});if(pr){pr.destroy();pr=null;}if(lS){lS.getTracks().forEach(t=>t.stop());lS=null;}document.getElementById('audio-elements').innerHTML='';aC={};document.getElementById('estado-voz').className='badge bg-secondary';document.getElementById('estado-voz').innerText='OFF';document.getElementById('controles-voz').classList.remove('d-none');document.getElementById('controles-activo-voz').classList.add('d-none');if(iM)toggleMute();}
+function addAud(p,s){if(!document.getElementById('au-'+p)){const a=document.createElement('audio');a.id='au-'+p;a.className='p-au';a.srcObject=s;a.autoplay=true;document.getElementById('audio-elements').appendChild(a);}}
+function remAud(p){const a=document.getElementById('au-'+p);if(a)a.remove();if(aC[p])aC[p].close();delete aC[p];}
+db.collection('investigaciones').doc(curInv).collection('voice_room').onSnapshot(s=>{const l=document.getElementById('lista-usuarios-voz');l.innerHTML='';let ac=[],pS=new Set();const nw=Date.now();s.forEach(d=>{const cd=d.data();if(!cd.lastSeen||nw-cd.lastSeen>30000){d.ref.delete();return;}if(pS.has(cd.peerId))return;pS.add(cd.peerId);ac.push(cd.peerId);const iMe=pr&&cd.peerId===pr.id,nm=iMe?`${cd.nombre} (Tú)`:cd.nombre,av=cd.avatar;l.innerHTML+=`<div class="d-flex align-items-center mb-2"><img src="${av}" class="rounded-circle me-2 border" width="28" height="28"><i class="fas fa-microphone ${iMe?'text-success':'text-secondary'} me-2 small"></i><span class="text-dark fw-medium small">${nm}</span></div>`;if(pr&&pr.id&&!iMe&&!aC[cd.peerId]&&pr.id<cd.peerId){const cll=pr.call(cd.peerId,lS);aC[cd.peerId]=cll;cll.on('stream',rs=>addAud(cd.peerId,rs));cll.on('close',()=>remAud(cd.peerId));}});if(l.innerHTML==='')l.innerHTML='<div class="text-muted small">Nadie en sala</div>';document.querySelectorAll('audio.p-au').forEach(a=>{if(!ac.includes(a.id.replace('au-','')))remAud(a.id.replace('au-',''));});});
+
+
+// --- PERFIL Y MURO INSTAGRAM STYLE (RESTAURADO) ---
 let pfB64=null, pfImgB64=null, perfilUidActual=null, perfilNombreActual='', perfilAvatarActual='', perfilVerificadoActual=false, perfilPostsMap={}, postActualId=null, editandoPostId=null;
 
 async function abrirPerfil(uid,fbN='',fbF=''){
@@ -204,7 +269,6 @@ function habilitarEdicionPerfil(){document.getElementById('perfil-bio-display').
 function subirFotoPerfil(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=e2=>{const im=new Image();im.onload=()=>{const cv=document.createElement('canvas');cv.width=300;cv.height=300;const cx=cv.getContext('2d'),sc=Math.max(300/im.width,300/im.height),x=(300-im.width*sc)/2,y=(300-im.height*sc)/2;cx.drawImage(im,x,y,im.width*sc,im.height*sc);pfB64=cv.toDataURL('image/jpeg',0.85);document.getElementById('perfil-foto').src=pfB64;};im.src=e2.target.result;};r.readAsDataURL(f);}
 async function guardarPerfil(){const b=document.getElementById('perfil-bio-edit').value.trim(),btn=document.getElementById('btn-save-perfil');btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i>';try{let u={bio:b};if(pfB64){u.foto=pfB64;avatarUrlActual=pfB64;document.getElementById('user-avatar').src=pfB64;}await db.collection('users').doc(usuarioUid).update(u);document.getElementById('perfil-bio-display').innerHTML=b.replace(/\n/g,'<br>')||"Sin información.";document.getElementById('perfil-bio-display').classList.remove('d-none');document.getElementById('perfil-bio-edit').classList.add('d-none');document.getElementById('btn-edit-foto').classList.add('d-none');document.getElementById('btn-edit-perfil').classList.remove('d-none');document.getElementById('btn-save-perfil').classList.add('d-none');}catch(e){}finally{btn.disabled=false;btn.innerHTML='Guardar <i class="fas fa-check"></i>';}}
 
-// Funciones Muro de Perfil Grid & Detalle
 function cargarImagenPerfil(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{const im=new Image();im.onload=()=>{const cv=document.createElement('canvas');let w=im.width,h=im.height;if(w>h){if(w>800){h*=800/w;w=800;}}else{if(h>800){w*=800/h;h=800;}}cv.width=w;cv.height=h;cv.getContext('2d').drawImage(im,0,0,w,h);pfImgB64=cv.toDataURL('image/jpeg',0.7);document.getElementById('pf-preview-img').src=pfImgB64;document.getElementById('pf-preview-container').style.display='block';};im.src=e.target.result;};r.readAsDataURL(f);}
 function quitarImagenPerfil(){pfImgB64=null;document.getElementById('pf-preview-img').src="";document.getElementById('pf-preview-container').style.display='none';document.getElementById('input-foto-pf').value="";}
 
@@ -266,7 +330,7 @@ async function eliminarPostMuroDetalle(){
             await db.collection('users').doc(usuarioUid).collection('muro').doc(postActualId).delete();
             volverAlGridPerfil();
             cargarMuroPerfil(usuarioUid);
-        }catch(e){alert("Error al eliminar.");}
+        }catch(e){}
     }
 }
 
@@ -330,7 +394,7 @@ function renderDetalleContenido(d){
 
     let likes = d.likes || [];
     let lkd = likes.includes(usuarioUid);
-    let hI = lkd ? 'fas fa-heart text-danger' : 'far fa-heart text-muted';
+    let hI = lkd ? 'fas fa-heart text-danger' : 'far fa-heart text-white';
     document.getElementById('detail-like-btn').innerHTML = `<button class="btn-icon d-inline-flex align-items-center text-decoration-none text-dark" onclick="toggleLikeMuroDetalle()"><i class="${hI} me-1" style="${lkd?'color:#dc3545':''}"></i><span style="font-size:0.9rem">${likes.length}</span></button>`;
 }
 
@@ -401,72 +465,10 @@ function volverAlGridPerfil(){
     if(perfilUidActual) cargarMuroPerfil(perfilUidActual);
 }
 
-// --- CANALES ---
-async function regAcc(uid,iId,nm,ft){if(!uid||!db)return;try{const ur=db.collection('users').doc(uid),d=await ur.get();let dt={};if(d.exists){let is=d.data().investigaciones||['general-unp'];if(!is.includes(iId)){is.push(iId);dt.investigaciones=is;}if(!d.data().foto)dt.foto=ft;if(!d.data().nombre)dt.nombre=nm;}else{dt={investigaciones:['general-unp',iId],nombre:nm,foto:ft,bio:""};}if(Object.keys(dt).length>0)await ur.set(dt,{merge:true});}catch(e){}}
-async function crearNuevaInvestigacion(){if(!usuarioUid)return alert("Inicia sesión.");const t=prompt("Título:");if(!t)return;try{const n=await db.collection('investigaciones').add({titulo:t.trim(),subtitulo:prompt("Subtítulo:")||"",creadorUid:usuarioUid,timestamp:firebase.firestore.FieldValue.serverTimestamp()});await regAcc(usuarioUid,n.id,usuarioActual,avatarUrlActual);window.location.href='?inv='+n.id;}catch(e){}}
-function cListInvs(uid){const c=document.getElementById('lista-investigaciones');let i=['general-unp'];if(uid){db.collection('users').doc(uid).onSnapshot(async d=>{if(d.exists&&d.data().investigaciones){i=d.data().investigaciones;if(!i.includes('general-unp'))i.unshift('general-unp');}await rLks([...new Set(i)],c);});}else rLks(i,c);}
-let rId=0;async function rLks(is,c){const cR=++rId;let h='';for(let id of is){let tm="Investigación General";if(id!=='general-unp'){const d=await db.collection('investigaciones').doc(id).get();if(d.exists)tm=d.data().titulo;else continue;}h+=`<a href="?inv=${id}" class="nav-item-channel ${id===curInv?'nav-item-active':''} shadow-sm"><span class="text-truncate"><i class="fas fa-hashtag me-2"></i>${tm}</span></a>`;}if(cR===rId)c.innerHTML=h;}
-
-function iniCanal(){if(curInv==='general-unp'){document.getElementById('btn-compartir-inv').classList.add('d-none');document.getElementById('subtitulo-doc').innerText="Y sus determinantes macrofinancieros en la banca múltiple del Perú (2018-2026)";}else{document.getElementById('btn-compartir-inv').classList.remove('d-none');db.collection('investigaciones').doc(curInv).onSnapshot(d=>{if(d.exists)document.getElementById('subtitulo-doc').innerText=d.data().subtitulo;});}escNotas();db.collection('investigaciones').doc(curInv).collection('bibliografia').orderBy("timestamp","desc").onSnapshot(s=>{const l=document.getElementById('lista-biblio');l.innerHTML="";s.forEach(d=>{const b=d.data();l.innerHTML+=`<li class="list-group-item border-0 border-bottom py-3"><div class="fw-semibold text-dark">${b.titulo}</div><a href="${b.url}" target="_blank" class="text-decoration-none small text-primary"><i class="fas fa-external-link-alt me-1"></i> Ver</a></li>`;});});}
-document.getElementById('subtitulo-doc').addEventListener('blur',()=>{if(curInv!=='general-unp')db.collection("investigaciones").doc(curInv).set({subtitulo:document.getElementById('subtitulo-doc').innerText.trim()},{merge:true});});document.getElementById('subtitulo-doc').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();e.target.blur();}});
-
-// --- VOZ ---
-let lS=null,pr=null,vH=null,aC={},iM=false,aX=null;
-async function conectarVoz(){try{if(window.AudioContext||window.webkitAudioContext){if(!aX)aX=new(window.AudioContext||window.webkitAudioContext)();if(aX&&aX.state==='suspended')await aX.resume();}lS=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true,googEchoCancellation:true,googAutoGainControl:true,googNoiseSuppression:true},video:false});pr=new Peer();pr.on('open',id=>{const vr=db.collection('investigaciones').doc(curInv).collection('voice_room').doc(vSid);vr.set({nombre:usuarioActual,avatar:avatarUrlActual,peerId:id,lastSeen:Date.now()}).then(()=>{document.getElementById('estado-voz').className='badge bg-success';document.getElementById('estado-voz').innerText='EN LÍNEA';document.getElementById('controles-voz').classList.add('d-none');document.getElementById('controles-activo-voz').classList.remove('d-none');if(vH)clearInterval(vH);vH=setInterval(()=>vr.set({lastSeen:Date.now()},{merge:true})/*.catch(()=>{})*/,10000);});});pr.on('call',c=>{c.answer(lS);c.on('stream',rs=>addAud(c.peer,rs));c.on('close',()=>remAud(c.peer));});}catch(e){alert("Sin micrófono.");}}
-document.addEventListener('visibilitychange',async()=>{if(!document.hidden){if(aX&&aX.state==='suspended')await aX.resume();if(lS)lS.getAudioTracks().forEach(t=>{if(!iM)t.enabled=true;});}});
-function toggleMute(){if(lS){iM=!iM;lS.getAudioTracks()[0].enabled=!iM;document.getElementById('btn-mute').innerHTML=iM?'<i class="fas fa-microphone-slash text-danger"></i>':'<i class="fas fa-microphone"></i>';}}
-function desconectarVoz(){if(vH)clearInterval(vH);if(db)db.collection('investigaciones').doc(curInv).collection('voice_room').doc(vSid).delete().catch(()=>{});if(pr){pr.destroy();pr=null;}if(lS){lS.getTracks().forEach(t=>t.stop());lS=null;}if(aX){aX.close();aX=null;}document.getElementById('audio-elements').innerHTML='';aC={};document.getElementById('estado-voz').className='badge bg-secondary';document.getElementById('estado-voz').innerText='DESCONECTADO';document.getElementById('controles-voz').classList.remove('d-none');document.getElementById('controles-activo-voz').classList.add('d-none');if(iM)toggleMute();}
-function addAud(p,s){if(!document.getElementById('au-'+p)){const a=document.createElement('audio');a.id='au-'+p;a.className='p-au';a.srcObject=s;a.autoplay=true;a.playsInline=true;document.getElementById('audio-elements').appendChild(a);}}
-function remAud(p){const a=document.getElementById('au-'+p);if(a)a.remove();if(aC[p]){try{aC[p].close();}catch(e){}delete aC[p];}}
-if(db)db.collection('investigaciones').doc(curInv).collection('voice_room').onSnapshot(s=>{const l=document.getElementById('lista-usuarios-voz');l.innerHTML='';let ac=[];let pS=new Set();const nw=Date.now();s.forEach(d=>{const cd=d.data();if(!cd.lastSeen||(nw-cd.lastSeen>30000)){d.ref.delete().catch(()=>{});return;}if(pS.has(cd.peerId))return;pS.add(cd.peerId);ac.push(cd.peerId);const iMe=pr&&cd.peerId===pr.id,nm=iMe?`${cd.nombre} (Tú)`:cd.nombre,cl=iMe?"text-success":"text-secondary",av=cd.avatar||`https://ui-avatars.com/api/?name=${encodeURIComponent(cd.nombre)}`;l.innerHTML+=`<div class="voice-user-item mb-2 shadow-sm"><img src="${av}" class="rounded-circle me-2 border shadow-sm" width="24" height="24" style="object-fit:cover;"><i class="fas fa-microphone ${cl} me-2" style="font-size:0.75rem;"></i><span class="text-dark text-truncate fw-medium">${nm}</span></div>`;if(pr&&pr.id&&!iMe&&!aC[cd.peerId]&&pr.id<cd.peerId){const cll=pr.call(cd.peerId,lS);aC[cd.peerId]=cll;cll.on('stream',rs=>addAud(cd.peerId,rs));cll.on('close',()=>remAud(cd.peerId));}});if(l.innerHTML==='')l.innerHTML='<div class="text-muted small text-center py-2">Nadie en sala</div>';document.querySelectorAll('audio.p-au').forEach(a=>{const pI=a.id.replace('au-','');if(!ac.includes(pI))remAud(pI);});});
-window.addEventListener('beforeunload',()=>{if(db)db.collection('investigaciones').doc(curInv).collection('voice_room').doc(vSid).delete().catch(()=>{});});
-
-// --- FEED PRINCIPAL ---
-function tRel(ms){const s=Math.floor((Date.now()-ms)/1000);if(s<60)return `hace ${s}s`;const m=Math.floor(s/60);if(m<60)return `hace ${m}m`;const h=Math.floor(m/60);if(h<24)return `hace ${h}h`;return `hace ${Math.floor(h/24)}d`;}setInterval(()=>{document.querySelectorAll('.t-rel').forEach(e=>{const ms=parseInt(e.getAttribute('dt'));if(ms)e.innerText=tRel(ms);});},30000);
-let iB=null,nD={},iE=null;
-function cargarImagen(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{const im=new Image();im.onload=()=>{const cv=document.createElement('canvas');let w=im.width,h=im.height;if(w>h){if(w>800){h*=800/w;w=800;}}else{if(h>800){w*=800/h;h=800;}}cv.width=w;cv.height=h;cv.getContext('2d').drawImage(im,0,0,w,h);iB=cv.toDataURL('image/jpeg',0.7);document.getElementById('preview-img').src=iB;document.getElementById('preview-container').style.display='inline-block';};im.src=e.target.result;};r.readAsDataURL(f);}
-function quitarImagen(){iB=null;document.getElementById('preview-img').src="";document.getElementById('preview-container').style.display='none';document.getElementById('input-foto').value="";}
-function publicarNota(){const ed=document.getElementById('editor-nota'),ht=ed.innerHTML.trim();if(ed.innerText.trim()===""&&!iB)return;const btn=document.getElementById('btn-publicar');btn.disabled=true;const r=db.collection('investigaciones').doc(curInv).collection('notas');if(iE){r.doc(iE).update({texto:ht,imagen:iB,editado:true}).then(()=>{cancelarEdicion();btn.disabled=false;});}else{r.add({autor:usuarioActual,autorUid:usuarioUid,autorAvatar:avatarUrlActual,texto:ht,imagen:iB,timestamp:firebase.firestore.FieldValue.serverTimestamp(),likes:[]}).then(()=>{ed.innerHTML="";quitarImagen();btn.disabled=false;});}}
-function iniciarEdicionNota(id){iE=id;const n=nD[id];document.getElementById('editor-nota').innerHTML=n.texto;if(n.imagen){iB=n.imagen;document.getElementById('preview-img').src=iB;document.getElementById('preview-container').style.display='inline-block';}else quitarImagen();document.getElementById('titulo-panel-edicion').innerHTML='<i class="fas fa-edit text-warning"></i> Editando';document.getElementById('btn-publicar').innerHTML='Guardar';document.getElementById('btn-publicar').classList.replace('btn-brand','btn-warning');document.getElementById('btn-cancelar-edicion').classList.remove('d-none');window.scrollTo({top:0,behavior:'smooth'});}
-function cancelarEdicion(){iE=null;document.getElementById('editor-nota').innerHTML="";quitarImagen();document.getElementById('titulo-panel-edicion').innerHTML='<i class="fas fa-pen text-brand"></i> Nueva Publicación';document.getElementById('btn-publicar').innerHTML='Publicar';document.getElementById('btn-publicar').classList.replace('btn-warning','btn-brand');document.getElementById('btn-cancelar-edicion').classList.add('d-none');}
-async function toggleLike(id){if(!usuarioUid)return;const r=db.collection('investigaciones').doc(curInv).collection('notas').doc(id),d=await r.get();if(d.exists){let l=d.data().likes||[];if(l.includes(usuarioUid))l=l.filter(u=>u!==usuarioUid);else l.push(usuarioUid);await r.update({likes:l});}}
-
-function escNotas(){
-    db.collection('investigaciones').doc(curInv).collection('notas').orderBy("timestamp","desc").onSnapshot(async sn=>{
-        const fd=document.getElementById('feed-notas');fd.innerHTML="";nD={};
-        for(let d of sn.docs){
-            const n=d.data();
-            nD[d.id]=n;
-            
-            let autorVerificado = false;
-            if(n.autorUid){
-                try{
-                    const uDoc = await db.collection('users').doc(n.autorUid).get();
-                    if(uDoc.exists && uDoc.data().verificado===true) autorVerificado = true;
-                }catch(e){}
-            }
-            let badgeNota = autorVerificado ? `&nbsp;<i class="fas fa-square-check text-primary" title="Cuenta Verificada"></i>` : '';
-
-            let ig=n.imagen?`<img src="${n.imagen}" class="note-img mt-2">`:'',
-                ed=n.editado?`<span class="text-muted ms-1 fst-italic" style="font-size:0.6rem;">(Editado)</span>`:'',
-                ms=n.timestamp?n.timestamp.toMillis():Date.now(),
-                ac=(n.autorUid===usuarioUid)?`<div class="action-buttons"><button class="btn-icon text-primary" onclick="iniciarEdicionNota('${d.id}')"><i class="fas fa-pencil-alt"></i></button><button class="btn-icon text-danger" onclick="if(confirm('¿Eliminar?'))db.collection('investigaciones').doc(curInv).collection('notas').doc('${d.id}').delete()"><i class="fas fa-trash-alt"></i></button></div>`:'',
-                fbNm=(n.autor||'Anónimo').replace(/'/g,"\\'"),
-                av=n.autorAvatar||`https://ui-avatars.com/api/?name=${encodeURIComponent(n.autor||'A')}`,
-                lk=n.likes||[],
-                lkd=lk.includes(usuarioUid),
-                hI=lkd?'fas fa-heart text-danger':'far fa-heart text-muted',
-                lkBtn=`<div class="mt-2 w-100 d-block"><button class="btn-icon d-inline-flex align-items-center mt-1 text-decoration-none text-dark" onclick="toggleLike('${d.id}')"><i class="${hI} me-1" style="${lkd?'color:#dc3545':''}"></i><span style="font-size:0.85rem">${lk.length}</span></button></div>`;
-            
-            fd.innerHTML+=`<div class="card card-custom note-card p-1">${ac}<div class="card-body p-3 mt-1"><div class="d-flex justify-content-between align-items-center text-muted small mb-3"><div class="fw-bold text-dark fs-6 d-flex align-items-center hover-perfil" onclick="abrirPerfil('${n.autorUid}','${fbNm}','${av}')" style="cursor:pointer;"><img src="${av}" width="28" height="28" class="rounded-circle me-2 border shadow-sm" style="object-fit:cover;"><span class="text-brand">${n.autor||'Anónimo'}</span>${badgeNota}</div><span class="badge bg-light text-secondary border fw-normal"><span class="t-rel" dt="${ms}">${tRel(ms)}</span>${ed}</span></div><div class="card-text mb-0 text-dark" style="word-break:break-word;line-height:1.6;font-size:0.95rem;">${n.texto}</div>${ig}${lkBtn}</div></div>`;
-        }
-    });
-}
-
-// --- CHAT Y BIBLIOGRAFÍA ---
-function agregarBibliografia(){const t=prompt("Título:");if(!t)return;let u=prompt("URL:")||"#";if(u!=="#"&&!u.startsWith('http'))u='https://'+u;db.collection('investigaciones').doc(curInv).collection('bibliografia').add({titulo:t,url:u,timestamp:firebase.firestore.FieldValue.serverTimestamp()});}
-function toggleChat(){const p=document.getElementById('chat-floating-panel');p.style.display=(p.style.display==='none'||p.style.display==='')?'block':'none';}
-function enviarMensaje(){const m=document.getElementById('chat-input').value.trim();if(!m)return;db.collection('investigaciones').doc(curInv).collection('chat').add({autor:usuarioActual,mensaje:m,timestamp:firebase.firestore.FieldValue.serverTimestamp()});document.getElementById('chat-input').value="";}
-db.collection('investigaciones').doc(curInv).collection('chat').orderBy("timestamp","asc").onSnapshot(s=>{const b=document.getElementById('chat-messages');b.innerHTML="";s.forEach(d=>{const c=d.data(),me=(c.autor===usuarioActual);b.innerHTML+=`<div class="chat-bubble ${me?'chat-me':'chat-other'}">${!me?`<div class="chat-author text-brand">${c.autor}</div>`:''}${c.mensaje}</div>`;});b.scrollTop=b.scrollHeight;});
-function insertarFormato(t){document.getElementById('editor-nota').focus();if(t==='bold')document.execCommand('bold');else if(t==='italic')document.execCommand('italic');else if(t==='color'){const c=prompt("Color:","#712cf9");if(c)document.execCommand('foreColor',false,c);}else if(t==='list')document.execCommand('insertUnorderedList');else if(t==='link'){let u=prompt("URL:","https://");if(u)document.execCommand('createLink',false,u.startsWith('http')?u:'https://'+u);}}
+// UTILIDADES (Chat, Formato)
+function agregarBibliografia(){const t=prompt("Título:");if(t)db.collection('investigaciones').doc(curInv).collection('bibliografia').add({titulo:t,url:prompt("URL:")||"#",timestamp:firebase.firestore.FieldValue.serverTimestamp()});}
+function toggleChat(){const p=document.getElementById('chat-floating-panel');p.style.display=p.style.display==='block'?'none':'block';}
+function enviarMensaje(){const m=document.getElementById('chat-input').value.trim();if(m)db.collection('investigaciones').doc(curInv).collection('chat').add({autor:usuarioActual,mensaje:m,timestamp:firebase.firestore.FieldValue.serverTimestamp()});document.getElementById('chat-input').value="";}
+db.collection('investigaciones').doc(curInv).collection('chat').orderBy("timestamp","asc").onSnapshot(s=>{const b=document.getElementById('chat-messages');b.innerHTML="";s.forEach(d=>{const c=d.data(),me=c.autor===usuarioActual;b.innerHTML+=`<div class="chat-bubble ${me?'chat-me':'chat-other'}">${!me?`<div class="fw-bold mb-1" style="font-size:0.7rem">${c.autor}</div>`:''}${c.mensaje}</div>`;});b.scrollTop=b.scrollHeight;});
+function insertarFormato(t){document.getElementById('editor-nota').focus();if(t==='bold')document.execCommand('bold');if(t==='list')document.execCommand('insertUnorderedList');}
 </script></body></html>
