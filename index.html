@@ -35,12 +35,15 @@
 .stories-wrapper::-webkit-scrollbar{display:none;}
 .story-card{flex:0 0 100px;height:170px;border-radius:10px;background:#f8f9fa;position:relative;cursor:pointer;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,0.1);border:1px solid #e1e4e8;}
 .story-card::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0) 50%,rgba(0,0,0,0.7) 100%);pointer-events:none;}
-.story-avatar{position:absolute;top:8px;left:8px;width:32px;height:32px;border-radius:50%;border:2px solid var(--brand);z-index:2;object-fit:cover;background:#fff;}
+.story-avatar{position:absolute;top:8px;left:8px;width:32px !important;height:32px !important;min-width:32px;min-height:32px;border-radius:50%;border:2px solid var(--brand);z-index:2;object-fit:cover;background:#fff;}
 .story-author{position:absolute;bottom:8px;left:4px;right:4px;color:#fff;font-size:0.7rem;font-weight:600;z-index:2;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .story-add-btn{width:32px;height:32px;border-radius:50%;background:var(--brand);color:white;display:flex;justify-content:center;align-items:center;position:absolute;top:100px;left:50%;transform:translate(-50%,0);border:3px solid #fff;z-index:3;}
 #story-view-modal img{object-fit:contain;width:100%;height:100%;background:#111;}
-.story-progress{position:absolute;top:10px;left:10px;right:10px;height:3px;background:rgba(255,255,255,0.3);border-radius:2px;z-index:10;}
-.story-progress-bar{height:100%;background:#fff;width:0%;animation:storyFill 5s linear forwards;}
+.story-progress{position:absolute;top:10px;left:10px;right:10px;display:flex;gap:4px;z-index:10;}
+.story-progress-segment{flex:1;height:3px;background:rgba(255,255,255,0.3);border-radius:2px;overflow:hidden;}
+.story-progress-bar{height:100%;background:#fff;width:0%;}
+.story-progress-bar.active{animation:storyFill 5s linear forwards;}
+.story-progress-bar.completed{width:100%;}
 @keyframes storyFill{to{width:100%;}}
 
 @media (max-width:991.98px){body{padding-bottom:80px;}#col-canales,#col-paneles{display:none;}#mobile-bottom-nav{position:fixed;bottom:0;left:0;width:100%;background:white;border-top:1px solid #ddd;display:flex;justify-content:space-around;align-items:center;z-index:1040;height:65px;box-shadow: 0 -2px 10px rgba(0,0,0,0.05);}.nav-btn{background:transparent;border:none;color:#6c757d;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;}.nav-btn i{font-size:1.3rem; margin-bottom: 2px;}.nav-btn span{font-size:0.65rem;font-weight:600;}.nav-btn.active{color:var(--brand);}#btn-toggle-chat,#chat-floating-panel{bottom:75px !important;}.perfil-card{height:95vh;width:100vw;max-width:100%;border-radius:0;}}
@@ -92,12 +95,16 @@
 <!-- MODAL VISOR DE HISTORIAS -->
 <div id="story-view-modal" class="modal-overlay d-none" style="z-index: 2050;">
     <div style="width:100%;max-width:400px;height:85vh;background:#000;border-radius:12px;position:relative;overflow:hidden;display:flex;align-items:center;">
-        <div class="story-progress"><div class="story-progress-bar" id="sv-progress"></div></div>
-        <div class="position-absolute top-0 w-100 p-3 d-flex justify-content-between align-items-center z-3 mt-3">
-            <div class="d-flex align-items-center gap-2"><img id="sv-avatar" src="" class="rounded-circle border border-white" width="36" height="36" style="object-fit:cover;"><span id="sv-name" class="text-white fw-bold shadow-sm" style="text-shadow:1px 1px 3px #000;"></span></div>
-            <div class="d-flex gap-3"><button id="sv-del" class="btn-icon text-white d-none shadow-sm" style="text-shadow:1px 1px 3px #000;"><i class="fas fa-trash"></i></button><button class="btn-icon text-white shadow-sm" style="text-shadow:1px 1px 3px #000;font-size:1.5rem;" onclick="cerrarHistoria()"><i class="fas fa-times"></i></button></div>
+        <div class="story-progress" id="sv-progress-container"></div>
+        <div class="position-absolute top-0 w-100 p-3 d-flex justify-content-between align-items-center mt-3" style="z-index:10; pointer-events:none;">
+            <div class="d-flex align-items-center gap-2" style="pointer-events:auto;"><img id="sv-avatar" src="" class="rounded-circle border border-white" style="width:36px;height:36px;min-width:36px;min-height:36px;object-fit:cover;"><span id="sv-name" class="text-white fw-bold shadow-sm" style="text-shadow:1px 1px 3px #000;"></span></div>
+            <div class="d-flex gap-3" style="pointer-events:auto;"><button id="sv-del" class="btn-icon text-white d-none shadow-sm" style="text-shadow:1px 1px 3px #000;"><i class="fas fa-trash"></i></button><button class="btn-icon text-white shadow-sm" style="text-shadow:1px 1px 3px #000;font-size:1.5rem;" onclick="cerrarHistoria()"><i class="fas fa-times"></i></button></div>
         </div>
-        <img id="sv-img" src="">
+        <!-- Controles de navegación invisibles -->
+        <div style="position:absolute;top:0;left:0;width:30%;height:100%;z-index:5;cursor:pointer;" onclick="prevStory()"></div>
+        <div style="position:absolute;top:0;right:0;width:70%;height:100%;z-index:5;cursor:pointer;" onclick="nextStory()"></div>
+        
+        <img id="sv-img" src="" style="position:relative;z-index:1;">
     </div>
 </div>
 
@@ -109,7 +116,6 @@
             <button class="btn-icon text-dark" onclick="document.getElementById('perfil-modal').classList.add('d-none')"><i class="fas fa-times fa-lg"></i></button>
         </div>
         <div class="card-body p-0 overflow-y-auto d-flex flex-column" style="flex:1;">
-            <!-- Header Centrado -->
             <div class="py-2 px-4 bg-white border-bottom d-flex flex-column align-items-center text-center gap-2">
                 <div class="position-relative">
                     <img id="perfil-foto" src="" class="rounded-circle border shadow-sm p-1 bg-white" width="75" height="75" style="object-fit:cover;border:2px solid var(--brand) !important;">
@@ -127,9 +133,7 @@
                 </div>
             </div>
 
-            <!-- Contenedor Principal Centrado para el Muro / Detalle -->
             <div class="p-3 bg-light flex-grow-1">
-                <!-- Panel de Creación / Edición de Post en Muro -->
                 <div id="panel-crear-post" class="card border-0 shadow-sm p-2 mb-3 d-none" style="max-width: 600px; margin: 0 auto;">
                     <h6 id="titulo-crear-post-muro" class="fw-bold text-muted small mb-1" style="font-size:0.75rem;"><i class="fas fa-edit me-1"></i> Publicar en mi muro</h6>
                     <textarea id="perfil-nuevo-post" class="form-control mb-2 border shadow-sm" rows="2" placeholder="¿Qué estás pensando?" style="font-size:0.85rem;resize:none;"></textarea>
@@ -149,13 +153,11 @@
                     </div>
                 </div>
 
-                <!-- Grid de Publicaciones Rectangulares Centradas -->
                 <div id="perfil-view-container" style="max-width: 750px; margin: 0 auto;">
                     <h6 class="fw-bold text-muted small mb-2 text-center" style="font-size:0.8rem;"><i class="fas fa-th me-1"></i> Muro de investigador</h6>
                     <div id="perfil-grid-posts"></div>
                 </div>
 
-                <!-- Vista Detalle Estilo Instagram (Con Doble Tap y Likes Sincronizados) -->
                 <div id="perfil-detail-container" class="d-none">
                     <div style="max-width: 720px; margin: 0 auto;">
                         <div class="mb-2 d-flex justify-content-between align-items-center">
@@ -203,29 +205,136 @@ try{firebase.initializeApp(fc);db=firebase.firestore();auth=firebase.auth();gPro
 function iniciarSesionGoogle(){auth.signInWithPopup(gProv).then(r=>manLog(r.user)).catch(e=>{if(e.code.includes('popup'))auth.signInWithRedirect(gProv);});}
 function cerrarSesion(){desconectarVoz();auth.signOut().then(()=>window.location.reload());}
 
-// CORRECCIÓN: iniCanal() se llama siempre, haya o no haya sesión.
 auth.onAuthStateChanged(u=>{
-    if(u){
-        manLog(u);
-    } else {
+    if(u) manLog(u);
+    else{
         usuarioActual="Invitado_"+Math.floor(Math.random()*1000);
         usuarioUid=null;
         document.getElementById('logged-in-view').classList.replace('d-flex','d-none');
         document.getElementById('logged-out-view').classList.remove('d-none');
         cListInvs(null);
     }
-    iniCanal(); // ¡Este era el que faltaba para cargar el muro en producción!
+    iniCanal(); 
 });
 
 async function manLog(u){usuarioUid=u.uid;usuarioActual=u.displayName||"Inv";avatarUrlActual=u.photoURL||`https://ui-avatars.com/api/?name=${encodeURIComponent(usuarioActual)}`;try{const d=await db.collection('users').doc(u.uid).get();if(d.exists){avatarUrlActual=d.data().foto||avatarUrlActual;usuarioActual=d.data().nombre||usuarioActual;esVerificadoActual=d.data().verificado===true;}}catch(e){}
     document.getElementById('user-avatar').src=avatarUrlActual;document.getElementById('editor-avatar').src=avatarUrlActual;document.getElementById('editor-avatar').style.display='block';document.getElementById('my-story-avatar').src=avatarUrlActual;document.getElementById('user-name').innerHTML=usuarioActual+(esVerificadoActual?' <i class="fas fa-check-circle text-primary"></i>':'');document.getElementById('logged-in-view').classList.replace('d-none','d-flex');document.getElementById('logged-out-view').classList.add('d-none');await regAcc(u.uid,curInv,usuarioActual,avatarUrlActual);cListInvs(u.uid);}
 
-// HISTORIAS
-let histMap={},stTimer;
+// HISTORIAS AGRUPADAS Y NAVEGACIÓN
+let histMap={}, groupedHist={}, currentGroupUid=null, currentStoryIdx=0, stTimer;
+
 function subirHistoria(e){const f=e.target.files[0];if(!f||!usuarioUid)return;const r=new FileReader();r.onload=e2=>{const im=new Image();im.onload=()=>{const cv=document.createElement('canvas');let w=im.width,h=im.height;if(h>800){w*=800/h;h=800;} cv.width=w;cv.height=h;cv.getContext('2d').drawImage(im,0,0,w,h);const b64=cv.toDataURL('image/jpeg',0.7);db.collection('investigaciones').doc(curInv).collection('historias').add({autorUid:usuarioUid,autor:usuarioActual,avatar:avatarUrlActual,imagen:b64,timestamp:firebase.firestore.FieldValue.serverTimestamp()});document.getElementById('input-story').value='';};im.src=e2.target.result;};r.readAsDataURL(f);}
-function escHistorias(){db.collection('investigaciones').doc(curInv).collection('historias').onSnapshot(s=>{let act=[];histMap={};const h24=Date.now()-86400000;s.forEach(d=>{const t=d.data();const ms=t.timestamp?t.timestamp.toMillis():Date.now();if(ms>h24){act.push({id:d.id,...t});histMap[d.id]=t;}else d.ref.delete();});act.sort((a,b)=>b.timestamp-a.timestamp);let h=`<div class="story-card" style="background:#fff;" onclick="document.getElementById('input-story').click()"><img id="my-story-avatar" src="${avatarUrlActual||'https://ui-avatars.com/api/?name=Yo'}" style="width:100%;height:110px;object-fit:cover;border-radius:10px 10px 0 0;"><div class="story-add-btn"><i class="fas fa-plus"></i></div><span class="story-author text-dark" style="bottom:6px;">Crear historia</span></div>`;act.forEach(st=>{let fbNm=(st.autor||'Anónimo').replace(/'/g,"\\'"); h+=`<div class="story-card" onclick="verHistoria('${st.id}')"><img src="${st.imagen}" style="width:100%;height:100%;object-fit:cover;"><img src="${st.avatar}" class="story-avatar"><span class="story-author">${st.autor}</span></div>`;});document.getElementById('stories-list').innerHTML=h;});}
-function verHistoria(id){const st=histMap[id];if(!st)return;document.getElementById('sv-img').src=st.imagen;document.getElementById('sv-avatar').src=st.avatar;document.getElementById('sv-name').innerText=st.autor;document.getElementById('story-view-modal').classList.remove('d-none');document.getElementById('sv-progress').style.animation='none';setTimeout(()=>document.getElementById('sv-progress').style.animation='storyFill 5s linear forwards',50);const delBtn=document.getElementById('sv-del');if(st.autorUid===usuarioUid){delBtn.classList.remove('d-none');delBtn.onclick=()=>{db.collection('investigaciones').doc(curInv).collection('historias').doc(id).delete();cerrarHistoria();};}else delBtn.classList.add('d-none');clearTimeout(stTimer);stTimer=setTimeout(cerrarHistoria,5000);}
-function cerrarHistoria(){document.getElementById('story-view-modal').classList.add('d-none');clearTimeout(stTimer);}
+
+function escHistorias(){
+    db.collection('investigaciones').doc(curInv).collection('historias').onSnapshot(s=>{
+        let act=[]; histMap={}; groupedHist={};
+        const h24=Date.now()-86400000;
+        
+        s.forEach(d=>{
+            const t=d.data();
+            const ms=t.timestamp?t.timestamp.toMillis():Date.now();
+            if(ms>h24){ act.push({id:d.id, ms:ms, ...t}); histMap[d.id]=t; }
+            else d.ref.delete();
+        });
+        
+        act.sort((a,b)=>a.ms - b.ms); // Cronológico: las más viejas primero
+        
+        act.forEach(st => {
+            if(!groupedHist[st.autorUid]) groupedHist[st.autorUid] = [];
+            groupedHist[st.autorUid].push(st);
+        });
+
+        let h=`<div class="story-card" style="background:#fff;" onclick="document.getElementById('input-story').click()"><img id="my-story-avatar" src="${avatarUrlActual||'https://ui-avatars.com/api/?name=Yo'}" style="width:100%;height:110px;object-fit:cover;border-radius:10px 10px 0 0;"><div class="story-add-btn"><i class="fas fa-plus"></i></div><span class="story-author text-dark" style="bottom:6px;">Crear historia</span></div>`;
+        
+        // Ordenar usuarios por su última historia (la más reciente)
+        let sortedUids = Object.keys(groupedHist).sort((u1,u2)=>{
+            let l1 = groupedHist[u1][groupedHist[u1].length-1].ms;
+            let l2 = groupedHist[u2][groupedHist[u2].length-1].ms;
+            return l2 - l1;
+        });
+
+        sortedUids.forEach(uid=>{
+            let group = groupedHist[uid];
+            let st = group[group.length - 1]; // Portada es la última historia subida
+            let unreadCount = group.length;
+            let fbNm=(st.autor||'Anónimo').replace(/'/g,"\\'");
+            h+=`<div class="story-card" onclick="abrirGrupoHistoria('${uid}')">
+                <img src="${st.imagen}" style="width:100%;height:100%;object-fit:cover;">
+                <img src="${st.avatar}" class="story-avatar">
+                <span class="story-author">${st.autor}</span>
+                ${unreadCount > 1 ? `<div style="position:absolute;top:6px;right:6px;background:var(--brand);color:white;font-size:0.65rem;font-weight:bold;padding:2px 6px;border-radius:10px;z-index:2;">${unreadCount}</div>` : ''}
+            </div>`;
+        });
+        document.getElementById('stories-list').innerHTML=h;
+    });
+}
+
+function abrirGrupoHistoria(uid){
+    if(!groupedHist[uid]) return;
+    currentGroupUid = uid; 
+    currentStoryIdx = 0;
+    document.getElementById('story-view-modal').classList.remove('d-none');
+    renderCurrentStory();
+}
+
+function renderCurrentStory(){
+    let group = groupedHist[currentGroupUid];
+    if(!group || currentStoryIdx >= group.length) { cerrarHistoria(); return; }
+    
+    let st = group[currentStoryIdx];
+    document.getElementById('sv-img').src = st.imagen;
+    document.getElementById('sv-avatar').src = st.avatar;
+    document.getElementById('sv-name').innerText = st.autor;
+
+    // Generar las rayitas de progreso
+    let progHTML = '';
+    for(let i=0; i<group.length; i++){
+        let stateClass = '';
+        if(i < currentStoryIdx) stateClass = 'completed';
+        else if(i === currentStoryIdx) stateClass = 'active';
+        progHTML += `<div class="story-progress-segment"><div class="story-progress-bar ${stateClass}"></div></div>`;
+    }
+    document.getElementById('sv-progress-container').innerHTML = progHTML;
+
+    const delBtn = document.getElementById('sv-del');
+    if(st.autorUid === usuarioUid){
+        delBtn.classList.remove('d-none');
+        delBtn.onclick = () => {
+            db.collection('investigaciones').doc(curInv).collection('historias').doc(st.id).delete();
+            cerrarHistoria();
+        };
+    } else {
+        delBtn.classList.add('d-none');
+    }
+
+    clearTimeout(stTimer);
+    stTimer = setTimeout(nextStory, 5000);
+}
+
+function nextStory(){
+    let group = groupedHist[currentGroupUid];
+    if(group && currentStoryIdx < group.length - 1){
+        currentStoryIdx++;
+        renderCurrentStory();
+    } else {
+        cerrarHistoria();
+    }
+}
+
+function prevStory(){
+    if(currentStoryIdx > 0){
+        currentStoryIdx--;
+        renderCurrentStory();
+    } else {
+        renderCurrentStory(); // reiniciar la primera
+    }
+}
+
+function cerrarHistoria(){
+    document.getElementById('story-view-modal').classList.add('d-none');
+    clearTimeout(stTimer);
+    currentGroupUid = null;
+}
 
 // FEED Y NOTAS
 function tRel(ms){const s=Math.floor((Date.now()-ms)/1000);if(s<60)return `hace ${s}s`;const m=Math.floor(s/60);if(m<60)return `hace ${m}m`;const h=Math.floor(m/60);if(h<24)return `hace ${h}h`;return `hace ${Math.floor(h/24)}d`;}setInterval(()=>document.querySelectorAll('.t-rel').forEach(e=>e.innerText=tRel(parseInt(e.getAttribute('dt')))),30000);
@@ -251,7 +360,7 @@ function escNotas(){
             let bdg=aVer?` <i class="fas fa-check-circle text-primary" style="font-size:0.8rem"></i>`:'';
             let ig=n.imagen?`<img src="${n.imagen}" class="note-img">`:'';
             let ms=n.timestamp?n.timestamp.toMillis():Date.now();
-            let fbNm=(n.autor||'Anónimo').replace(/'/g,"\\'"); // Evita que un nombre con apóstrofe rompa el HTML
+            let fbNm=(n.autor||'Anónimo').replace(/'/g,"\\'");
             let ac=(n.autorUid===usuarioUid)?`<div class="action-buttons"><button class="btn-icon" onclick="iniciarEdicionNota('${d.id}')"><i class="fas fa-pen"></i></button><button class="btn-icon text-danger" onclick="if(confirm('¿Eliminar?'))db.collection('investigaciones').doc(curInv).collection('notas').doc('${d.id}').delete()"><i class="fas fa-trash"></i></button></div>`:'';
             let av=n.autorAvatar||`https://ui-avatars.com/api/?name=${encodeURIComponent(n.autor||'A')}`;
             let lk=n.likes||[],lkd=lk.includes(usuarioUid);
@@ -280,7 +389,6 @@ function iniCanal(){
     escNotas();
     escHistorias();
     
-    // CORRECCIÓN: Agregado orderBy nuevamente a la bibliografía
     db.collection('investigaciones').doc(curInv).collection('bibliografia').orderBy("timestamp","desc").onSnapshot(s=>{
         let h='';
         s.forEach(d=>{
