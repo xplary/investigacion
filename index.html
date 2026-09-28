@@ -29,7 +29,6 @@ body{background-color:#f8f9fa;color:#212529;font-family:system-ui,sans-serif;pad
 
 <div class="container-fluid px-4 py-4">
     <header class="pb-3 mb-4 border-bottom d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-        <!-- MARGEN 10% -->
         <div style="margin-left: 10%;"><h1 class="fw-bold fs-3 mb-0 text-dark" style="letter-spacing:-1px;">VEST</h1><h2 id="subtitulo-doc" class="text-muted fs-6 fw-normal mb-0 mt-1" contenteditable="true" title="Clic para editar subtítulo">Cargando detalles...</h2></div>
         
         <div class="p-2 rounded bg-white shadow-sm border border-brand" style="min-width:200px;"><div id="auth-container"><div id="logged-out-view"><button class="btn btn-outline-dark btn-sm w-100 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2 py-1" onclick="iniciarSesionGoogle()"><img src="https://www.svgrepo.com/show/475656/google-color.svg" width="16" height="16"> Iniciar sesión con Google</button></div><div id="logged-in-view" class="d-none align-items-center justify-content-between"><div class="d-flex align-items-center gap-2 text-truncate cursor-pointer" onclick="abrirPerfil(usuarioUid, usuarioActual, avatarUrlActual)" style="cursor:pointer;" title="Ver mi perfil"><img id="user-avatar" src="" class="rounded-circle border" width="32" height="32" style="object-fit:cover;"><span id="user-name" class="small fw-bold text-dark text-truncate"></span></div><button class="btn btn-sm btn-light text-danger border-0 p-1 ms-2" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i></button></div></div></div>
@@ -145,7 +144,7 @@ function switchMobileTab(t,b){if(window.innerWidth>=992)return;document.getEleme
 
 // --- FIREBASE INIT ---
 const fc={apiKey:"AIzaSyBlz5QoMwyp5oEJOXbocwFYuypxiIa-udI",authDomain:"tesis-b4554.firebaseapp.com",projectId:"tesis-b4554",storageBucket:"tesis-b4554.firebasestorage.app",messagingSenderId:"145791282196",appId:"1:145791282196:web:a73cecae9c93100371cb01",measurementId:"G-VK5VEPFD9R"};
-let db,auth,gProv,usuarioActual="Invitado_"+Math.floor(Math.random()*1000),usuarioUid=null,avatarUrlActual="";
+let db,auth,gProv,usuarioActual="Invitado_"+Math.floor(Math.random()*1000),usuarioUid=null,avatarUrlActual="",esVerificadoActual=false;
 let vSid=localStorage.getItem('unp_vsid');if(!vSid){vSid='vs_'+Math.random().toString(36).substring(2,10);localStorage.setItem('unp_vsid',vSid);}
 let curInv=new URLSearchParams(window.location.search).get('inv')||'general-unp';
 try{firebase.initializeApp(fc);db=firebase.firestore();auth=firebase.auth();gProv=new firebase.auth.GoogleAuthProvider();auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);}catch(e){}
@@ -154,23 +153,53 @@ try{firebase.initializeApp(fc);db=firebase.firestore();auth=firebase.auth();gPro
 function iniciarSesionGoogle(){auth.signInWithPopup(gProv).then(r=>manLog(r.user)).catch(e=>{if(e.code.includes('popup'))auth.signInWithRedirect(gProv);});}
 function cerrarSesion(){desconectarVoz();auth.signOut().then(()=>window.location.reload());}
 auth.getRedirectResult().then(r=>{if(r&&r.user)manLog(r.user);});
-auth.onAuthStateChanged(u=>{if(u)manLog(u);else{usuarioActual="Invitado_"+Math.floor(Math.random()*1000);usuarioUid=null;document.getElementById('logged-in-view').classList.replace('d-flex','d-none');document.getElementById('logged-out-view').classList.remove('d-none');cListInvs(null);}iniCanal();});
-async function manLog(u){usuarioUid=u.uid;usuarioActual=u.displayName||"Inv";avatarUrlActual=u.photoURL||`https://ui-avatars.com/api/?name=${usuarioActual}`;try{const d=await db.collection('users').doc(usuarioUid).get();if(d.exists){if(d.data().foto)avatarUrlActual=d.data().foto;if(d.data().nombre)usuarioActual=d.data().nombre;}}catch(e){}document.getElementById('user-avatar').src=avatarUrlActual;document.getElementById('user-name').innerText=usuarioActual;document.getElementById('logged-in-view').classList.replace('d-none','d-flex');document.getElementById('logged-out-view').classList.add('d-none');await regAcc(u.uid,curInv,usuarioActual,avatarUrlActual);cListInvs(u.uid);}
+auth.onAuthStateChanged(u=>{if(u)manLog(u);else{usuarioActual="Invitado_"+Math.floor(Math.random()*1000);usuarioUid=null;esVerificadoActual=false;document.getElementById('logged-in-view').classList.replace('d-flex','d-none');document.getElementById('logged-out-view').classList.remove('d-none');cListInvs(null);}iniCanal();});
+
+async function manLog(u){
+    usuarioUid=u.uid;
+    usuarioActual=u.displayName||"Inv";
+    avatarUrlActual=u.photoURL||`https://ui-avatars.com/api/?name=${usuarioActual}`;
+    esVerificadoActual=false;
+    try{
+        const d=await db.collection('users').doc(usuarioUid).get();
+        if(d.exists){
+            if(d.data().foto)avatarUrlActual=d.data().foto;
+            if(d.data().nombre)usuarioActual=d.data().nombre;
+            if(d.data().verificado===true)esVerificadoActual=true;
+        }
+    }catch(e){}
+    
+    let badgeHtml = esVerificadoActual ? `&nbsp;<i class="fas fa-square-check text-primary" title="Cuenta Verificada"></i>` : '';
+    document.getElementById('user-avatar').src=avatarUrlActual;
+    document.getElementById('user-name').innerHTML=usuarioActual + badgeHtml;
+    document.getElementById('logged-in-view').classList.replace('d-none','d-flex');
+    document.getElementById('logged-out-view').classList.add('d-none');
+    await regAcc(u.uid,curInv,usuarioActual,avatarUrlActual);
+    cListInvs(u.uid);
+}
 
 // --- PERFIL Y MURO INSTAGRAM STYLE ---
-let pfB64=null, pfImgB64=null, perfilUidActual=null, perfilNombreActual='', perfilAvatarActual='', perfilPostsMap={}, postActualId=null, editandoPostId=null;
+let pfB64=null, pfImgB64=null, perfilUidActual=null, perfilNombreActual='', perfilAvatarActual='', perfilVerificadoActual=false, perfilPostsMap={}, postActualId=null, editandoPostId=null;
+
 async function abrirPerfil(uid,fbN='',fbF=''){
-    perfilUidActual=uid; perfilNombreActual=fbN||'Anónimo'; perfilAvatarActual=fbF||`https://ui-avatars.com/api/?name=${perfilNombreActual}`;
+    perfilUidActual=uid; perfilNombreActual=fbN||'Anónimo'; perfilAvatarActual=fbF||`https://ui-avatars.com/api/?name=${perfilNombreActual}`; perfilVerificadoActual=false;
     document.getElementById('perfil-modal').classList.remove('d-none');
     volverAlGridPerfil();
     document.getElementById('perfil-bio-display').classList.remove('d-none');document.getElementById('perfil-bio-edit').classList.add('d-none');document.getElementById('btn-edit-foto').classList.add('d-none');document.getElementById('btn-edit-perfil').classList.add('d-none');document.getElementById('btn-save-perfil').classList.add('d-none');pfB64=null;
-    let nF=fbN||'Anónimo',fF=fbF||`https://ui-avatars.com/api/?name=${nF}`,bF="Sin información.",esM=(uid===usuarioUid);
-    if(uid&&db){try{const d=await db.collection('users').doc(uid).get();if(d.exists){const dt=d.data();if(dt.nombre)nF=dt.nombre;if(dt.foto)fF=dt.foto;if(dt.bio)bF=dt.bio;}}catch(e){}}
-    perfilNombreActual=nF; perfilAvatarActual=fF;
-    document.getElementById('perfil-foto').src=fF;document.getElementById('perfil-nombre').innerText=nF;document.getElementById('perfil-bio-display').innerHTML=bF.replace(/\n/g,'<br>');
+    
+    let nF=fbN||'Anónimo',fF=fbF||`https://ui-avatars.com/api/?name=${nF}`,bF="Sin información.",vF=false,esM=(uid===usuarioUid);
+    if(uid&&db){try{const d=await db.collection('users').doc(uid).get();if(d.exists){const dt=d.data();if(dt.nombre)nF=dt.nombre;if(dt.foto)fF=dt.foto;if(dt.bio)bF=dt.bio;if(dt.verificado===true)vF=true;}}catch(e){}}
+    perfilNombreActual=nF; perfilAvatarActual=fF; perfilVerificadoActual=vF;
+    
+    let badgeHtml = perfilVerificadoActual ? `&nbsp;<i class="fas fa-square-check text-primary" title="Cuenta Verificada"></i>` : '';
+    document.getElementById('perfil-foto').src=fF;
+    document.getElementById('perfil-nombre').innerHTML=nF + badgeHtml;
+    document.getElementById('perfil-bio-display').innerHTML=bF.replace(/\n/g,'<br>');
+    
     if(esM){document.getElementById('perfil-actions').classList.remove('d-none');document.getElementById('btn-edit-perfil').classList.remove('d-none');document.getElementById('perfil-bio-edit').value=bF!=="Sin información."?bF:"";document.getElementById('panel-crear-post').classList.remove('d-none');}else{document.getElementById('perfil-actions').classList.add('d-none');document.getElementById('panel-crear-post').classList.add('d-none');}
     cargarMuroPerfil(uid);
 }
+
 function habilitarEdicionPerfil(){document.getElementById('perfil-bio-display').classList.add('d-none');document.getElementById('perfil-bio-edit').classList.remove('d-none');document.getElementById('btn-edit-foto').classList.remove('d-none');document.getElementById('btn-edit-perfil').classList.add('d-none');document.getElementById('btn-save-perfil').classList.remove('d-none');}
 function subirFotoPerfil(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=e2=>{const im=new Image();im.onload=()=>{const cv=document.createElement('canvas');cv.width=300;cv.height=300;const cx=cv.getContext('2d'),sc=Math.max(300/im.width,300/im.height),x=(300-im.width*sc)/2,y=(300-im.height*sc)/2;cx.drawImage(im,x,y,im.width*sc,im.height*sc);pfB64=cv.toDataURL('image/jpeg',0.85);document.getElementById('perfil-foto').src=pfB64;};im.src=e2.target.result;};r.readAsDataURL(f);}
 async function guardarPerfil(){const b=document.getElementById('perfil-bio-edit').value.trim(),btn=document.getElementById('btn-save-perfil');btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i>';try{let u={bio:b};if(pfB64){u.foto=pfB64;avatarUrlActual=pfB64;document.getElementById('user-avatar').src=pfB64;}await db.collection('users').doc(usuarioUid).update(u);document.getElementById('perfil-bio-display').innerHTML=b.replace(/\n/g,'<br>')||"Sin información.";document.getElementById('perfil-bio-display').classList.remove('d-none');document.getElementById('perfil-bio-edit').classList.add('d-none');document.getElementById('btn-edit-foto').classList.add('d-none');document.getElementById('btn-edit-perfil').classList.remove('d-none');document.getElementById('btn-save-perfil').classList.add('d-none');}catch(e){}finally{btn.disabled=false;btn.innerHTML='Guardar <i class="fas fa-check"></i>';}}
@@ -270,7 +299,6 @@ function verDetallePostPerfil(pId){
     document.getElementById('perfil-view-container').classList.add('d-none');
     document.getElementById('perfil-detail-container').classList.remove('d-none');
     
-    // Mostrar botones de editar/eliminar si es el dueño
     const ownerAct = document.getElementById('detail-owner-actions');
     if(perfilUidActual === usuarioUid){
         ownerAct.classList.remove('d-none');
@@ -284,8 +312,9 @@ function verDetallePostPerfil(pId){
 }
 
 function renderDetalleContenido(d){
+    let badgeHtml = perfilVerificadoActual ? `&nbsp;<i class="fas fa-square-check text-primary" title="Cuenta Verificada"></i>` : '';
     document.getElementById('detail-avatar').src = perfilAvatarActual;
-    document.getElementById('detail-autor').innerText = perfilNombreActual;
+    document.getElementById('detail-autor').innerHTML = perfilNombreActual + badgeHtml;
     document.getElementById('detail-texto').innerHTML = (d.texto||"").replace(/\n/g,'<br>');
     const ms = d.timestamp ? d.timestamp.toMillis() : Date.now();
     document.getElementById('detail-fecha').innerText = tRel(ms);
@@ -317,9 +346,9 @@ async function toggleLikeMuroDetalle(){
             let likes = data.likes || [];
             let index = likes.indexOf(usuarioUid);
             if (index > -1) {
-                likes.splice(index, 1); // Quitar like
+                likes.splice(index, 1);
             } else {
-                likes.push(usuarioUid); // Dar like
+                likes.push(usuarioUid);
             }
             transaction.update(ref, { likes: likes });
             perfilPostsMap[postActualId].likes = likes;
@@ -383,7 +412,7 @@ document.getElementById('subtitulo-doc').addEventListener('blur',()=>{if(curInv!
 
 // --- VOZ ---
 let lS=null,pr=null,vH=null,aC={},iM=false,aX=null;
-async function conectarVoz(){try{if(window.AudioContext||window.webkitAudioContext){if(!aX)aX=new(window.AudioContext||window.webkitAudioContext)();if(aX&&aX.state==='suspended')await aX.resume();}lS=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true,googEchoCancellation:true,googAutoGainControl:true,googNoiseSuppression:true},video:false});pr=new Peer();pr.on('open',id=>{const vr=db.collection('investigaciones').doc(curInv).collection('voice_room').doc(vSid);vr.set({nombre:usuarioActual,avatar:avatarUrlActual,peerId:id,lastSeen:Date.now()}).then(()=>{document.getElementById('estado-voz').className='badge bg-success';document.getElementById('estado-voz').innerText='EN LÍNEA';document.getElementById('controles-voz').classList.add('d-none');document.getElementById('controles-activo-voz').classList.remove('d-none');if(vH)clearInterval(vH);vH=setInterval(()=>vr.set({lastSeen:Date.now()},{merge:true}).catch(()=>{}),10000);});});pr.on('call',c=>{c.answer(lS);c.on('stream',rs=>addAud(c.peer,rs));c.on('close',()=>remAud(c.peer));});}catch(e){alert("Sin micrófono.");}}
+async function conectarVoz(){try{if(window.AudioContext||window.webkitAudioContext){if(!aX)aX=new(window.AudioContext||window.webkitAudioContext)();if(aX&&aX.state==='suspended')await aX.resume();}lS=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true,googEchoCancellation:true,googAutoGainControl:true,googNoiseSuppression:true},video:false});pr=new Peer();pr.on('open',id=>{const vr=db.collection('investigaciones').doc(curInv).collection('voice_room').doc(vSid);vr.set({nombre:usuarioActual,avatar:avatarUrlActual,peerId:id,lastSeen:Date.now()}).then(()=>{document.getElementById('estado-voz').className='badge bg-success';document.getElementById('estado-voz').innerText='EN LÍNEA';document.getElementById('controles-voz').classList.add('d-none');document.getElementById('controles-activo-voz').classList.remove('d-none');if(vH)clearInterval(vH);vH=setInterval(()=>vr.set({lastSeen:Date.now()},{merge:true})/*.catch(()=>{})*/,10000);});});pr.on('call',c=>{c.answer(lS);c.on('stream',rs=>addAud(c.peer,rs));c.on('close',()=>remAud(c.peer));});}catch(e){alert("Sin micrófono.");}}
 document.addEventListener('visibilitychange',async()=>{if(!document.hidden){if(aX&&aX.state==='suspended')await aX.resume();if(lS)lS.getAudioTracks().forEach(t=>{if(!iM)t.enabled=true;});}});
 function toggleMute(){if(lS){iM=!iM;lS.getAudioTracks()[0].enabled=!iM;document.getElementById('btn-mute').innerHTML=iM?'<i class="fas fa-microphone-slash text-danger"></i>':'<i class="fas fa-microphone"></i>';}}
 function desconectarVoz(){if(vH)clearInterval(vH);if(db)db.collection('investigaciones').doc(curInv).collection('voice_room').doc(vSid).delete().catch(()=>{});if(pr){pr.destroy();pr=null;}if(lS){lS.getTracks().forEach(t=>t.stop());lS=null;}if(aX){aX.close();aX=null;}document.getElementById('audio-elements').innerHTML='';aC={};document.getElementById('estado-voz').className='badge bg-secondary';document.getElementById('estado-voz').innerText='DESCONECTADO';document.getElementById('controles-voz').classList.remove('d-none');document.getElementById('controles-activo-voz').classList.add('d-none');if(iM)toggleMute();}
@@ -401,7 +430,38 @@ function publicarNota(){const ed=document.getElementById('editor-nota'),ht=ed.in
 function iniciarEdicionNota(id){iE=id;const n=nD[id];document.getElementById('editor-nota').innerHTML=n.texto;if(n.imagen){iB=n.imagen;document.getElementById('preview-img').src=iB;document.getElementById('preview-container').style.display='inline-block';}else quitarImagen();document.getElementById('titulo-panel-edicion').innerHTML='<i class="fas fa-edit text-warning"></i> Editando';document.getElementById('btn-publicar').innerHTML='Guardar';document.getElementById('btn-publicar').classList.replace('btn-brand','btn-warning');document.getElementById('btn-cancelar-edicion').classList.remove('d-none');window.scrollTo({top:0,behavior:'smooth'});}
 function cancelarEdicion(){iE=null;document.getElementById('editor-nota').innerHTML="";quitarImagen();document.getElementById('titulo-panel-edicion').innerHTML='<i class="fas fa-pen text-brand"></i> Nueva Publicación';document.getElementById('btn-publicar').innerHTML='Publicar';document.getElementById('btn-publicar').classList.replace('btn-warning','btn-brand');document.getElementById('btn-cancelar-edicion').classList.add('d-none');}
 async function toggleLike(id){if(!usuarioUid)return;const r=db.collection('investigaciones').doc(curInv).collection('notas').doc(id),d=await r.get();if(d.exists){let l=d.data().likes||[];if(l.includes(usuarioUid))l=l.filter(u=>u!==usuarioUid);else l.push(usuarioUid);await r.update({likes:l});}}
-function escNotas(){db.collection('investigaciones').doc(curInv).collection('notas').orderBy("timestamp","desc").onSnapshot(sn=>{const fd=document.getElementById('feed-notas');fd.innerHTML="";nD={};sn.forEach(d=>{const n=d.data();nD[d.id]=n;let ig=n.imagen?`<img src="${n.imagen}" class="note-img mt-2">`:'',ed=n.editado?`<span class="text-muted ms-1 fst-italic" style="font-size:0.6rem;">(Editado)</span>`:'',ms=n.timestamp?n.timestamp.toMillis():Date.now(),ac=(n.autorUid===usuarioUid)?`<div class="action-buttons"><button class="btn-icon text-primary" onclick="iniciarEdicionNota('${d.id}')"><i class="fas fa-pencil-alt"></i></button><button class="btn-icon text-danger" onclick="if(confirm('¿Eliminar?'))db.collection('investigaciones').doc(curInv).collection('notas').doc('${d.id}').delete()"><i class="fas fa-trash-alt"></i></button></div>`:'',fbNm=(n.autor||'Anónimo').replace(/'/g,"\\'"),av=n.autorAvatar||`https://ui-avatars.com/api/?name=${encodeURIComponent(n.autor||'A')}`,lk=n.likes||[],lkd=lk.includes(usuarioUid),hI=lkd?'fas fa-heart text-danger':'far fa-heart text-muted',lkBtn=`<div class="mt-2 w-100 d-block"><button class="btn-icon d-inline-flex align-items-center mt-1 text-decoration-none text-dark" onclick="toggleLike('${d.id}')"><i class="${hI} me-1" style="${lkd?'color:#dc3545':''}"></i><span style="font-size:0.85rem">${lk.length}</span></button></div>`;fd.innerHTML+=`<div class="card card-custom note-card p-1">${ac}<div class="card-body p-3 mt-1"><div class="d-flex justify-content-between align-items-center text-muted small mb-3"><div class="fw-bold text-dark fs-6 d-flex align-items-center hover-perfil" onclick="abrirPerfil('${n.autorUid}','${fbNm}','${av}')" style="cursor:pointer;"><img src="${av}" width="28" height="28" class="rounded-circle me-2 border shadow-sm" style="object-fit:cover;"><span class="text-brand">${n.autor||'Anónimo'}</span></div><span class="badge bg-light text-secondary border fw-normal"><span class="t-rel" dt="${ms}">${tRel(ms)}</span>${ed}</span></div><div class="card-text mb-0 text-dark" style="word-break:break-word;line-height:1.6;font-size:0.95rem;">${n.texto}</div>${ig}${lkBtn}</div></div>`;});});}
+
+function escNotas(){
+    db.collection('investigaciones').doc(curInv).collection('notas').orderBy("timestamp","desc").onSnapshot(async sn=>{
+        const fd=document.getElementById('feed-notas');fd.innerHTML="";nD={};
+        for(let d of sn.docs){
+            const n=d.data();
+            nD[d.id]=n;
+            
+            let autorVerificado = false;
+            if(n.autorUid){
+                try{
+                    const uDoc = await db.collection('users').doc(n.autorUid).get();
+                    if(uDoc.exists && uDoc.data().verificado===true) autorVerificado = true;
+                }catch(e){}
+            }
+            let badgeNota = autorVerificado ? `&nbsp;<i class="fas fa-square-check text-primary" title="Cuenta Verificada"></i>` : '';
+
+            let ig=n.imagen?`<img src="${n.imagen}" class="note-img mt-2">`:'',
+                ed=n.editado?`<span class="text-muted ms-1 fst-italic" style="font-size:0.6rem;">(Editado)</span>`:'',
+                ms=n.timestamp?n.timestamp.toMillis():Date.now(),
+                ac=(n.autorUid===usuarioUid)?`<div class="action-buttons"><button class="btn-icon text-primary" onclick="iniciarEdicionNota('${d.id}')"><i class="fas fa-pencil-alt"></i></button><button class="btn-icon text-danger" onclick="if(confirm('¿Eliminar?'))db.collection('investigaciones').doc(curInv).collection('notas').doc('${d.id}').delete()"><i class="fas fa-trash-alt"></i></button></div>`:'',
+                fbNm=(n.autor||'Anónimo').replace(/'/g,"\\'"),
+                av=n.autorAvatar||`https://ui-avatars.com/api/?name=${encodeURIComponent(n.autor||'A')}`,
+                lk=n.likes||[],
+                lkd=lk.includes(usuarioUid),
+                hI=lkd?'fas fa-heart text-danger':'far fa-heart text-muted',
+                lkBtn=`<div class="mt-2 w-100 d-block"><button class="btn-icon d-inline-flex align-items-center mt-1 text-decoration-none text-dark" onclick="toggleLike('${d.id}')"><i class="${hI} me-1" style="${lkd?'color:#dc3545':''}"></i><span style="font-size:0.85rem">${lk.length}</span></button></div>`;
+            
+            fd.innerHTML+=`<div class="card card-custom note-card p-1">${ac}<div class="card-body p-3 mt-1"><div class="d-flex justify-content-between align-items-center text-muted small mb-3"><div class="fw-bold text-dark fs-6 d-flex align-items-center hover-perfil" onclick="abrirPerfil('${n.autorUid}','${fbNm}','${av}')" style="cursor:pointer;"><img src="${av}" width="28" height="28" class="rounded-circle me-2 border shadow-sm" style="object-fit:cover;"><span class="text-brand">${n.autor||'Anónimo'}</span>${badgeNota}</div><span class="badge bg-light text-secondary border fw-normal"><span class="t-rel" dt="${ms}">${tRel(ms)}</span>${ed}</span></div><div class="card-text mb-0 text-dark" style="word-break:break-word;line-height:1.6;font-size:0.95rem;">${n.texto}</div>${ig}${lkBtn}</div></div>`;
+        }
+    });
+}
 
 // --- CHAT Y BIBLIOGRAFÍA ---
 function agregarBibliografia(){const t=prompt("Título:");if(!t)return;let u=prompt("URL:")||"#";if(u!=="#"&&!u.startsWith('http'))u='https://'+u;db.collection('investigaciones').doc(curInv).collection('bibliografia').add({titulo:t,url:u,timestamp:firebase.firestore.FieldValue.serverTimestamp()});}
