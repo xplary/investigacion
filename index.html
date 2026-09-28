@@ -52,7 +52,7 @@ body{background-color:#f8f9fa;color:#212529;font-family:system-ui,sans-serif;pad
 <button id="btn-toggle-chat" class="btn btn-brand rounded-circle shadow-lg position-fixed bottom-0 end-0 m-4 d-flex align-items-center justify-content-center" style="width:60px;height:60px;z-index:1050;" onclick="toggleChat()"><i class="fas fa-comments fa-lg"></i></button>
 <div id="chat-floating-panel" class="card border-0 shadow-lg"><div class="card-header bg-brand text-white py-2 d-flex justify-content-between align-items-center"><span class="fw-bold small"><i class="fas fa-comments me-1"></i> Chat del Equipo</span><button class="btn btn-sm text-white p-0" onclick="toggleChat()"><i class="fas fa-times"></i></button></div><div id="chat-messages" style="height:260px;overflow-y:auto;background:#f8f9fa;padding:15px;display:flex;flex-direction:column;gap:10px;"></div><div class="card-footer bg-white border-top p-2"><div class="input-group input-group-sm"><input type="text" id="chat-input" class="form-control" placeholder="Escribe..." onkeypress="if(event.key==='Enter') enviarMensaje()"><button class="btn btn-brand" onclick="enviarMensaje()"><i class="fas fa-paper-plane"></i></button></div></div></div>
 
-<!-- MODAL PERFIL INSTAGRAM STYLE (HEADER CENTRADO) -->
+<!-- MODAL PERFIL INSTAGRAM STYLE -->
 <div id="perfil-modal" class="modal-overlay d-none">
     <div class="perfil-card card shadow-lg border-0 bg-white">
         <div class="card-header bg-white border-bottom px-4 py-2 d-flex justify-content-between align-items-center">
@@ -80,9 +80,9 @@ body{background-color:#f8f9fa;color:#212529;font-family:system-ui,sans-serif;pad
 
             <!-- Contenedor Principal Centrado para el Muro / Detalle -->
             <div class="p-3 bg-light flex-grow-1">
-                <!-- Panel de Creación de Post Compacto -->
+                <!-- Panel de Creación / Edición de Post en Muro -->
                 <div id="panel-crear-post" class="card border-0 shadow-sm p-2 mb-3 d-none" style="max-width: 600px; margin: 0 auto;">
-                    <h6 class="fw-bold text-muted small mb-1" style="font-size:0.75rem;"><i class="fas fa-edit me-1"></i> Publicar en mi muro</h6>
+                    <h6 id="titulo-crear-post-muro" class="fw-bold text-muted small mb-1" style="font-size:0.75rem;"><i class="fas fa-edit me-1"></i> Publicar en mi muro</h6>
                     <textarea id="perfil-nuevo-post" class="form-control mb-2 border shadow-sm" rows="2" placeholder="¿Qué estás pensando?" style="font-size:0.85rem;resize:none;"></textarea>
                     
                     <div id="pf-preview-container" style="display:none;position:relative;margin-bottom:8px;">
@@ -93,7 +93,10 @@ body{background-color:#f8f9fa;color:#212529;font-family:system-ui,sans-serif;pad
                     <div class="d-flex justify-content-between align-items-center">
                         <input type="file" id="input-foto-pf" accept="image/*" style="display:none;" onchange="cargarImagenPerfil(event)">
                         <button class="btn btn-sm btn-light border shadow-sm py-1 px-2" style="font-size:0.8rem;" onclick="document.getElementById('input-foto-pf').click()"><i class="fas fa-camera text-muted me-1"></i> Foto</button>
-                        <button class="btn btn-brand btn-sm shadow-sm fw-bold px-3 py-1" style="font-size:0.8rem;" onclick="publicarDesdePerfil(this)">Publicar <i class="fas fa-paper-plane ms-1"></i></button>
+                        <div>
+                            <button id="btn-cancelar-muro-edicion" class="btn btn-sm btn-secondary d-none py-1 px-2 me-1" style="font-size:0.8rem;" onclick="cancelarEdicionMuro()">Cancelar</button>
+                            <button id="btn-publicar-muro" class="btn btn-brand btn-sm shadow-sm fw-bold px-3 py-1" style="font-size:0.8rem;" onclick="publicarDesdePerfil(this)">Publicar <i class="fas fa-paper-plane ms-1"></i></button>
+                        </div>
                     </div>
                 </div>
 
@@ -103,15 +106,19 @@ body{background-color:#f8f9fa;color:#212529;font-family:system-ui,sans-serif;pad
                     <div id="perfil-grid-posts"></div>
                 </div>
 
-                <!-- Vista Detalle Estilo Instagram Sin Scroll -->
+                <!-- Vista Detalle Estilo Instagram (Con Doble Tap y Likes Sincronizados) -->
                 <div id="perfil-detail-container" class="d-none">
                     <div style="max-width: 720px; margin: 0 auto;">
-                        <div class="mb-2">
+                        <div class="mb-2 d-flex justify-content-between align-items-center">
                             <button class="btn btn-sm btn-light border shadow-sm fw-bold py-1 px-2" style="font-size:0.8rem;" onclick="volverAlGridPerfil()"><i class="fas fa-arrow-left me-1"></i> Volver al muro</button>
+                            <div id="detail-owner-actions" class="d-none gap-2">
+                                <button class="btn btn-sm btn-outline-primary py-1 px-2" style="font-size:0.8rem;" onclick="iniciarEdicionMuroDetalle()"><i class="fas fa-pencil-alt"></i> Editar</button>
+                                <button class="btn btn-sm btn-outline-danger py-1 px-2" style="font-size:0.8rem;" onclick="eliminarPostMuroDetalle()"><i class="fas fa-trash-alt"></i> Eliminar</button>
+                            </div>
                         </div>
                         <div class="card border-0 shadow-sm overflow-hidden">
                             <div class="row g-0">
-                                <div class="col-md-7 bg-dark d-flex align-items-center justify-content-center" style="min-height:260px;max-height:360px;" id="detail-img-wrapper"></div>
+                                <div class="col-md-7 bg-dark d-flex align-items-center justify-content-center position-relative" style="min-height:260px;max-height:360px;cursor:pointer;" id="detail-img-wrapper" ondblclick="dobleTapDarLike()"></div>
                                 <div class="col-md-5 d-flex flex-column bg-white p-3" style="max-height:360px;">
                                     <div class="d-flex align-items-center mb-2 pb-2 border-bottom">
                                         <img id="detail-avatar" src="" class="rounded-circle me-2 border" width="28" height="28" style="object-fit:cover;">
@@ -151,7 +158,7 @@ auth.onAuthStateChanged(u=>{if(u)manLog(u);else{usuarioActual="Invitado_"+Math.f
 async function manLog(u){usuarioUid=u.uid;usuarioActual=u.displayName||"Inv";avatarUrlActual=u.photoURL||`https://ui-avatars.com/api/?name=${usuarioActual}`;try{const d=await db.collection('users').doc(usuarioUid).get();if(d.exists){if(d.data().foto)avatarUrlActual=d.data().foto;if(d.data().nombre)usuarioActual=d.data().nombre;}}catch(e){}document.getElementById('user-avatar').src=avatarUrlActual;document.getElementById('user-name').innerText=usuarioActual;document.getElementById('logged-in-view').classList.replace('d-none','d-flex');document.getElementById('logged-out-view').classList.add('d-none');await regAcc(u.uid,curInv,usuarioActual,avatarUrlActual);cListInvs(u.uid);}
 
 // --- PERFIL Y MURO INSTAGRAM STYLE ---
-let pfB64=null, pfImgB64=null, perfilUidActual=null, perfilNombreActual='', perfilAvatarActual='', perfilPostsMap={};
+let pfB64=null, pfImgB64=null, perfilUidActual=null, perfilNombreActual='', perfilAvatarActual='', perfilPostsMap={}, postActualId=null, editandoPostId=null;
 async function abrirPerfil(uid,fbN='',fbF=''){
     perfilUidActual=uid; perfilNombreActual=fbN||'Anónimo'; perfilAvatarActual=fbF||`https://ui-avatars.com/api/?name=${perfilNombreActual}`;
     document.getElementById('perfil-modal').classList.remove('d-none');
@@ -171,7 +178,68 @@ async function guardarPerfil(){const b=document.getElementById('perfil-bio-edit'
 // Funciones Muro de Perfil Grid & Detalle
 function cargarImagenPerfil(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{const im=new Image();im.onload=()=>{const cv=document.createElement('canvas');let w=im.width,h=im.height;if(w>h){if(w>800){h*=800/w;w=800;}}else{if(h>800){w*=800/h;h=800;}}cv.width=w;cv.height=h;cv.getContext('2d').drawImage(im,0,0,w,h);pfImgB64=cv.toDataURL('image/jpeg',0.7);document.getElementById('pf-preview-img').src=pfImgB64;document.getElementById('pf-preview-container').style.display='block';};im.src=e.target.result;};r.readAsDataURL(f);}
 function quitarImagenPerfil(){pfImgB64=null;document.getElementById('pf-preview-img').src="";document.getElementById('pf-preview-container').style.display='none';document.getElementById('input-foto-pf').value="";}
-function publicarDesdePerfil(btn){const tx=document.getElementById('perfil-nuevo-post').value.trim();if(!tx&&!pfImgB64)return;btn.disabled=true;db.collection('users').doc(usuarioUid).collection('muro').add({texto:tx,imagen:pfImgB64,timestamp:firebase.firestore.FieldValue.serverTimestamp(),likes:[]}).then(()=>{document.getElementById('perfil-nuevo-post').value="";quitarImagenPerfil();btn.disabled=false;cargarMuroPerfil(usuarioUid);}).catch(()=>{btn.disabled=false;});}
+
+function publicarDesdePerfil(btn){
+    const tx=document.getElementById('perfil-nuevo-post').value.trim();
+    if(!tx&&!pfImgB64)return;
+    btn.disabled=true;
+    const refMuro = db.collection('users').doc(usuarioUid).collection('muro');
+    
+    if(editandoPostId){
+        refMuro.doc(editandoPostId).update({texto:tx, imagen:pfImgB64}).then(()=>{
+            cancelarEdicionMuro();
+            btn.disabled=false;
+            cargarMuroPerfil(usuarioUid);
+        }).catch(()=>{btn.disabled=false;});
+    } else {
+        refMuro.add({texto:tx, imagen:pfImgB64, timestamp:firebase.firestore.FieldValue.serverTimestamp(), likes:[]}).then(()=>{
+            document.getElementById('perfil-nuevo-post').value="";
+            quitarImagenPerfil();
+            btn.disabled=false;
+            cargarMuroPerfil(usuarioUid);
+        }).catch(()=>{btn.disabled=false;});
+    }
+}
+
+function cancelarEdicionMuro(){
+    editandoPostId=null;
+    document.getElementById('perfil-nuevo-post').value="";
+    quitarImagenPerfil();
+    document.getElementById('titulo-crear-post-muro').innerHTML='<i class="fas fa-edit me-1"></i> Publicar en mi muro';
+    document.getElementById('btn-publicar-muro').innerHTML='Publicar <i class="fas fa-paper-plane ms-1"></i>';
+    document.getElementById('btn-cancelar-muro-edicion').classList.add('d-none');
+}
+
+function iniciarEdicionMuroDetalle(){
+    if(!postActualId) return;
+    const d = perfilPostsMap[postActualId];
+    if(!d) return;
+    volverAlGridPerfil();
+    editandoPostId = postActualId;
+    document.getElementById('perfil-nuevo-post').value = d.texto || "";
+    if(d.imagen){
+        pfImgB64 = d.imagen;
+        document.getElementById('pf-preview-img').src = d.imagen;
+        document.getElementById('pf-preview-container').style.display = 'block';
+    } else {
+        quitarImagenPerfil();
+    }
+    document.getElementById('titulo-crear-post-muro').innerHTML='<i class="fas fa-edit text-warning me-1"></i> Editando publicación';
+    document.getElementById('btn-publicar-muro').innerHTML='Guardar cambios';
+    document.getElementById('btn-cancelar-muro-edicion').classList.remove('d-none');
+    window.scrollTo({top:0,behavior:'smooth'});
+}
+
+async function eliminarPostMuroDetalle(){
+    if(!postActualId || !usuarioUid) return;
+    if(confirm('¿Estás seguro de eliminar esta publicación de tu muro?')){
+        try{
+            await db.collection('users').doc(usuarioUid).collection('muro').doc(postActualId).delete();
+            volverAlGridPerfil();
+            cargarMuroPerfil(usuarioUid);
+        }catch(e){alert("Error al eliminar.");}
+    }
+}
 
 async function cargarMuroPerfil(uid){
     const gd=document.getElementById('perfil-grid-posts');
@@ -196,10 +264,26 @@ async function cargarMuroPerfil(uid){
 }
 
 function verDetallePostPerfil(pId){
+    postActualId = pId;
     const d = perfilPostsMap[pId];
     if(!d) return;
     document.getElementById('perfil-view-container').classList.add('d-none');
     document.getElementById('perfil-detail-container').classList.remove('d-none');
+    
+    // Mostrar botones de editar/eliminar si es el dueño
+    const ownerAct = document.getElementById('detail-owner-actions');
+    if(perfilUidActual === usuarioUid){
+        ownerAct.classList.remove('d-none');
+        ownerAct.classList.add('d-flex');
+    } else {
+        ownerAct.classList.remove('d-flex');
+        ownerAct.classList.add('d-none');
+    }
+
+    renderDetalleContenido(d);
+}
+
+function renderDetalleContenido(d){
     document.getElementById('detail-avatar').src = perfilAvatarActual;
     document.getElementById('detail-autor').innerText = perfilNombreActual;
     document.getElementById('detail-texto').innerHTML = (d.texto||"").replace(/\n/g,'<br>');
@@ -216,30 +300,76 @@ function verDetallePostPerfil(pId){
     }
 
     let likes = d.likes || [];
-    let lkd = likes.includes(usuarioUid), hI = lkd ? 'fas fa-heart text-danger' : 'far fa-heart text-muted';
-    document.getElementById('detail-like-btn').innerHTML = `<button class="btn-icon d-inline-flex align-items-center text-decoration-none text-dark" onclick="toggleLikeMuroDetalle('${pId}', this)"><i class="${hI} me-1" style="${lkd?'color:#dc3545':''}"></i><span style="font-size:0.9rem">${likes.length}</span></button>`;
+    let lkd = likes.includes(usuarioUid);
+    let hI = lkd ? 'fas fa-heart text-danger' : 'far fa-heart text-muted';
+    document.getElementById('detail-like-btn').innerHTML = `<button class="btn-icon d-inline-flex align-items-center text-decoration-none text-dark" onclick="toggleLikeMuroDetalle()"><i class="${hI} me-1" style="${lkd?'color:#dc3545':''}"></i><span style="font-size:0.9rem">${likes.length}</span></button>`;
+}
+
+async function toggleLikeMuroDetalle(){
+    if(!usuarioUid || !perfilUidActual || !postActualId) return;
+    const ref = db.collection('users').doc(perfilUidActual).collection('muro').doc(postActualId);
+    
+    try {
+        await db.runTransaction(async (transaction) => {
+            const doc = await transaction.get(ref);
+            if (!doc.exists) return;
+            let data = doc.data();
+            let likes = data.likes || [];
+            let index = likes.indexOf(usuarioUid);
+            if (index > -1) {
+                likes.splice(index, 1); // Quitar like
+            } else {
+                likes.push(usuarioUid); // Dar like
+            }
+            transaction.update(ref, { likes: likes });
+            perfilPostsMap[postActualId].likes = likes;
+        });
+        renderDetalleContenido(perfilPostsMap[postActualId]);
+    } catch(e) {}
+}
+
+async function dobleTapDarLike(){
+    if(!usuarioUid || !perfilUidActual || !postActualId) return;
+    const ref = db.collection('users').doc(perfilUidActual).collection('muro').doc(postActualId);
+    try {
+        await db.runTransaction(async (transaction) => {
+            const doc = await transaction.get(ref);
+            if (!doc.exists) return;
+            let data = doc.data();
+            let likes = data.likes || [];
+            if (!likes.includes(usuarioUid)) {
+                likes.push(usuarioUid);
+                transaction.update(ref, { likes: likes });
+                perfilPostsMap[postActualId].likes = likes;
+            }
+        });
+        renderDetalleContenido(perfilPostsMap[postActualId]);
+        mostrarAnimacionCorazon();
+    } catch(e) {}
+}
+
+function mostrarAnimacionCorazon(){
+    const wrapper = document.getElementById('detail-img-wrapper');
+    if(!wrapper) return;
+    const heart = document.createElement('div');
+    heart.innerHTML = '<i class="fas fa-heart text-danger fa-4x shadow-sm"></i>';
+    heart.style.position = 'absolute';
+    heart.style.top = '50%';
+    heart.style.left = '50%';
+    heart.style.transform = 'translate(-50%, -50%) scale(0)';
+    heart.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
+    heart.style.zIndex = '10';
+    wrapper.appendChild(heart);
+    setTimeout(()=>{ heart.style.transform = 'translate(-50%, -50%) scale(1.2)'; }, 50);
+    setTimeout(()=>{ heart.style.opacity = '0'; }, 600);
+    setTimeout(()=>{ heart.remove(); }, 800);
 }
 
 function volverAlGridPerfil(){
     document.getElementById('perfil-detail-container').classList.add('d-none');
     document.getElementById('perfil-view-container').classList.remove('d-none');
+    postActualId = null;
     if(perfilUidActual) cargarMuroPerfil(perfilUidActual);
-}
-
-async function toggleLikeMuroDetalle(pId, btn){
-    if(!usuarioUid || !perfilUidActual) return;
-    const r = db.collection('users').doc(perfilUidActual).collection('muro').doc(pId), d = await r.get();
-    if(d.exists){
-        let data = d.data();
-        let l = data.likes || [], isL = false;
-        if(l.includes(usuarioUid)){ l = l.filter(u => u !== usuarioUid); isL = true; } else { l.push(usuarioUid); }
-        await r.update({ likes: l });
-        if(perfilPostsMap[pId]) perfilPostsMap[pId].likes = l;
-        let i = btn.querySelector('i'), s = btn.querySelector('span');
-        i.className = isL ? 'far fa-heart text-muted me-1' : 'fas fa-heart text-danger me-1';
-        i.style.color = isL ? '' : '#dc3545';
-        s.innerText = l.length;
-    }
 }
 
 // --- CANALES ---
