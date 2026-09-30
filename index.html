@@ -63,7 +63,7 @@
     <h1 class="fw-bold m-0" style="font-size:3.5rem;letter-spacing:-2px;text-shadow:2px 2px 4px rgba(0,0,0,0.2);">VEST</h1>
     <div class="spinner-border text-light mt-3" role="status" style="width: 2.5rem; height: 2.5rem;"></div>
 </div>
-<!-- Bloquear splash visualmente de inmediato si ya lo vimos en esta sesión -->
+<!-- Evitar splash si ya se mostró en esta sesión -->
 <script>if(sessionStorage.getItem('vest_splash_shown')) document.getElementById('mobile-splash').style.display = 'none';</script>
 
 <header class="bg-white shadow-sm position-sticky top-0 border-bottom py-2 mb-4" style="z-index:1045;">
@@ -368,7 +368,7 @@ function cerrarHistoria(){
     currentGroupUid = null;
 }
 
-// FEED Y NOTAS FIX OPTIMIZADO PARA ZERO FLICKER
+// FEED Y NOTAS
 function tRel(ms){const s=Math.floor((Date.now()-ms)/1000);if(s<60)return `hace ${s}s`;const m=Math.floor(s/60);if(m<60)return `hace ${m}m`;const h=Math.floor(m/60);if(h<24)return `hace ${h}h`;return `hace ${Math.floor(h/24)}d`;}setInterval(()=>document.querySelectorAll('.t-rel').forEach(e=>e.innerText=tRel(parseInt(e.getAttribute('dt')))),30000);
 let iB=null,nD={},iE=null,userCache={};
 function cargarImagen(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{const im=new Image();im.onload=()=>{const cv=document.createElement('canvas');let w=im.width,h=im.height;if(w>h){if(w>800){h*=800/w;w=800;}}else{if(h>800){w*=800/h;h=800;}}cv.width=w;cv.height=h;cv.getContext('2d').drawImage(im,0,0,w,h);iB=cv.toDataURL('image/jpeg',0.7);document.getElementById('preview-img').src=iB;document.getElementById('preview-container').style.display='block';};im.src=e.target.result;};r.readAsDataURL(f);}
@@ -376,92 +376,83 @@ function quitarImagen(){iB=null;document.getElementById('preview-img').src="";do
 function publicarNota(){const ed=document.getElementById('editor-nota'),ht=ed.innerHTML.trim();if(ed.innerText.trim()===""&&!iB)return;const btn=document.getElementById('btn-publicar');btn.disabled=true;const r=db.collection('investigaciones').doc(curInv).collection('notas');if(iE)r.doc(iE).update({texto:ht,imagen:iB,editado:true}).then(()=>{cancelarEdicion();btn.disabled=false;});else r.add({autor:usuarioActual,autorUid:usuarioUid,autorAvatar:avatarUrlActual,texto:ht,imagen:iB,timestamp:firebase.firestore.FieldValue.serverTimestamp(),likes:[]}).then(()=>{ed.innerHTML="";quitarImagen();btn.disabled=false;});}
 function iniciarEdicionNota(id){iE=id;const n=nD[id];document.getElementById('editor-nota').innerHTML=n.texto;if(n.imagen){iB=n.imagen;document.getElementById('preview-img').src=iB;document.getElementById('preview-container').style.display='block';}else quitarImagen();document.getElementById('btn-cancelar-edicion').classList.remove('d-none');window.scrollTo(0,0);}
 function cancelarEdicion(){iE=null;document.getElementById('editor-nota').innerHTML="";quitarImagen();document.getElementById('btn-cancelar-edicion').classList.add('d-none');}
-async function toggleLike(id){if(!usuarioUid)return;const r=db.collection('investigaciones').doc(curInv).collection('notas').doc(id),d=await r.get();if(d.exists){let l=d.data().likes||[];l.includes(usuarioUid)?l=l.filter(u=>u!==usuarioUid):l.push(usuarioUid);await r.update({likes:l});}}
+
+async function toggleLike(id){
+    if(!usuarioUid)return;
+    const r=db.collection('investigaciones').doc(curInv).collection('notas').doc(id);
+    const d=await r.get();
+    if(d.exists){
+        let l=d.data().likes||[];
+        let lkd = l.includes(usuarioUid);
+        if(lkd){
+            l = l.filter(u => u !== usuarioUid);
+        } else {
+            l.push(usuarioUid);
+        }
+        await r.update({likes:l});
+        // Actualización optimista inmediata en la interfaz sin parpadeo
+        let btn = document.getElementById(`like-btn-${id}`);
+        let countSpan = document.getElementById(`like-count-${id}`);
+        if(btn && countSpan){
+            let newLkd = !lkd;
+            btn.className = `btn-icon text-decoration-none fw-bold ${newLkd?'text-danger':'text-secondary'}`;
+            btn.querySelector('i').className = `${newLkd?'fas':'far'} fa-heart me-1`;
+            countSpan.innerText = l.length || 'Interesante';
+        }
+    }
+}
 
 function escNotas(){
-    db.collection('investigaciones').doc(curInv).collection('notas').orderBy("timestamp","desc").onSnapshot(async sn=>{
+    db.collection('investigaciones').doc(curInv).collection('notas').onSnapshot(async sn=>{
         const fd = document.getElementById('feed-notas');
-        let newNd = {};
+        nD = {};
         
         if(sn.empty){ 
-            if(fd.querySelector('.skeleton-card')){
-                // Retrasamos el "No hay publicaciones" para evitar falsos parpadeos por carga local
-                setTimeout(() => {
-                    if(fd.querySelector('.skeleton-card') && Object.keys(newNd).length === 0){
-                        fd.innerHTML = '<div class="text-center text-muted mt-4 fade-in">No hay publicaciones aún.</div>'; 
-                        ocultarSplash();
-                    }
-                }, 1000);
-            } else if (!fd.innerHTML.includes('No hay publicaciones')) {
-                fd.innerHTML = '<div class="text-center text-muted mt-4 fade-in">No hay publicaciones aún.</div>'; 
-                ocultarSplash(); 
-            }
+            setTimeout(() => {
+                if(fd.querySelector('.skeleton-card') && sn.empty){
+                    fd.innerHTML = '<div class="text-center text-muted mt-4 fade-in">No hay publicaciones aún.</div>'; 
+                    ocultarSplash();
+                }
+            }, 1000);
             return; 
         }
         
-        let renderPromises = sn.docs.map(async (d) => {
-            const n=d.data({serverTimestamps:"estimate"});
-            newNd[d.id]=n;
-            
-            let lk = n.likes || [];
-            let lkd = lk.includes(usuarioUid);
-            let currentHash = (n.texto||'') + '|' + (n.imagen||'') + '|' + (n.editado?'1':'0');
-            
-            let existingPost = document.getElementById(`post-${d.id}`);
-            if(existingPost) {
-                let existingHash = existingPost.getAttribute('data-hash');
-                // Si solo cambió el like (el hash sigue siendo el mismo), actualizamos solo el botón sin parpadear el feed.
-                if(existingHash === currentHash) {
-                    let btn = document.getElementById(`like-btn-${d.id}`);
-                    if(btn) {
-                        btn.innerHTML = `<i class="${lkd?'fas':'far'} fa-heart me-1"></i> ${lk.length || 'Interesante'}`;
-                        btn.className = `btn-icon text-decoration-none fw-bold ${lkd?'text-danger':'text-secondary'}`;
-                    }
-                    return { id: d.id, node: existingPost };
-                }
-            }
-            
-            // Si el post no existía o su texto/imagen cambió, lo generamos de cero
+        let docsArr = [];
+        sn.forEach(d => {
+            docsArr.push({ id: d.id, ...d.data({serverTimestamps:"estimate"}) });
+        });
+        
+        // Ordenamiento estricto descendente por fecha
+        docsArr.sort((a, b) => {
+            let msA = a.timestamp ? a.timestamp.toMillis() : Date.now();
+            let msB = b.timestamp ? b.timestamp.toMillis() : Date.now();
+            return msB - msA;
+        });
+
+        let html = '';
+        for(let n of docsArr){
+            nD[n.id] = n;
             let aVer = false;
             if(n.autorUid){
-                if(userCache[n.autorUid] !== undefined) aVer = userCache[n.autorUid];
-                else { try{const uD=await db.collection('users').doc(n.autorUid).get();if(uD.exists&&uD.data().verificado)aVer=true; userCache[n.autorUid]=aVer;}catch(e){} }
+                if(userCache[n.autorUid] !== undefined){
+                    aVer = userCache[n.autorUid];
+                } else {
+                    try{const uD=await db.collection('users').doc(n.autorUid).get();if(uD.exists&&uD.data().verificado)aVer=true; userCache[n.autorUid]=aVer;}catch(e){}
+                }
             }
             let bdg = aVer ? ` <i class="fas fa-check-circle text-primary" style="font-size:0.8rem"></i>` : '';
             let ig = n.imagen ? `<img src="${n.imagen}" class="note-img">` : '';
             let ms = n.timestamp ? n.timestamp.toMillis() : Date.now();
             let fbNm = (n.autor||'Anónimo').replace(/'/g,"\\'");
-            let ac = (n.autorUid===usuarioUid) ? `<div class="action-buttons"><button class="btn-icon" onclick="iniciarEdicionNota('${d.id}')"><i class="fas fa-pen"></i></button><button class="btn-icon text-danger" onclick="if(confirm('¿Eliminar?'))db.collection('investigaciones').doc(curInv).collection('notas').doc('${d.id}').delete()"><i class="fas fa-trash"></i></button></div>` : '';
+            let ac = (n.autorUid===usuarioUid) ? `<div class="action-buttons"><button class="btn-icon" onclick="iniciarEdicionNota('${n.id}')"><i class="fas fa-pen"></i></button><button class="btn-icon text-danger" onclick="if(confirm('¿Eliminar?'))db.collection('investigaciones').doc(curInv).collection('notas').doc('${n.id}').delete()"><i class="fas fa-trash"></i></button></div>` : '';
             let av = n.autorAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(n.autor||'A')}`;
+            let lk = n.likes || [], lkd = lk.includes(usuarioUid);
             
-            let htmlStr = `<div id="post-${d.id}" data-hash="${currentHash}" class="card-custom note-card p-3 position-relative fade-in">${ac}<div class="d-flex align-items-center mb-2"><img src="${av}" width="40" height="40" class="rounded-circle me-2 border" style="cursor:pointer;" onclick="abrirPerfil('${n.autorUid}','${fbNm}','${av}')"><div><div class="fw-bold text-dark" style="cursor:pointer;font-size:0.95rem" onclick="abrirPerfil('${n.autorUid}','${fbNm}','${av}')">${n.autor}${bdg}</div><div class="text-muted small"><span class="t-rel" dt="${ms}">${tRel(ms)}</span>${n.editado?' · Editado':''}</div></div></div><div class="text-dark" style="font-size:0.95rem;line-height:1.5;">${n.texto}</div>${ig}<div class="border-top mt-3 pt-2"><button id="like-btn-${d.id}" class="btn-icon text-decoration-none fw-bold ${lkd?'text-danger':'text-secondary'}" onclick="toggleLike('${d.id}')"><i class="${lkd?'fas':'far'} fa-heart me-1"></i> ${lk.length || 'Interesante'}</button></div></div>`;
-            
-            let tempDiv = document.createElement('div');
-            tempDiv.innerHTML = htmlStr;
-            return { id: d.id, node: tempDiv.firstElementChild };
-        });
-        
-        let nodes = await Promise.all(renderPromises);
-        nD = newNd;
-        
-        // Limpiamos esqueletos antes de inyectar las notas reales.
-        if(fd.querySelector('.skeleton-card') || fd.innerHTML.includes('No hay publicaciones aún')){
-            fd.innerHTML = '';
+            html += `<div id="post-${n.id}" class="card-custom note-card p-3 position-relative fade-in">${ac}<div class="d-flex align-items-center mb-2"><img src="${av}" width="40" height="40" class="rounded-circle me-2 border" style="cursor:pointer;" onclick="abrirPerfil('${n.autorUid}','${fbNm}','${av}')"><div><div class="fw-bold text-dark" style="cursor:pointer;font-size:0.95rem" onclick="abrirPerfil('${n.autorUid}','${fbNm}','${av}')">${n.autor}${bdg}</div><div class="text-muted small"><span class="t-rel" dt="${ms}">${tRel(ms)}</span>${n.editado?' · Editado':''}</div></div></div><div class="text-dark" style="font-size:0.95rem;line-height:1.5;">${n.texto}</div>${ig}<div class="border-top mt-3 pt-2"><button id="like-btn-${n.id}" class="btn-icon text-decoration-none fw-bold ${lkd?'text-danger':'text-secondary'}" onclick="toggleLike('${n.id}')"><i class="${lkd?'fas':'far'} fa-heart me-1"></i> <span id="like-count-${n.id}">${lk.length || 'Interesante'}</span></button></div></div>`;
         }
         
-        // Reordenamiento inteligente del DOM. Evita reescribir si ya está en orden.
-        nodes.forEach((item, index) => {
-            let currentAtPos = fd.children[index];
-            if (currentAtPos !== item.node) {
-                fd.insertBefore(item.node, currentAtPos || null);
-            }
-        });
-        
-        while(fd.children.length > nodes.length) {
-            fd.removeChild(fd.lastChild);
-        }
-        
-        ocultarSplash(); 
+        fd.innerHTML = html;
+        ocultarSplash();
     });
 }
 
