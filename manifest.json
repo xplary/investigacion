@@ -1,0 +1,13 @@
+{
+  "background_color": "#8900ff",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "Vest",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "Vest",
+  "start_url": "/investigacion",
+  "theme_color": "#8900ff",
+  "id": "Vest",
+  "lang": "es"
+}
