@@ -21,7 +21,7 @@
 .chat-bubble{max-width:85%;padding:8px 12px;border-radius:18px;font-size:0.85rem;line-height:1.3;}.chat-me{background-color:var(--brand);color:white;align-self:flex-end; border-bottom-right-radius: 4px;}.chat-other{background-color:#f1f3f5;color:#1c1e21;align-self:flex-start; border-bottom-left-radius: 4px;}
 .modal-overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.6);z-index:2000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);padding:15px;}
 
-/* ESTILOS DEL PERFIL (DISEÑO ORIGINAL INSTAGRAM) */
+/* ESTILOS DEL PERFIL */
 .perfil-card{width:95vw;max-width:1050px;height:92vh;max-height:95vh;border-radius:1rem;overflow:hidden;animation:scaleIn 0.2s ease-out;display:flex;flex-direction:column;background:#fff;}
 @keyframes scaleIn{from{transform:scale(0.95);opacity:0;}to{transform:scale(1);opacity:1;}}
 .insta-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:700px;margin:0 auto;}
@@ -46,8 +46,23 @@
 .story-progress-bar.completed{width:100%;}
 @keyframes storyFill{to{width:100%;}}
 
+/* EFECTOS DE CARGA SKELETON Y FADE IN */
+@keyframes shimmer{0%{background-position:-468px 0}100%{background-position:468px 0}}
+.skeleton-card{background:#fff;border:1px solid #e1e4e8;border-radius:10px;padding:15px;margin-bottom:1rem;box-shadow:0 2px 4px rgba(0,0,0,0.04);}
+.skeleton-item{background:#f6f7f8;background-image:linear-gradient(to right,#f6f7f8 0%,#edeef1 20%,#f6f7f8 40%,#f6f7f8 100%);background-repeat:no-repeat;background-size:800px 100%;animation:shimmer 1.5s infinite linear forwards;border-radius:4px;}
+.sk-av{width:40px;height:40px;border-radius:50%;}
+.sk-txt{height:12px;margin-bottom:8px;width:100%;}
+.fade-in{animation:fadeIn 0.4s ease-out forwards;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
+
 @media (max-width:991.98px){body{padding-bottom:80px;}#col-canales,#col-paneles{display:none;}#mobile-bottom-nav{position:fixed;bottom:0;left:0;width:100%;background:white;border-top:1px solid #ddd;display:flex;justify-content:space-around;align-items:center;z-index:1040;height:65px;box-shadow: 0 -2px 10px rgba(0,0,0,0.05);}.nav-btn{background:transparent;border:none;color:#6c757d;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;}.nav-btn i{font-size:1.3rem; margin-bottom: 2px;}.nav-btn span{font-size:0.65rem;font-weight:600;}.nav-btn.active{color:var(--brand);}#btn-toggle-chat,#chat-floating-panel{bottom:75px !important;}.perfil-card{height:95vh;width:100vw;max-width:100%;border-radius:0;}}
 </style></head><body>
+
+<!-- PANTALLA DE CARGA CELULARES -->
+<div id="mobile-splash" class="d-lg-none" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:linear-gradient(135deg, #712cf9, #d63384);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;transition:opacity 0.5s ease;">
+    <h1 class="fw-bold m-0" style="font-size:3.5rem;letter-spacing:-2px;text-shadow:2px 2px 4px rgba(0,0,0,0.2);">VEST</h1>
+    <div class="spinner-border text-light mt-3" role="status" style="width: 2.5rem; height: 2.5rem;"></div>
+</div>
 
 <header class="bg-white shadow-sm position-sticky top-0 z-3 border-bottom py-2 mb-4">
     <div class="container-fluid px-4 d-flex justify-content-between align-items-center">
@@ -76,8 +91,12 @@
         <div class="card-custom p-3 mb-3"><div class="d-flex gap-2 mb-2"><img id="editor-avatar" src="" class="rounded-circle border" width="40" height="40" style="object-fit:cover;display:none;"><div id="editor-nota" class="editor-custom w-100" contenteditable="true" placeholder="¿Qué hallazgos tienes hoy?"></div></div>
         <div id="preview-container" style="display:none;position:relative;margin-bottom:10px;margin-left:48px;"><img id="preview-img" style="max-height:100px;border-radius:8px;"><button class="btn btn-dark btn-sm rounded-circle position-absolute" style="top:5px;left:5px;padding:2px 8px;opacity:0.7;" onclick="quitarImagen()"><i class="fas fa-times"></i></button></div>
         <div class="d-flex justify-content-between align-items-center mt-2 border-top pt-2"><div class="d-flex gap-2"><input type="file" id="input-foto" accept="image/*" class="d-none" onchange="cargarImagen(event)"><button class="btn btn-light border btn-sm text-secondary fw-bold" onclick="document.getElementById('input-foto').click()"><i class="fas fa-image text-success"></i> Foto</button><div class="btn-group btn-group-sm"><button class="btn btn-light border text-secondary" onclick="insertarFormato('bold')"><i class="fas fa-bold"></i></button><button class="btn btn-light border text-secondary" onclick="insertarFormato('list')"><i class="fas fa-list-ul"></i></button></div></div><div><button id="btn-cancelar-edicion" class="btn btn-sm btn-secondary d-none me-1" onclick="cancelarEdicion()">Cancelar</button><button id="btn-publicar" class="btn btn-brand px-4 shadow-sm rounded-pill" onclick="publicarNota()">Publicar</button></div></div></div>
-        <!-- Feed -->
-        <div id="feed-notas"><div class="text-center text-muted mt-5"><i class="fas fa-spinner fa-spin fa-2x mb-2"></i><br>Cargando muro...</div></div>
+        
+        <!-- Feed (Con Skeleton Inicial) -->
+        <div id="feed-notas">
+            <div class="skeleton-card"><div class="d-flex align-items-center mb-3"><div class="skeleton-item sk-av me-2"></div><div><div class="skeleton-item sk-txt mb-1" style="width:120px;"></div><div class="skeleton-item sk-txt" style="width:70px;"></div></div></div><div class="skeleton-item sk-txt"></div><div class="skeleton-item sk-txt"></div><div class="skeleton-item sk-txt" style="width:65%;"></div></div>
+            <div class="skeleton-card"><div class="d-flex align-items-center mb-3"><div class="skeleton-item sk-av me-2"></div><div><div class="skeleton-item sk-txt mb-1" style="width:100px;"></div><div class="skeleton-item sk-txt" style="width:60px;"></div></div></div><div class="skeleton-item sk-txt"></div><div class="skeleton-item sk-txt" style="width:45%;"></div></div>
+        </div>
     </div>
 
     <!-- PANELES DERECHOS -->
@@ -100,7 +119,6 @@
             <div class="d-flex align-items-center gap-2" style="pointer-events:auto;"><img id="sv-avatar" src="" class="rounded-circle border border-white" style="width:36px;height:36px;min-width:36px;min-height:36px;object-fit:cover;"><span id="sv-name" class="text-white fw-bold shadow-sm" style="text-shadow:1px 1px 3px #000;"></span></div>
             <div class="d-flex gap-3" style="pointer-events:auto;"><button id="sv-del" class="btn-icon text-white d-none shadow-sm" style="text-shadow:1px 1px 3px #000;"><i class="fas fa-trash"></i></button><button class="btn-icon text-white shadow-sm" style="text-shadow:1px 1px 3px #000;font-size:1.5rem;" onclick="cerrarHistoria()"><i class="fas fa-times"></i></button></div>
         </div>
-        <!-- Controles de navegación invisibles -->
         <div style="position:absolute;top:0;left:0;width:30%;height:100%;z-index:5;cursor:pointer;" onclick="prevStory()"></div>
         <div style="position:absolute;top:0;right:0;width:70%;height:100%;z-index:5;cursor:pointer;" onclick="nextStory()"></div>
         
@@ -201,6 +219,15 @@ let vSid=localStorage.getItem('unp_vsid')||(localStorage.setItem('unp_vsid','vs_
 let curInv=new URLSearchParams(window.location.search).get('inv')||'general-unp';
 try{firebase.initializeApp(fc);db=firebase.firestore();auth=firebase.auth();gProv=new firebase.auth.GoogleAuthProvider();auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);}catch(e){}
 
+// PANTALLA DE CARGA FIX
+function ocultarSplash(){
+    const sp = document.getElementById('mobile-splash');
+    if(sp && sp.style.display !== 'none'){
+        sp.style.opacity = '0';
+        setTimeout(() => sp.style.display = 'none', 500);
+    }
+}
+
 // AUTH & LOGIC
 function iniciarSesionGoogle(){auth.signInWithPopup(gProv).then(r=>manLog(r.user)).catch(e=>{if(e.code.includes('popup'))auth.signInWithRedirect(gProv);});}
 function cerrarSesion(){desconectarVoz();auth.signOut().then(()=>window.location.reload());}
@@ -217,8 +244,13 @@ auth.onAuthStateChanged(u=>{
     iniCanal(); 
 });
 
-async function manLog(u){usuarioUid=u.uid;usuarioActual=u.displayName||"Inv";avatarUrlActual=u.photoURL||`https://ui-avatars.com/api/?name=${encodeURIComponent(usuarioActual)}`;try{const d=await db.collection('users').doc(u.uid).get();if(d.exists){avatarUrlActual=d.data().foto||avatarUrlActual;usuarioActual=d.data().nombre||usuarioActual;esVerificadoActual=d.data().verificado===true;}}catch(e){}
-    document.getElementById('user-avatar').src=avatarUrlActual;document.getElementById('editor-avatar').src=avatarUrlActual;document.getElementById('editor-avatar').style.display='block';document.getElementById('my-story-avatar').src=avatarUrlActual;document.getElementById('user-name').innerHTML=usuarioActual+(esVerificadoActual?' <i class="fas fa-check-circle text-primary"></i>':'');document.getElementById('logged-in-view').classList.replace('d-none','d-flex');document.getElementById('logged-out-view').classList.add('d-none');await regAcc(u.uid,curInv,usuarioActual,avatarUrlActual);cListInvs(u.uid);}
+async function manLog(u){
+    usuarioUid=u.uid;usuarioActual=u.displayName||"Inv";avatarUrlActual=u.photoURL||`https://ui-avatars.com/api/?name=${encodeURIComponent(usuarioActual)}`;
+    try{const d=await db.collection('users').doc(u.uid).get();if(d.exists){avatarUrlActual=d.data().foto||avatarUrlActual;usuarioActual=d.data().nombre||usuarioActual;esVerificadoActual=d.data().verificado===true;}}catch(e){}
+    document.getElementById('user-avatar').src=avatarUrlActual;document.getElementById('editor-avatar').src=avatarUrlActual;document.getElementById('editor-avatar').style.display='block';document.getElementById('my-story-avatar').src=avatarUrlActual;document.getElementById('user-name').innerHTML=usuarioActual+(esVerificadoActual?' <i class="fas fa-check-circle text-primary"></i>':'');document.getElementById('logged-in-view').classList.replace('d-none','d-flex');document.getElementById('logged-out-view').classList.add('d-none');
+    await regAcc(u.uid,curInv,usuarioActual,avatarUrlActual);
+    cListInvs(u.uid);
+}
 
 // HISTORIAS AGRUPADAS Y NAVEGACIÓN
 let histMap={}, groupedHist={}, currentGroupUid=null, currentStoryIdx=0, stTimer;
@@ -231,13 +263,13 @@ function escHistorias(){
         const h24=Date.now()-86400000;
         
         s.forEach(d=>{
-            const t=d.data();
+            const t=d.data({serverTimestamps:"estimate"});
             const ms=t.timestamp?t.timestamp.toMillis():Date.now();
             if(ms>h24){ act.push({id:d.id, ms:ms, ...t}); histMap[d.id]=t; }
             else d.ref.delete();
         });
         
-        act.sort((a,b)=>a.ms - b.ms); // Cronológico: las más viejas primero
+        act.sort((a,b)=>a.ms - b.ms);
         
         act.forEach(st => {
             if(!groupedHist[st.autorUid]) groupedHist[st.autorUid] = [];
@@ -246,7 +278,6 @@ function escHistorias(){
 
         let h=`<div class="story-card" style="background:#fff;" onclick="document.getElementById('input-story').click()"><img id="my-story-avatar" src="${avatarUrlActual||'https://ui-avatars.com/api/?name=Yo'}" style="width:100%;height:110px;object-fit:cover;border-radius:10px 10px 0 0;"><div class="story-add-btn"><i class="fas fa-plus"></i></div><span class="story-author text-dark" style="bottom:6px;">Crear historia</span></div>`;
         
-        // Ordenar usuarios por su última historia (la más reciente)
         let sortedUids = Object.keys(groupedHist).sort((u1,u2)=>{
             let l1 = groupedHist[u1][groupedHist[u1].length-1].ms;
             let l2 = groupedHist[u2][groupedHist[u2].length-1].ms;
@@ -255,7 +286,7 @@ function escHistorias(){
 
         sortedUids.forEach(uid=>{
             let group = groupedHist[uid];
-            let st = group[group.length - 1]; // Portada es la última historia subida
+            let st = group[group.length - 1];
             let unreadCount = group.length;
             let fbNm=(st.autor||'Anónimo').replace(/'/g,"\\'");
             h+=`<div class="story-card" onclick="abrirGrupoHistoria('${uid}')">
@@ -286,7 +317,6 @@ function renderCurrentStory(){
     document.getElementById('sv-avatar').src = st.avatar;
     document.getElementById('sv-name').innerText = st.autor;
 
-    // Generar las rayitas de progreso
     let progHTML = '';
     for(let i=0; i<group.length; i++){
         let stateClass = '';
@@ -326,7 +356,7 @@ function prevStory(){
         currentStoryIdx--;
         renderCurrentStory();
     } else {
-        renderCurrentStory(); // reiniciar la primera
+        renderCurrentStory();
     }
 }
 
@@ -336,9 +366,9 @@ function cerrarHistoria(){
     currentGroupUid = null;
 }
 
-// FEED Y NOTAS
+// FEED Y NOTAS FIX BUGS RECARGA Y PUBLICACIONES
 function tRel(ms){const s=Math.floor((Date.now()-ms)/1000);if(s<60)return `hace ${s}s`;const m=Math.floor(s/60);if(m<60)return `hace ${m}m`;const h=Math.floor(m/60);if(h<24)return `hace ${h}h`;return `hace ${Math.floor(h/24)}d`;}setInterval(()=>document.querySelectorAll('.t-rel').forEach(e=>e.innerText=tRel(parseInt(e.getAttribute('dt')))),30000);
-let iB=null,nD={},iE=null;
+let iB=null,nD={},iE=null,userCache={};
 function cargarImagen(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{const im=new Image();im.onload=()=>{const cv=document.createElement('canvas');let w=im.width,h=im.height;if(w>h){if(w>800){h*=800/w;w=800;}}else{if(h>800){w*=800/h;h=800;}}cv.width=w;cv.height=h;cv.getContext('2d').drawImage(im,0,0,w,h);iB=cv.toDataURL('image/jpeg',0.7);document.getElementById('preview-img').src=iB;document.getElementById('preview-container').style.display='block';};im.src=e.target.result;};r.readAsDataURL(f);}
 function quitarImagen(){iB=null;document.getElementById('preview-img').src="";document.getElementById('preview-container').style.display='none';document.getElementById('input-foto').value="";}
 function publicarNota(){const ed=document.getElementById('editor-nota'),ht=ed.innerHTML.trim();if(ed.innerText.trim()===""&&!iB)return;const btn=document.getElementById('btn-publicar');btn.disabled=true;const r=db.collection('investigaciones').doc(curInv).collection('notas');if(iE)r.doc(iE).update({texto:ht,imagen:iB,editado:true}).then(()=>{cancelarEdicion();btn.disabled=false;});else r.add({autor:usuarioActual,autorUid:usuarioUid,autorAvatar:avatarUrlActual,texto:ht,imagen:iB,timestamp:firebase.firestore.FieldValue.serverTimestamp(),likes:[]}).then(()=>{ed.innerHTML="";quitarImagen();btn.disabled=false;});}
@@ -349,14 +379,25 @@ async function toggleLike(id){if(!usuarioUid)return;const r=db.collection('inves
 function escNotas(){
     db.collection('investigaciones').doc(curInv).collection('notas').orderBy("timestamp","desc").onSnapshot(async sn=>{
         const fd=document.getElementById('feed-notas');
-        fd.innerHTML="";
-        nD={};
-        if(sn.empty){ fd.innerHTML='<div class="text-center text-muted mt-4">No hay publicaciones aún.</div>'; return; }
-        for(let d of sn.docs){
-            const n=d.data();
-            nD[d.id]=n;
+        let newNd = {};
+        if(sn.empty){ 
+            fd.innerHTML='<div class="text-center text-muted mt-4 fade-in">No hay publicaciones aún.</div>'; 
+            nD = newNd; 
+            ocultarSplash(); 
+            return; 
+        }
+        
+        let promises = sn.docs.map(async d => {
+            const n=d.data({serverTimestamps:"estimate"});
+            newNd[d.id]=n;
             let aVer=false;
-            if(n.autorUid){try{const uD=await db.collection('users').doc(n.autorUid).get();if(uD.exists&&uD.data().verificado)aVer=true;}catch(e){}}
+            if(n.autorUid){
+                if(userCache[n.autorUid] !== undefined){
+                    aVer = userCache[n.autorUid];
+                } else {
+                    try{const uD=await db.collection('users').doc(n.autorUid).get();if(uD.exists&&uD.data().verificado)aVer=true; userCache[n.autorUid]=aVer;}catch(e){}
+                }
+            }
             let bdg=aVer?` <i class="fas fa-check-circle text-primary" style="font-size:0.8rem"></i>`:'';
             let ig=n.imagen?`<img src="${n.imagen}" class="note-img">`:'';
             let ms=n.timestamp?n.timestamp.toMillis():Date.now();
@@ -365,8 +406,13 @@ function escNotas(){
             let av=n.autorAvatar||`https://ui-avatars.com/api/?name=${encodeURIComponent(n.autor||'A')}`;
             let lk=n.likes||[],lkd=lk.includes(usuarioUid);
             
-            fd.innerHTML+=`<div class="card-custom note-card p-3 position-relative">${ac}<div class="d-flex align-items-center mb-2"><img src="${av}" width="40" height="40" class="rounded-circle me-2 border" style="cursor:pointer;" onclick="abrirPerfil('${n.autorUid}','${fbNm}','${av}')"><div><div class="fw-bold text-dark" style="cursor:pointer;font-size:0.95rem" onclick="abrirPerfil('${n.autorUid}','${fbNm}','${av}')">${n.autor}${bdg}</div><div class="text-muted small"><span class="t-rel" dt="${ms}">${tRel(ms)}</span>${n.editado?' · Editado':''}</div></div></div><div class="text-dark" style="font-size:0.95rem;line-height:1.5;">${n.texto}</div>${ig}<div class="border-top mt-3 pt-2"><button class="btn-icon text-decoration-none fw-bold ${lkd?'text-danger':'text-secondary'}" onclick="toggleLike('${d.id}')"><i class="${lkd?'fas':'far'} fa-heart me-1"></i> ${lk.length||'Me gusta'}</button></div></div>`;
-        }
+            return `<div class="card-custom note-card p-3 position-relative fade-in">${ac}<div class="d-flex align-items-center mb-2"><img src="${av}" width="40" height="40" class="rounded-circle me-2 border" style="cursor:pointer;" onclick="abrirPerfil('${n.autorUid}','${fbNm}','${av}')"><div><div class="fw-bold text-dark" style="cursor:pointer;font-size:0.95rem" onclick="abrirPerfil('${n.autorUid}','${fbNm}','${av}')">${n.autor}${bdg}</div><div class="text-muted small"><span class="t-rel" dt="${ms}">${tRel(ms)}</span>${n.editado?' · Editado':''}</div></div></div><div class="text-dark" style="font-size:0.95rem;line-height:1.5;">${n.texto}</div>${ig}<div class="border-top mt-3 pt-2"><button class="btn-icon text-decoration-none fw-bold ${lkd?'text-danger':'text-secondary'}" onclick="toggleLike('${d.id}')"><i class="${lkd?'fas':'far'} fa-heart me-1"></i> ${lk.length||'Me gusta'}</button></div></div>`;
+        });
+        
+        let resultadosHtml = await Promise.all(promises);
+        nD = newNd;
+        fd.innerHTML = resultadosHtml.join('');
+        ocultarSplash(); // Oculta la pantalla de carga solo después de dibujar el muro
     });
 }
 
@@ -410,7 +456,7 @@ function remAud(p){const a=document.getElementById('au-'+p);if(a)a.remove();if(a
 db.collection('investigaciones').doc(curInv).collection('voice_room').onSnapshot(s=>{const l=document.getElementById('lista-usuarios-voz');l.innerHTML='';let ac=[],pS=new Set();const nw=Date.now();s.forEach(d=>{const cd=d.data();if(!cd.lastSeen||nw-cd.lastSeen>30000){d.ref.delete();return;}if(pS.has(cd.peerId))return;pS.add(cd.peerId);ac.push(cd.peerId);const iMe=pr&&cd.peerId===pr.id,nm=iMe?`${cd.nombre} (Tú)`:cd.nombre,av=cd.avatar;l.innerHTML+=`<div class="d-flex align-items-center mb-2"><img src="${av}" class="rounded-circle me-2 border" width="28" height="28"><i class="fas fa-microphone ${iMe?'text-success':'text-secondary'} me-2 small"></i><span class="text-dark fw-medium small">${nm}</span></div>`;if(pr&&pr.id&&!iMe&&!aC[cd.peerId]&&pr.id<cd.peerId){const cll=pr.call(cd.peerId,lS);aC[cd.peerId]=cll;cll.on('stream',rs=>addAud(cd.peerId,rs));cll.on('close',()=>remAud(cd.peerId));}});if(l.innerHTML==='')l.innerHTML='<div class="text-muted small">Nadie en sala</div>';document.querySelectorAll('audio.p-au').forEach(a=>{if(!ac.includes(a.id.replace('au-','')))remAud(a.id.replace('au-',''));});});
 
 
-// --- PERFIL Y MURO INSTAGRAM STYLE (RESTAURADO) ---
+// --- PERFIL Y MURO INSTAGRAM STYLE ---
 let pfB64=null, pfImgB64=null, perfilUidActual=null, perfilNombreActual='', perfilAvatarActual='', perfilVerificadoActual=false, perfilPostsMap={}, postActualId=null, editandoPostId=null;
 
 async function abrirPerfil(uid,fbN='',fbF=''){
@@ -423,7 +469,7 @@ async function abrirPerfil(uid,fbN='',fbF=''){
     if(uid&&db){try{const d=await db.collection('users').doc(uid).get();if(d.exists){const dt=d.data();if(dt.nombre)nF=dt.nombre;if(dt.foto)fF=dt.foto;if(dt.bio)bF=dt.bio;if(dt.verificado===true)vF=true;}}catch(e){}}
     perfilNombreActual=nF; perfilAvatarActual=fF; perfilVerificadoActual=vF;
     
-    let badgeHtml = perfilVerificadoActual ? `&nbsp;<i class="fas fa-square-check text-primary" title="Cuenta Verificada"></i>` : '';
+    let badgeHtml = perfilVerificadoActual ? `&nbsp;<i class="fas fa-check-circle text-primary" title="Cuenta Verificada"></i>` : '';
     document.getElementById('perfil-foto').src=fF;
     document.getElementById('perfil-nombre').innerHTML=nF + badgeHtml;
     document.getElementById('perfil-bio-display').innerHTML=bF.replace(/\n/g,'<br>');
@@ -503,12 +549,14 @@ async function eliminarPostMuroDetalle(){
 
 async function cargarMuroPerfil(uid){
     const gd=document.getElementById('perfil-grid-posts');
-    gd.innerHTML='<div class="text-muted small mt-4 text-center w-100"><i class="fas fa-spinner fa-spin"></i> Cargando muro...</div>';
+    // Implementado Skeleton para el muro del perfil (haciéndolo consistente)
+    gd.innerHTML='<div class="insta-grid fade-in"><div class="insta-tile skeleton-item" style="border-radius:8px;"></div><div class="insta-tile skeleton-item" style="border-radius:8px;"></div><div class="insta-tile skeleton-item" style="border-radius:8px;"></div></div>';
+    
     try{
         const sp=await db.collection('users').doc(uid).collection('muro').orderBy('timestamp','desc').get();
         perfilPostsMap = {};
-        if(sp.empty){gd.innerHTML='<div class="text-muted small mt-4 text-center w-100"><i class="fas fa-camera opacity-25 fa-2x mb-2"></i><br>Sin publicaciones en el muro.</div>';return;}
-        let h='<div class="insta-grid">';
+        if(sp.empty){gd.innerHTML='<div class="text-muted small mt-4 text-center w-100 fade-in"><i class="fas fa-camera opacity-25 fa-2x mb-2"></i><br>Sin publicaciones en el muro.</div>';return;}
+        let h='<div class="insta-grid fade-in">';
         sp.forEach(x=>{
             const d=x.data();
             perfilPostsMap[x.id] = d;
@@ -543,7 +591,7 @@ function verDetallePostPerfil(pId){
 }
 
 function renderDetalleContenido(d){
-    let badgeHtml = perfilVerificadoActual ? `&nbsp;<i class="fas fa-square-check text-primary" title="Cuenta Verificada"></i>` : '';
+    let badgeHtml = perfilVerificadoActual ? `&nbsp;<i class="fas fa-check-circle text-primary" title="Cuenta Verificada"></i>` : '';
     document.getElementById('detail-avatar').src = perfilAvatarActual;
     document.getElementById('detail-autor').innerHTML = perfilNombreActual + badgeHtml;
     document.getElementById('detail-texto').innerHTML = (d.texto||"").replace(/\n/g,'<br>');
