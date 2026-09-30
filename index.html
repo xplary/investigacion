@@ -48,8 +48,8 @@
 .sk-txt{height:12px;margin-bottom:8px;width:100%;}
 .fade-in{animation:fadeIn 0.4s ease-out forwards;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
-@media (max-width:767.98px){#wapp-sidebar{width:100% !important;}}
-.wapp-chat-item:hover{background:#f5f6f6;}
+@media (max-width:767.98px){#chat-sidebar{width:100% !important;}}
+.chat-item-priv:hover{background:#f8f9fa;}
 @media (max-width:991.98px){body{padding-bottom:80px;}#col-canales,#col-paneles{display:none;}#mobile-bottom-nav{position:fixed;bottom:0;left:0;width:100%;background:white;border-top:1px solid #ddd;display:flex;justify-content:space-around;align-items:center;z-index:9000 !important;height:65px;box-shadow: 0 -2px 10px rgba(0,0,0,0.05);}.nav-btn{background:transparent;border:none;color:#6c757d;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;}.nav-btn i{font-size:1.3rem; margin-bottom: 2px;}.nav-btn span{font-size:0.65rem;font-weight:600;}.nav-btn.active{color:var(--brand);}#btn-toggle-chat,#chat-floating-panel{bottom:75px !important;}.perfil-card{height:95vh;width:100vw;max-width:100%;border-radius:0;}}
 </style></head><body>
 
@@ -144,25 +144,25 @@
     </div>
 </div>
 
-<div id="whatsapp-view" class="d-none" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:#ece5dd;z-index:9999;display:flex;">
-    <div id="wapp-sidebar" style="width:30%;min-width:300px;background:#fff;border-right:1px solid #d1d7db;display:flex;flex-direction:column;">
-        <div style="background:#f0f2f5;padding:10px 15px;display:flex;align-items:center;height:60px;">
-            <button class="btn-icon me-3" onclick="cerrarPaginaChats()"><i class="fas fa-arrow-left"></i></button>
-            <img id="wapp-my-av" src="" style="width:40px;height:40px;border-radius:50%;object-fit:cover;" class="me-3">
-            <span class="fw-bold text-dark">Chats Privados</span>
+<div id="whatsapp-view" class="d-none" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:#f8f9fa;z-index:9999;display:flex;">
+    <div id="chat-sidebar" style="width:320px;background:#fff;border-right:1px solid #e1e4e8;display:flex;flex-direction:column;box-shadow:2px 0 5px rgba(0,0,0,0.02);">
+        <div style="background:#fff;padding:12px 18px;display:flex;align-items:center;height:65px;border-bottom:1px solid #e1e4e8;">
+            <button class="btn-icon me-3 text-secondary" onclick="cerrarPaginaChats()"><i class="fas fa-arrow-left fa-lg"></i></button>
+            <img id="wapp-my-av" src="" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:1px solid #e1e4e8;" class="me-3">
+            <span class="fw-bold text-dark fs-6">Mensajes Privados</span>
         </div>
         <div id="wapp-chat-list" style="flex:1;overflow-y:auto;background:#fff;"></div>
     </div>
-    <div id="wapp-main" class="d-none d-md-flex" style="flex:1;flex-direction:column;background:#efeae2;background-image:url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');">
-        <div style="background:#f0f2f5;padding:10px 15px;display:flex;align-items:center;height:60px;border-left:1px solid #d1d7db;">
-            <button class="btn-icon me-3 d-md-none" onclick="wappVolverLista()"><i class="fas fa-arrow-left"></i></button>
-            <img id="wapp-active-av" src="" style="width:40px;height:40px;border-radius:50%;object-fit:cover;display:none;" class="me-3">
-            <span id="wapp-active-name" class="fw-bold text-dark">Selecciona un chat</span>
+    <div id="wapp-main" class="d-none d-md-flex" style="flex:1;flex-direction:column;background:#f4f6f9;">
+        <div style="background:#fff;padding:12px 20px;display:flex;align-items:center;height:65px;border-bottom:1px solid #e1e4e8;box-shadow:0 1px 2px rgba(0,0,0,0.02);">
+            <button class="btn-icon me-3 d-md-none text-secondary" onclick="wappVolverLista()"><i class="fas fa-arrow-left fa-lg"></i></button>
+            <img id="wapp-active-av" src="" style="width:38px;height:38px;border-radius:50%;object-fit:cover;display:none;border:1px solid #e1e4e8;" class="me-3">
+            <span id="wapp-active-name" class="fw-bold text-dark fs-6">Selecciona una conversación</span>
         </div>
-        <div id="wapp-messages" style="flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:8px;"></div>
-        <div id="wapp-input-area" style="background:#f0f2f5;padding:10px 15px;display:none;align-items:center;gap:10px;">
-            <input type="text" id="wapp-input" class="form-control rounded-pill border-0 px-3 py-2 shadow-sm" placeholder="Escribe un mensaje..." onkeypress="if(event.key==='Enter') enviarMsgPrivado()">
-            <button class="btn btn-brand rounded-circle shadow-sm d-flex justify-content-center align-items-center" style="width:42px;height:42px;min-width:42px;" onclick="enviarMsgPrivado()"><i class="fas fa-paper-plane"></i></button>
+        <div id="wapp-messages" style="flex:1;overflow-y:auto;padding:25px;display:flex;flex-direction:column;gap:12px;"></div>
+        <div id="wapp-input-area" style="background:#fff;padding:15px 20px;display:none;align-items:center;gap:12px;border-top:1px solid #e1e4e8;">
+            <input type="text" id="wapp-input" class="form-control rounded-pill border bg-light px-4 py-2 shadow-none" placeholder="Escribe tu mensaje..." onkeypress="if(event.key==='Enter') enviarMsgPrivado()">
+            <button class="btn btn-brand rounded-circle shadow-sm d-flex justify-content-center align-items-center" style="width:44px;height:44px;min-width:44px;" onclick="enviarMsgPrivado()"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
 </div>
@@ -282,8 +282,51 @@ function getChatId(u1,u2){return u1<u2?u1+"_"+u2:u2+"_"+u1;}
 function abrirPaginaChats(targetUid=null){document.getElementById('whatsapp-view').classList.remove('d-none');document.getElementById('wapp-my-av').src=avatarUrlActual;document.body.style.overflow='hidden';if(targetUid){abrirChatActivo(targetUid);}else{wappVolverLista();}}
 function cerrarPaginaChats(){document.getElementById('whatsapp-view').classList.add('d-none');document.body.style.overflow='';if(unsubWappMsgs){unsubWappMsgs();unsubWappMsgs=null;}activeWappChatId=null;activeWappOtherUid=null;}
 function irAChatDesdePerfil(){document.getElementById('perfil-modal').classList.add('d-none');abrirPaginaChats(perfilUidActual);}
-function renderWappSidebar(){const list=document.getElementById('wapp-chat-list');if(!list)return;let arr=Object.values(privChatsData).sort((a,b)=>(b.lastUpdate||0)-(a.lastUpdate||0));let h='';arr.forEach(c=>{let oUid=c.users.find(u=>u!==usuarioUid);let oU=allUsersCache.find(u=>u.id===oUid)||{nombre:'Desconocido',foto:'https://ui-avatars.com/api/?name=?'};let unread=c['unread_'+usuarioUid]||0;let isActive=activeWappChatId===getChatId(usuarioUid,oUid);let timeStr=c.lastUpdate?new Date(c.lastUpdate).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'';h+=`<div class="wapp-chat-item ${isActive?'bg-light':''}" onclick="abrirChatActivo('${oUid}')" style="display:flex;align-items:center;padding:12px 15px;border-bottom:1px solid #f0f2f5;cursor:pointer;"><img src="${oU.foto}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;margin-right:15px;"><div style="flex:1;overflow:hidden;"><div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span class="fw-bold text-dark text-truncate">${oU.nombre}</span><span style="font-size:0.7rem;color:#667781;">${timeStr}</span></div><div style="display:flex;justify-content:space-between;align-items:center;"><span class="text-truncate" style="font-size:0.85rem;color:#667781;">${c.lastMessage||'Inicia un chat'}</span>${unread>0&&!isActive?`<span class="badge rounded-pill bg-success">${unread}</span>`:''}</div></div></div>`;});list.innerHTML=h||'<div class="text-center text-muted mt-4 small">No tienes chats aún</div>';}
-function wappVolverLista(){activeWappChatId=null;document.getElementById('wapp-sidebar').style.display='flex';document.getElementById('wapp-main').classList.add('d-none','d-md-flex');if(unsubWappMsgs){unsubWappMsgs();unsubWappMsgs=null;}}
-function abrirChatActivo(otherUid){activeWappOtherUid=otherUid;activeWappChatId=getChatId(usuarioUid,otherUid);let oU=allUsersCache.find(u=>u.id===otherUid)||{nombre:'Desconocido',foto:'https://ui-avatars.com/api/?name=?'};document.getElementById('wapp-sidebar').style.display=window.innerWidth<768?'none':'flex';document.getElementById('wapp-main').classList.remove('d-none');document.getElementById('wapp-main').classList.add('d-flex');document.getElementById('wapp-active-name').innerText=oU.nombre;document.getElementById('wapp-active-av').src=oU.foto;document.getElementById('wapp-active-av').style.display='block';document.getElementById('wapp-input-area').style.display='flex';if(unsubWappMsgs)unsubWappMsgs();if(privChatsData[activeWappChatId]&&privChatsData[activeWappChatId]['unread_'+usuarioUid]>0){db.collection('private_chats').doc(activeWappChatId).update({['unread_'+usuarioUid]:0});}unsubWappMsgs=db.collection('private_chats').doc(activeWappChatId).collection('messages').orderBy('timestamp','asc').onSnapshot(s=>{const b=document.getElementById('wapp-messages');b.innerHTML='';s.forEach(d=>{const m=d.data();const me=m.sender===usuarioUid;const timeStr=m.timestamp?new Date(m.timestamp.toMillis()).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'';b.innerHTML+=`<div style="max-width:75%;align-self:${me?'flex-end':'flex-start'};background:${me?'#d9fdd3':'#fff'};padding:8px 12px;border-radius:8px;box-shadow:0 1px 1px rgba(0,0,0,0.1);position:relative;"><span style="font-size:0.9rem;color:#111b21;word-break:break-word;">${m.text}</span><div style="font-size:0.65rem;color:#667781;text-align:right;margin-top:2px;min-width:40px;">${timeStr}</div></div>`;});b.scrollTop=b.scrollHeight;if(privChatsData[activeWappChatId]&&privChatsData[activeWappChatId]['unread_'+usuarioUid]>0){db.collection('private_chats').doc(activeWappChatId).update({['unread_'+usuarioUid]:0});}});renderWappSidebar();}
-async function enviarMsgPrivado(){if(!activeWappChatId||!activeWappOtherUid)return;const inp=document.getElementById('wapp-input');const txt=inp.value.trim();if(!txt)return;inp.value='';const rRef=db.collection('private_chats').doc(activeWappChatId);const ts=firebase.firestore.FieldValue.serverTimestamp();await rRef.set({users:[usuarioUid,activeWappOtherUid],lastMessage:txt,lastUpdate:Date.now(),['unread_'+activeWappOtherUid]:firebase.firestore.FieldValue.increment(1)},{merge:true});await rRef.collection('messages').add({sender:usuarioUid,text:txt,timestamp:ts});}
+function renderWappSidebar(){const list=document.getElementById('wapp-chat-list');if(!list)return;let arr=Object.values(privChatsData).sort((a,b)=>(b.lastUpdate||0)-(a.lastUpdate||0));let h='';arr.forEach(c=>{let oUid=c.users.find(u=>u!==usuarioUid);let oU=allUsersCache.find(u=>u.id===oUid)||{nombre:'Desconocido',foto:'https://ui-avatars.com/api/?name=?'};let unread=c['unread_'+usuarioUid]||0;let isActive=activeWappChatId===getChatId(usuarioUid,oUid);let timeStr=c.lastUpdate?new Date(c.lastUpdate).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'';h+=`<div class="chat-item-priv ${isActive?'bg-light':''}" onclick="abrirChatActivo('${oUid}')" style="display:flex;align-items:center;padding:12px 18px;border-bottom:1px solid #f1f3f5;cursor:pointer;transition:0.2s;"><img src="${oU.foto}" style="width:46px;height:46px;border-radius:50%;object-fit:cover;margin-right:15px;border:1px solid #e1e4e8;"><div style="flex:1;overflow:hidden;"><div style="display:flex;justify-content:space-between;margin-bottom:3px;"><span class="fw-bold text-dark text-truncate small">${oU.nombre}</span><span style="font-size:0.7rem;color:#6c757d;">${timeStr}</span></div><div style="display:flex;justify-content:space-between;align-items:center;"><span class="text-truncate text-muted" style="font-size:0.8rem;">${c.lastMessage||'Inicia un chat'}</span>${unread>0&&!isActive?`<span class="badge rounded-pill bg-brand" style="font-size:0.65rem;">${unread}</span>`:''}</div></div></div>`;});list.innerHTML=h||'<div class="text-center text-muted mt-5 small"><i class="fas fa-comments opacity-25 fa-2x mb-2"></i><br>No hay conversaciones aún</div>';}
+function wappVolverLista(){activeWappChatId=null;document.getElementById('chat-sidebar').style.display='flex';document.getElementById('wapp-main').classList.add('d-none','d-md-flex');if(unsubWappMsgs){unsubWappMsgs();unsubWappMsgs=null;}}
+function abrirChatActivo(otherUid){activeWappOtherUid=otherUid;activeWappChatId=getChatId(usuarioUid,otherUid);let oU=allUsersCache.find(u=>u.id===otherUid)||{nombre:'Desconocido',foto:'https://ui-avatars.com/api/?name=?'};document.getElementById('chat-sidebar').style.display=window.innerWidth<768?'none':'flex';document.getElementById('wapp-main').classList.remove('d-none');document.getElementById('wapp-main').classList.add('d-flex');document.getElementById('wapp-active-name').innerText=oU.nombre;document.getElementById('wapp-active-av').src=oU.foto;document.getElementById('wapp-active-av').style.display='block';document.getElementById('wapp-input-area').style.display='flex';if(unsubWappMsgs)unsubWappMsgs();if(privChatsData[activeWappChatId]&&privChatsData[activeWappChatId]['unread_'+usuarioUid]>0){db.collection('private_chats').doc(activeWappChatId).update({['unread_'+usuarioUid]:0});}unsubWappMsgs=db.collection('private_chats').doc(activeWappChatId).collection('messages').orderBy('timestamp','asc').onSnapshot(s=>{const b=document.getElementById('wapp-messages');b.innerHTML='';s.forEach(d=>{const m=d.data();const me=m.sender===usuarioUid;const timeStr=m.timestamp?new Date(m.timestamp.toMillis()).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'';b.innerHTML+=`<div style="max-width:75%;align-self:${me?'flex-end':'flex-start'};background:${me?'var(--brand)':'#fff'};color:${me?'#fff':'#1c1e21'};padding:10px 14px;border-radius:${me?'14px 14px 2px 14px':'14px 14px 14px 2px'};box-shadow:0 2px 4px rgba(0,0,0,0.04);position:relative;border:${me?'none':'1px solid #e1e4e8'};"><span style="font-size:0.9rem;word-break:break-word;">${m.text}</span><div style="font-size:0.65rem;color:${me?'rgba(255,255,255,0.8)':'#6c757d'};text-align:right;margin-top:2px;">${timeStr}</div></div>`;});b.scrollTop=b.scrollHeight;if(privChatsData[activeWappChatId]&&privChatsData[activeWappChatId]['unread_'+usuarioUid]>0){db.collection('private_chats').doc(activeWappChatId).update({['unread_'+usuarioUid]:0});}});renderWappSidebar();}
+
+async function enviarMsgPrivado(){
+    if(!activeWappChatId || !activeWappOtherUid) return;
+    const inp = document.getElementById('wapp-input');
+    const txt = inp.value.trim();
+    if(!txt) return;
+    inp.value = '';
+
+    const tempId = 'temp_' + Date.now();
+    const timeStr = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    const b = document.getElementById('wapp-messages');
+    
+    const localBubble = document.createElement('div');
+    localBubble.id = tempId;
+    localBubble.style.cssText = "max-width:75%;align-self:flex-end;background:var(--brand);color:#fff;padding:10px 14px;border-radius:14px 14px 2px 14px;box-shadow:0 2px 4px rgba(0,0,0,0.04);position:relative;animation:fadeIn 0.2s ease;";
+    localBubble.innerHTML = `<span style="font-size:0.9rem;word-break:break-word;">${txt}</span><div style="font-size:0.65rem;color:rgba(255,255,255,0.8);text-align:right;margin-top:2px;display:flex;align-items:center;justify-content:flex-end;gap:4px;"><span>${timeStr}</span><i class="fas fa-clock" style="font-size:0.6rem;" title="Enviando..."></i></div>`;
+    b.appendChild(localBubble);
+    b.scrollTop = b.scrollHeight;
+
+    const rRef = db.collection('private_chats').doc(activeWappChatId);
+    const ts = firebase.firestore.FieldValue.serverTimestamp();
+    try {
+        await rRef.set({
+            users: [usuarioUid, activeWappOtherUid],
+            lastMessage: txt,
+            lastUpdate: Date.now(),
+            ['unread_' + activeWappOtherUid]: firebase.firestore.FieldValue.increment(1)
+        }, {merge: true});
+        await rRef.collection('messages').add({
+            sender: usuarioUid,
+            text: txt,
+            timestamp: ts
+        });
+        const el = document.getElementById(tempId);
+        if(el) el.remove();
+    } catch(e) {
+        const el = document.getElementById(tempId);
+        if(el) {
+            el.style.opacity = '0.7';
+            el.querySelector('i').className = 'fas fa-exclamation-circle text-warning';
+            el.querySelector('i').title = 'Error al enviar';
+        }
+    }
+}
 </script></body></html>
