@@ -31,13 +31,13 @@
 .insta-tile-text{padding:12px;font-size:0.8rem;color:#495057;text-align:center;overflow:hidden;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;}
 
 /* HISTORIAS FUNCIONALES Y RESPONSIVAS */
-.stories-wrapper{display:flex;gap:8px;overflow-x:auto;padding:10px;scrollbar-width:none;background:#fff;border-radius:10px;box-shadow:0 2px 4px rgba(0,0,0,0.04);margin-bottom:1rem; border:1px solid #e1e4e8;}
+.stories-wrapper{position:relative;z-index:1;display:flex;gap:8px;overflow-x:auto;padding:10px;scrollbar-width:none;background:#fff;border-radius:10px;box-shadow:0 2px 4px rgba(0,0,0,0.04);margin-bottom:1rem; border:1px solid #e1e4e8;}
 .stories-wrapper::-webkit-scrollbar{display:none;}
 .story-card{flex:0 0 100px;height:170px;border-radius:10px;background:#f8f9fa;position:relative;cursor:pointer;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,0.1);border:1px solid #e1e4e8;}
 .story-card::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0) 50%,rgba(0,0,0,0.7) 100%);pointer-events:none;}
 .story-avatar{position:absolute;top:8px;left:8px;width:32px !important;height:32px !important;min-width:32px;min-height:32px;border-radius:50%;border:2px solid var(--brand);z-index:2;object-fit:cover;background:#fff;}
 .story-author{position:absolute;bottom:8px;left:4px;right:4px;color:#fff;font-size:0.7rem;font-weight:600;z-index:2;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.story-add-btn{width:32px;height:32px;border-radius:50%;background:var(--brand);color:white;display:flex;justify-content:center;align-items:center;position:absolute;top:100px;left:50%;transform:translate(-50%,0);border:3px solid #fff;z-index:3;}
+.story-add-btn{width:32px;height:32px;border-radius:50%;background:var(--brand);color:white;display:flex;justify-content:center;align-items:center;position:absolute;top:100px;left:50%;transform:translate(-50%,0);border:3px solid #fff;z-index:2;}
 #story-view-modal img{object-fit:contain;width:100%;height:100%;background:#111;}
 .story-progress{position:absolute;top:10px;left:10px;right:10px;display:flex;gap:4px;z-index:10;}
 .story-progress-segment{flex:1;height:3px;background:rgba(255,255,255,0.3);border-radius:2px;overflow:hidden;}
@@ -55,7 +55,7 @@
 .fade-in{animation:fadeIn 0.4s ease-out forwards;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
 
-@media (max-width:991.98px){body{padding-bottom:80px;}#col-canales,#col-paneles{display:none;}#mobile-bottom-nav{position:fixed;bottom:0;left:0;width:100%;background:white;border-top:1px solid #ddd;display:flex;justify-content:space-around;align-items:center;z-index:1040;height:65px;box-shadow: 0 -2px 10px rgba(0,0,0,0.05);}.nav-btn{background:transparent;border:none;color:#6c757d;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;}.nav-btn i{font-size:1.3rem; margin-bottom: 2px;}.nav-btn span{font-size:0.65rem;font-weight:600;}.nav-btn.active{color:var(--brand);}#btn-toggle-chat,#chat-floating-panel{bottom:75px !important;}.perfil-card{height:95vh;width:100vw;max-width:100%;border-radius:0;}}
+@media (max-width:991.98px){body{padding-bottom:80px;}#col-canales,#col-paneles{display:none;}#mobile-bottom-nav{position:fixed;bottom:0;left:0;width:100%;background:white;border-top:1px solid #ddd;display:flex;justify-content:space-around;align-items:center;z-index:9000 !important;height:65px;box-shadow: 0 -2px 10px rgba(0,0,0,0.05);}.nav-btn{background:transparent;border:none;color:#6c757d;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;}.nav-btn i{font-size:1.3rem; margin-bottom: 2px;}.nav-btn span{font-size:0.65rem;font-weight:600;}.nav-btn.active{color:var(--brand);}#btn-toggle-chat,#chat-floating-panel{bottom:75px !important;}.perfil-card{height:95vh;width:100vw;max-width:100%;border-radius:0;}}
 </style></head><body>
 
 <!-- PANTALLA DE CARGA CELULARES -->
@@ -63,8 +63,10 @@
     <h1 class="fw-bold m-0" style="font-size:3.5rem;letter-spacing:-2px;text-shadow:2px 2px 4px rgba(0,0,0,0.2);">VEST</h1>
     <div class="spinner-border text-light mt-3" role="status" style="width: 2.5rem; height: 2.5rem;"></div>
 </div>
+<!-- Bloquear splash visualmente de inmediato si ya lo vimos en esta sesión -->
+<script>if(sessionStorage.getItem('vest_splash_shown')) document.getElementById('mobile-splash').style.display = 'none';</script>
 
-<header class="bg-white shadow-sm position-sticky top-0 z-3 border-bottom py-2 mb-4">
+<header class="bg-white shadow-sm position-sticky top-0 border-bottom py-2 mb-4" style="z-index:1045;">
     <div class="container-fluid px-4 d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center gap-2"><h1 class="fw-bold fs-3 mb-0 vest-logo m-0">VEST</h1><div class="vr mx-2"></div><h2 id="subtitulo-doc" class="text-muted fs-6 fw-normal mb-0" contenteditable="true" title="Clic para editar">Cargando...</h2></div>
         <div id="auth-container"><div id="logged-out-view"><button class="btn btn-light border btn-sm fw-bold shadow-sm d-flex align-items-center gap-2" onclick="iniciarSesionGoogle()"><img src="https://www.svgrepo.com/show/475656/google-color.svg" width="16" height="16"> Entrar</button></div><div id="logged-in-view" class="d-none align-items-center"><div class="d-flex align-items-center gap-2" onclick="abrirPerfil(usuarioUid, usuarioActual, avatarUrlActual)" style="cursor:pointer;"><img id="user-avatar" src="" class="rounded-circle border" width="36" height="36" style="object-fit:cover;"><span id="user-name" class="small fw-bold text-dark d-none d-md-block"></span></div><button class="btn btn-sm btn-light text-danger border-0 p-1 ms-3 bg-transparent" onclick="cerrarSesion()" title="Cerrar sesión"><i class="fas fa-sign-out-alt fa-lg"></i></button></div></div>
@@ -224,7 +226,7 @@ function ocultarSplash(){
     const sp = document.getElementById('mobile-splash');
     if(sp && sp.style.display !== 'none'){
         sp.style.opacity = '0';
-        setTimeout(() => sp.style.display = 'none', 500);
+        setTimeout(() => { sp.style.display = 'none'; sessionStorage.setItem('vest_splash_shown', 'true'); }, 500);
     }
 }
 
@@ -366,7 +368,7 @@ function cerrarHistoria(){
     currentGroupUid = null;
 }
 
-// FEED Y NOTAS FIX BUGS RECARGA Y PUBLICACIONES
+// FEED Y NOTAS FIX OPTIMIZADO PARA ZERO FLICKER
 function tRel(ms){const s=Math.floor((Date.now()-ms)/1000);if(s<60)return `hace ${s}s`;const m=Math.floor(s/60);if(m<60)return `hace ${m}m`;const h=Math.floor(m/60);if(h<24)return `hace ${h}h`;return `hace ${Math.floor(h/24)}d`;}setInterval(()=>document.querySelectorAll('.t-rel').forEach(e=>e.innerText=tRel(parseInt(e.getAttribute('dt')))),30000);
 let iB=null,nD={},iE=null,userCache={};
 function cargarImagen(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{const im=new Image();im.onload=()=>{const cv=document.createElement('canvas');let w=im.width,h=im.height;if(w>h){if(w>800){h*=800/w;w=800;}}else{if(h>800){w*=800/h;h=800;}}cv.width=w;cv.height=h;cv.getContext('2d').drawImage(im,0,0,w,h);iB=cv.toDataURL('image/jpeg',0.7);document.getElementById('preview-img').src=iB;document.getElementById('preview-container').style.display='block';};im.src=e.target.result;};r.readAsDataURL(f);}
@@ -378,41 +380,88 @@ async function toggleLike(id){if(!usuarioUid)return;const r=db.collection('inves
 
 function escNotas(){
     db.collection('investigaciones').doc(curInv).collection('notas').orderBy("timestamp","desc").onSnapshot(async sn=>{
-        const fd=document.getElementById('feed-notas');
+        const fd = document.getElementById('feed-notas');
         let newNd = {};
+        
         if(sn.empty){ 
-            fd.innerHTML='<div class="text-center text-muted mt-4 fade-in">No hay publicaciones aún.</div>'; 
-            nD = newNd; 
-            ocultarSplash(); 
+            if(fd.querySelector('.skeleton-card')){
+                // Retrasamos el "No hay publicaciones" para evitar falsos parpadeos por carga local
+                setTimeout(() => {
+                    if(fd.querySelector('.skeleton-card') && Object.keys(newNd).length === 0){
+                        fd.innerHTML = '<div class="text-center text-muted mt-4 fade-in">No hay publicaciones aún.</div>'; 
+                        ocultarSplash();
+                    }
+                }, 1000);
+            } else if (!fd.innerHTML.includes('No hay publicaciones')) {
+                fd.innerHTML = '<div class="text-center text-muted mt-4 fade-in">No hay publicaciones aún.</div>'; 
+                ocultarSplash(); 
+            }
             return; 
         }
         
-        let promises = sn.docs.map(async d => {
+        let renderPromises = sn.docs.map(async (d) => {
             const n=d.data({serverTimestamps:"estimate"});
             newNd[d.id]=n;
-            let aVer=false;
-            if(n.autorUid){
-                if(userCache[n.autorUid] !== undefined){
-                    aVer = userCache[n.autorUid];
-                } else {
-                    try{const uD=await db.collection('users').doc(n.autorUid).get();if(uD.exists&&uD.data().verificado)aVer=true; userCache[n.autorUid]=aVer;}catch(e){}
+            
+            let lk = n.likes || [];
+            let lkd = lk.includes(usuarioUid);
+            let currentHash = (n.texto||'') + '|' + (n.imagen||'') + '|' + (n.editado?'1':'0');
+            
+            let existingPost = document.getElementById(`post-${d.id}`);
+            if(existingPost) {
+                let existingHash = existingPost.getAttribute('data-hash');
+                // Si solo cambió el like (el hash sigue siendo el mismo), actualizamos solo el botón sin parpadear el feed.
+                if(existingHash === currentHash) {
+                    let btn = document.getElementById(`like-btn-${d.id}`);
+                    if(btn) {
+                        btn.innerHTML = `<i class="${lkd?'fas':'far'} fa-heart me-1"></i> ${lk.length || 'Interesante'}`;
+                        btn.className = `btn-icon text-decoration-none fw-bold ${lkd?'text-danger':'text-secondary'}`;
+                    }
+                    return { id: d.id, node: existingPost };
                 }
             }
-            let bdg=aVer?` <i class="fas fa-check-circle text-primary" style="font-size:0.8rem"></i>`:'';
-            let ig=n.imagen?`<img src="${n.imagen}" class="note-img">`:'';
-            let ms=n.timestamp?n.timestamp.toMillis():Date.now();
-            let fbNm=(n.autor||'Anónimo').replace(/'/g,"\\'");
-            let ac=(n.autorUid===usuarioUid)?`<div class="action-buttons"><button class="btn-icon" onclick="iniciarEdicionNota('${d.id}')"><i class="fas fa-pen"></i></button><button class="btn-icon text-danger" onclick="if(confirm('¿Eliminar?'))db.collection('investigaciones').doc(curInv).collection('notas').doc('${d.id}').delete()"><i class="fas fa-trash"></i></button></div>`:'';
-            let av=n.autorAvatar||`https://ui-avatars.com/api/?name=${encodeURIComponent(n.autor||'A')}`;
-            let lk=n.likes||[],lkd=lk.includes(usuarioUid);
             
-            return `<div class="card-custom note-card p-3 position-relative fade-in">${ac}<div class="d-flex align-items-center mb-2"><img src="${av}" width="40" height="40" class="rounded-circle me-2 border" style="cursor:pointer;" onclick="abrirPerfil('${n.autorUid}','${fbNm}','${av}')"><div><div class="fw-bold text-dark" style="cursor:pointer;font-size:0.95rem" onclick="abrirPerfil('${n.autorUid}','${fbNm}','${av}')">${n.autor}${bdg}</div><div class="text-muted small"><span class="t-rel" dt="${ms}">${tRel(ms)}</span>${n.editado?' · Editado':''}</div></div></div><div class="text-dark" style="font-size:0.95rem;line-height:1.5;">${n.texto}</div>${ig}<div class="border-top mt-3 pt-2"><button class="btn-icon text-decoration-none fw-bold ${lkd?'text-danger':'text-secondary'}" onclick="toggleLike('${d.id}')"><i class="${lkd?'fas':'far'} fa-heart me-1"></i> ${lk.length||'Me gusta'}</button></div></div>`;
+            // Si el post no existía o su texto/imagen cambió, lo generamos de cero
+            let aVer = false;
+            if(n.autorUid){
+                if(userCache[n.autorUid] !== undefined) aVer = userCache[n.autorUid];
+                else { try{const uD=await db.collection('users').doc(n.autorUid).get();if(uD.exists&&uD.data().verificado)aVer=true; userCache[n.autorUid]=aVer;}catch(e){} }
+            }
+            let bdg = aVer ? ` <i class="fas fa-check-circle text-primary" style="font-size:0.8rem"></i>` : '';
+            let ig = n.imagen ? `<img src="${n.imagen}" class="note-img">` : '';
+            let ms = n.timestamp ? n.timestamp.toMillis() : Date.now();
+            let fbNm = (n.autor||'Anónimo').replace(/'/g,"\\'");
+            let ac = (n.autorUid===usuarioUid) ? `<div class="action-buttons"><button class="btn-icon" onclick="iniciarEdicionNota('${d.id}')"><i class="fas fa-pen"></i></button><button class="btn-icon text-danger" onclick="if(confirm('¿Eliminar?'))db.collection('investigaciones').doc(curInv).collection('notas').doc('${d.id}').delete()"><i class="fas fa-trash"></i></button></div>` : '';
+            let av = n.autorAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(n.autor||'A')}`;
+            
+            let htmlStr = `<div id="post-${d.id}" data-hash="${currentHash}" class="card-custom note-card p-3 position-relative fade-in">${ac}<div class="d-flex align-items-center mb-2"><img src="${av}" width="40" height="40" class="rounded-circle me-2 border" style="cursor:pointer;" onclick="abrirPerfil('${n.autorUid}','${fbNm}','${av}')"><div><div class="fw-bold text-dark" style="cursor:pointer;font-size:0.95rem" onclick="abrirPerfil('${n.autorUid}','${fbNm}','${av}')">${n.autor}${bdg}</div><div class="text-muted small"><span class="t-rel" dt="${ms}">${tRel(ms)}</span>${n.editado?' · Editado':''}</div></div></div><div class="text-dark" style="font-size:0.95rem;line-height:1.5;">${n.texto}</div>${ig}<div class="border-top mt-3 pt-2"><button id="like-btn-${d.id}" class="btn-icon text-decoration-none fw-bold ${lkd?'text-danger':'text-secondary'}" onclick="toggleLike('${d.id}')"><i class="${lkd?'fas':'far'} fa-heart me-1"></i> ${lk.length || 'Interesante'}</button></div></div>`;
+            
+            let tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlStr;
+            return { id: d.id, node: tempDiv.firstElementChild };
         });
         
-        let resultadosHtml = await Promise.all(promises);
+        let nodes = await Promise.all(renderPromises);
         nD = newNd;
-        fd.innerHTML = resultadosHtml.join('');
-        ocultarSplash(); // Oculta la pantalla de carga solo después de dibujar el muro
+        
+        // Limpiamos esqueletos antes de inyectar las notas reales.
+        if(fd.querySelector('.skeleton-card') || fd.innerHTML.includes('No hay publicaciones aún')){
+            fd.innerHTML = '';
+        }
+        
+        // Reordenamiento inteligente del DOM. Evita reescribir si ya está en orden.
+        nodes.forEach((item, index) => {
+            let currentAtPos = fd.children[index];
+            if (currentAtPos !== item.node) {
+                fd.insertBefore(item.node, currentAtPos || null);
+            }
+        });
+        
+        while(fd.children.length > nodes.length) {
+            fd.removeChild(fd.lastChild);
+        }
+        
+        ocultarSplash(); 
     });
 }
 
@@ -549,7 +598,6 @@ async function eliminarPostMuroDetalle(){
 
 async function cargarMuroPerfil(uid){
     const gd=document.getElementById('perfil-grid-posts');
-    // Implementado Skeleton para el muro del perfil (haciéndolo consistente)
     gd.innerHTML='<div class="insta-grid fade-in"><div class="insta-tile skeleton-item" style="border-radius:8px;"></div><div class="insta-tile skeleton-item" style="border-radius:8px;"></div><div class="insta-tile skeleton-item" style="border-radius:8px;"></div></div>';
     
     try{
@@ -610,7 +658,7 @@ function renderDetalleContenido(d){
     let likes = d.likes || [];
     let lkd = likes.includes(usuarioUid);
     let hI = lkd ? 'fas fa-heart text-danger' : 'far fa-heart text-white';
-    document.getElementById('detail-like-btn').innerHTML = `<button class="btn-icon d-inline-flex align-items-center text-decoration-none text-dark" onclick="toggleLikeMuroDetalle()"><i class="${hI} me-1" style="${lkd?'color:#dc3545':''}"></i><span style="font-size:0.9rem">${likes.length}</span></button>`;
+    document.getElementById('detail-like-btn').innerHTML = `<button class="btn-icon d-inline-flex align-items-center text-decoration-none text-dark" onclick="toggleLikeMuroDetalle()"><i class="${hI} me-1" style="${lkd?'color:#dc3545':''}"></i><span style="font-size:0.9rem">${likes.length || 'Interesante'}</span></button>`;
 }
 
 async function toggleLikeMuroDetalle(){
