@@ -1,13 +1,11 @@
 {
-  "background_color": "#8900ff",
+  "background_color": "#ffffff",
   "dir": "ltr",
   "display": "standalone",
   "name": "Vest",
   "orientation": "any",
   "scope": "/",
   "short_name": "Vest",
-  "start_url": "/investigacion",
-  "theme_color": "#8900ff",
-  "id": "Vest",
-  "lang": "es"
+  "start_url": "https://xplary.github.io/investigacion/",
+  "theme_color": "#ffffff"
 }
