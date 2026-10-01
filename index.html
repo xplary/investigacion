@@ -3,17 +3,18 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script><script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script><script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script><script src="https://unpkg.com/peerjs@1.5.1/dist/peerjs.min.js"></script>
 <style>
 :root{--brand:#712cf9;--brand-hover:#5a23c8;--bg:#f4f6f9;} body{background-color:var(--bg);color:#1c1e21;font-family:system-ui,sans-serif;padding-bottom:30px;}
+::-webkit-scrollbar{width:6px;height:6px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:10px;}::-webkit-scrollbar-thumb:hover{background:#9ca3af;}
 .text-brand{color:var(--brand) !important;}.bg-brand{background-color:var(--brand) !important;color:white;}.border-brand{border-color:var(--brand) !important;}
 .btn-brand{background-color:var(--brand);color:white;border:none;font-weight:600;}.btn-brand:hover{background-color:var(--brand-hover);color:white;}
 .vest-logo {background: linear-gradient(135deg, #712cf9, #d63384); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1px;}
 .card-custom{border:1px solid #e1e4e8;border-radius:10px;box-shadow:0 2px 4px rgba(0,0,0,0.04);background:#fff;margin-bottom:1rem;}
 [contenteditable="true"]{padding:2px 4px;border-radius:4px;transition:0.2s;border:1px dashed transparent;margin-left:-4px;}
 [contenteditable="true"]:focus{background-color:#f0f2f5;border-color:#ccd0d5;outline:none;}
-.note-card{border-radius:10px;background:#fff;margin-bottom:1rem;box-shadow:0 2px 4px rgba(0,0,0,0.04) !important;}
+.note-card{border-radius:10px;background:#fff;margin-bottom:1rem;box-shadow:0 2px 4px rgba(0,0,0,0.04) !important;will-change:transform,box-shadow;transition:box-shadow 0.2s ease;}
 .editor-custom{border:none;border-radius:8px;padding:12px;min-height:90px;max-height:350px;overflow-y:auto;background:#f8f9fa;font-size:0.95rem; border: 1px solid #e1e4e8;}
 .editor-custom:focus{outline:none;background:#fff; border-color:var(--brand);}
 .note-img{max-width:100%;border-radius:8px;margin-top:10px;border:1px solid #e9ecef;}
-.btn-icon{background:none;border:none;cursor:pointer;font-size:1rem;padding:0;color:#6c757d; transition:0.2s;}.btn-icon:hover{transform:scale(1.1);}
+.btn-icon{background:none;border:none;cursor:pointer;font-size:1rem;padding:0;color:#6c757d; transition:transform 0.15s ease, color 0.15s ease;will-change:transform;}.btn-icon:hover{transform:scale(1.1);}
 .action-buttons{position:absolute;top:15px;right:20px;display:flex;gap:10px;}
 .voice-user-item,.nav-item-channel{padding:8px 12px;border-radius:6px;font-size:0.85rem;display:flex;align-items:center;background:#fff;color:#1c1e21;text-decoration:none;margin-bottom:5px;}
 .nav-item-channel:hover{background-color:var(--bg);}.nav-item-active{background-color:#f3f0ff !important;color:var(--brand) !important;font-weight:600; border-left:3px solid var(--brand);}
@@ -46,14 +47,14 @@
 .skeleton-item{background:#f6f7f8;background-image:linear-gradient(to right,#f6f7f8 0%,#edeef1 20%,#f6f7f8 40%,#f6f7f8 100%);background-repeat:no-repeat;background-size:800px 100%;animation:shimmer 1.5s infinite linear forwards;border-radius:4px;}
 .sk-av{width:40px;height:40px;border-radius:50%;}
 .sk-txt{height:12px;margin-bottom:8px;width:100%;}
-.fade-in{animation:fadeIn 0.4s ease-out forwards;}
+.fade-in{animation:fadeIn 0.25s ease-out forwards;will-change:transform,opacity;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
 @media (max-width:767.98px){#chat-sidebar{width:100% !important;}}
 .chat-item-priv:hover{background:#f8f9fa;}
 @media (max-width:991.98px){body{padding-bottom:80px;}#col-canales,#col-paneles{display:none;}#mobile-bottom-nav{position:fixed;bottom:0;left:0;width:100%;background:white;border-top:1px solid #ddd;display:flex;justify-content:space-around;align-items:center;z-index:9000 !important;height:65px;box-shadow: 0 -2px 10px rgba(0,0,0,0.05);}.nav-btn{background:transparent;border:none;color:#6c757d;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;}.nav-btn i{font-size:1.3rem; margin-bottom: 2px;}.nav-btn span{font-size:0.65rem;font-weight:600;}.nav-btn.active{color:var(--brand);}.perfil-card{height:95vh;width:100vw;max-width:100%;border-radius:0;}}
 </style></head><body>
 
-<div id="mobile-splash" class="d-lg-none" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:linear-gradient(135deg, #712cf9, #d63384);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;transition:opacity 0.5s ease;">
+<div id="mobile-splash" class="d-lg-none" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:linear-gradient(135deg, #712cf9, #d63384);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;transition:opacity 0.4s ease;">
     <h1 class="fw-bold m-0" style="font-size:3.5rem;letter-spacing:-2px;text-shadow:2px 2px 4px rgba(0,0,0,0.2);">VEST</h1>
     <div class="spinner-border text-light mt-3" role="status" style="width: 2.5rem; height: 2.5rem;"></div>
 </div>
@@ -109,12 +110,10 @@
 </div>
 
 <!-- Botones Flotantes Desktop -->
-<!-- Chat Equipo (Derecha) -->
 <button id="btn-toggle-chat" class="btn btn-brand rounded-circle shadow-lg position-fixed bottom-0 end-0 m-4 d-none d-lg-flex align-items-center justify-content-center" style="width:60px;height:60px;z-index:1050;" onclick="toggleChat()"><i class="fas fa-comments fa-lg"></i></button>
-<!-- Chat Privado (Izquierda) -->
 <button id="btn-toggle-priv" class="btn bg-dark text-white rounded-circle shadow-lg position-fixed bottom-0 start-0 m-4 d-none d-lg-flex align-items-center justify-content-center" style="width:60px;height:60px;z-index:1050;" onclick="togglePrivChat()"><i class="fas fa-user-friends fa-lg"></i><span id="badge-priv-chats-float" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.55rem;display:none;">0</span></button>
 
-<!-- Panel Chat Equipo (Derecha) -->
+<!-- Panel Chat Equipo -->
 <div id="chat-floating-panel" class="card border-0"><div class="card-header bg-brand text-white py-2 d-flex justify-content-between align-items-center"><span class="fw-bold small"><i class="fas fa-comments me-1"></i> Chat del Equipo</span><button class="btn btn-sm text-white p-0" onclick="toggleChat()"><i class="fas fa-times"></i></button></div><div id="chat-messages" style="height:280px;overflow-y:auto;background:#fff;padding:15px;display:flex;flex-direction:column;gap:10px;"></div><div class="card-footer bg-white border-top p-2"><div class="input-group input-group-sm"><input type="text" id="chat-input" class="form-control rounded-pill bg-light border-0 px-3" placeholder="Escribe un mensaje..." onkeypress="if(event.key==='Enter') enviarMensaje()"><button class="btn text-brand ms-1" onclick="enviarMensaje()"><i class="fas fa-paper-plane"></i></button></div></div></div>
 
 <!-- Visor de Historias -->
@@ -155,7 +154,7 @@
     </div>
 </div>
 
-<!-- Panel Chat Privado (Pantalla Completa Original) -->
+<!-- Panel Chat Privado -->
 <div id="whatsapp-view" class="d-none" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:#fff;z-index:9999;display:flex;">
     <div id="chat-sidebar" style="width:320px;background:#fff;border-right:1px solid #e1e4e8;display:flex;flex-direction:column;box-shadow:2px 0 5px rgba(0,0,0,0.02);">
         <div style="background:#fff;padding:12px 18px;display:flex;align-items:center;height:65px;border-bottom:1px solid #e1e4e8;">
@@ -189,7 +188,7 @@ let db,auth,gProv,usuarioActual="Invitado",usuarioUid=null,avatarUrlActual="",es
 let vSid=localStorage.getItem('unp_vsid')||(localStorage.setItem('unp_vsid','vs_'+Math.random().toString(36).substr(2,10)),localStorage.getItem('unp_vsid'));
 let curInv=new URLSearchParams(window.location.search).get('inv')||'general-unp';
 try{firebase.initializeApp(fc);db=firebase.firestore();auth=firebase.auth();gProv=new firebase.auth.GoogleAuthProvider();auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);db.collection('users').onSnapshot(s=>{allUsersCache=s.docs.map(d=>({id:d.id,...d.data()}));});}catch(e){}
-function ocultarSplash(){const sp=document.getElementById('mobile-splash');if(sp&&sp.style.display!=='none'){sp.style.opacity='0';setTimeout(()=>{sp.style.display='none';sessionStorage.setItem('vest_splash_shown','true');},500);}}
+function ocultarSplash(){const sp=document.getElementById('mobile-splash');if(sp&&sp.style.display!=='none'){sp.style.opacity='0';setTimeout(()=>{sp.style.display='none';sessionStorage.setItem('vest_splash_shown','true');},400);}}
 function iniciarSesionGoogle(){auth.signInWithPopup(gProv).then(r=>manLog(r.user)).catch(e=>{if(e.code.includes('popup'))auth.signInWithRedirect(gProv);});}
 function cerrarSesion(){desconectarVoz();auth.signOut().then(()=>window.location.reload());}
 let privChatsInit=false;
@@ -234,7 +233,7 @@ function escNotas(){
         for(let n of dArr){
             let aV=false;if(n.autorUid){if(userCache[n.autorUid]!==undefined)aV=userCache[n.autorUid];else{try{const uD=await db.collection('users').doc(n.autorUid).get();if(uD.exists&&uD.data().verificado)aV=true;userCache[n.autorUid]=aV;}catch(e){}}}
             let ms=n.timestamp?n.timestamp.toMillis():Date.now(),fN=(n.autor||'Anónimo').replace(/'/g,"\\'"),av=n.autorAvatar||`https://ui-avatars.com/api/?name=${encodeURIComponent(n.autor||'A')}`,lk=n.likes||[],lkd=lk.includes(usuarioUid);
-            h+=`<div id="post-${n.id}" class="card-custom note-card p-3 position-relative fade-in">${(n.autorUid===usuarioUid)?`<div class="action-buttons"><button class="btn-icon" onclick="iniciarEdicionNota('${n.id}')"><i class="fas fa-pen"></i></button><button class="btn-icon text-danger" onclick="if(confirm('¿Eliminar?'))db.collection('investigaciones').doc(curInv).collection('notas').doc('${n.id}').delete()"><i class="fas fa-trash"></i></button></div>`:''}<div class="d-flex align-items-center mb-2"><img src="${av}" width="40" height="40" class="rounded-circle me-2 border" style="cursor:pointer;" onclick="abrirPerfil('${n.autorUid}','${fN}','${av}')"><div><div class="fw-bold text-dark" style="cursor:pointer;font-size:0.95rem" onclick="abrirPerfil('${n.autorUid}','${fN}','${av}')">${n.autor}${aV?' <i class="fas fa-check-circle text-primary" style="font-size:0.8rem"></i>':''}</div><div class="text-muted small"><span class="t-rel" dt="${ms}">${tRel(ms)}</span>${n.editado?' · Editado':''}</div></div></div><div class="text-dark post-text" style="font-size:0.95rem;line-height:1.5;">${n.texto}</div>${n.imagen?`<img src="${n.imagen}" class="note-img">`:''}<div class="border-top mt-3 pt-2"><button id="like-btn-${n.id}" class="btn-icon text-decoration-none fw-bold ${lkd?'text-danger':'text-secondary'}" onclick="toggleLike('${n.id}')"><i class="${lkd?'fas':'far'} fa-heart me-1"></i> <span id="like-count-${n.id}">${lk.length||'Interesante'}</span></button></div></div>`;
+            h+=`<div id="post-${n.id}" class="card-custom note-card p-3 position-relative fade-in">${(n.autorUid===usuarioUid)?`<div class="action-buttons"><button class="btn-icon" onclick="iniciarEdicionNota('${n.id}')"><i class="fas fa-pen"></i></button><button class="btn-icon text-danger" onclick="if(confirm('¿Eliminar?'))db.collection('investigaciones').doc(curInv).collection('notas').doc('${n.id}').delete()"><i class="fas fa-trash"></i></button></div>`:''}<div class="d-flex align-items-center mb-2"><img src="${av}" width="40" height="40" class="rounded-circle me-2 border" style="cursor:pointer;" onclick="abrirPerfil('${n.autorUid}','${fN}','${av}')"><div><div class="fw-bold text-dark" style="cursor:pointer;font-size:0.95rem" onclick="abrirPerfil('${n.autorUid}','${fN}','${av}')">${n.autor}${aV?' <i class="fas fa-check-circle text-primary" style="font-size:0.8rem"></i>':''}</div><div class="text-muted small"><span class="t-rel" dt="${ms}">${tRel(ms)}</span>${n.editado?' · Editado':''}</div></div></div><div class="text-dark post-text" style="font-size:0.95rem;line-height:1.5;">${n.texto}</div>${n.imagen?`<img src="${n.imagen}" class="note-img">`:''}<div class="border-top mt-3 pt-2 d-flex justify-content-between align-items-center"><div><button id="like-btn-${n.id}" class="btn-icon text-decoration-none fw-bold ${lkd?'text-danger':'text-secondary'}" onclick="toggleLike('${n.id}')"><i class="${lkd?'fas':'far'} fa-heart me-1"></i> <span id="like-count-${n.id}">${lk.length||'Interesante'}</span></button><button class="btn-icon text-decoration-none fw-bold text-secondary ms-3" onclick="toggleComentarios('${n.id}')"><i class="far fa-comment me-1"></i> <span>Comentar</span></button></div></div><div id="comments-section-${n.id}" class="mt-2 d-none border-top pt-2"><div id="comments-list-${n.id}" class="mb-2 pe-1" style="max-height:300px;overflow-y:auto;font-size:0.85rem;scrollbar-width:thin;"></div><div id="reply-indicator-${n.id}" class="d-none small text-muted mb-1 ms-1 ps-2 border-start border-brand border-2">Respondiendo a <span id="reply-to-name-${n.id}" class="fw-bold text-dark"></span><button class="btn-icon ms-2 text-danger" style="font-size:0.7rem" onclick="cancelarReply('${n.id}')"><i class="fas fa-times"></i></button></div><div class="d-flex align-items-center gap-2"><img src="${avatarUrlActual||'https://ui-avatars.com/api/?name=?'}" class="rounded-circle border user-av-thumb" width="28" height="28" style="object-fit:cover;"><div class="input-group input-group-sm flex-grow-1"><input type="text" id="comment-input-${n.id}" class="form-control rounded-pill bg-light border-0 px-3 shadow-none" placeholder="Escribe un comentario..." onkeypress="if(event.key==='Enter') enviarComentario('${n.id}')"><button class="btn text-brand ms-1 bg-transparent border-0" onclick="enviarComentario('${n.id}')"><i class="fas fa-paper-plane fa-lg"></i></button></div></div></div></div>`;
         }
         fd.innerHTML=h;ocultarSplash();
     });
@@ -302,47 +301,13 @@ function renderWappSidebar(){const list=document.getElementById('wapp-chat-list'
 function wappVolverLista(){activeWappChatId=null;document.getElementById('chat-sidebar').style.display='flex';document.getElementById('wapp-main').className='d-none d-md-flex';if(unsubWappMsgs){unsubWappMsgs();unsubWappMsgs=null;}document.getElementById('wapp-main').style.flex='1';document.getElementById('wapp-main').style.flexDirection='column';document.getElementById('wapp-main').style.background='#f4f6f9';}
 function abrirChatActivo(otherUid){activeWappOtherUid=otherUid;activeWappChatId=getChatId(usuarioUid,otherUid);let oU=allUsersCache.find(u=>u.id===otherUid)||{nombre:'Desconocido',foto:'https://ui-avatars.com/api/?name=?'};document.getElementById('chat-sidebar').style.display=window.innerWidth<768?'none':'flex';document.getElementById('wapp-main').className='d-flex';document.getElementById('wapp-active-name').innerText=oU.nombre;document.getElementById('wapp-active-av').src=oU.foto;document.getElementById('wapp-active-av').style.display='block';document.getElementById('wapp-input-area').style.display='flex';if(unsubWappMsgs)unsubWappMsgs();if(privChatsData[activeWappChatId]&&privChatsData[activeWappChatId]['unread_'+usuarioUid]>0){db.collection('private_chats').doc(activeWappChatId).update({['unread_'+usuarioUid]:0});}unsubWappMsgs=db.collection('private_chats').doc(activeWappChatId).collection('messages').orderBy('timestamp','asc').onSnapshot(s=>{const b=document.getElementById('wapp-messages');b.innerHTML='';s.forEach(d=>{const m=d.data();const me=m.sender===usuarioUid;const timeStr=m.timestamp?new Date(m.timestamp.toMillis()).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'';b.innerHTML+=`<div style="max-width:75%;align-self:${me?'flex-end':'flex-start'};background:${me?'var(--brand)':'#fff'};color:${me?'#fff':'#1c1e21'};padding:10px 14px;border-radius:${me?'14px 14px 2px 14px':'14px 14px 14px 2px'};box-shadow:0 2px 4px rgba(0,0,0,0.04);position:relative;border:${me?'none':'1px solid #e1e4e8'};"><span style="font-size:0.9rem;word-break:break-word;">${m.text}</span><div style="font-size:0.65rem;color:${me?'rgba(255,255,255,0.8)':'#6c757d'};text-align:right;margin-top:2px;">${timeStr}</div></div>`;});b.scrollTop=b.scrollHeight;if(privChatsData[activeWappChatId]&&privChatsData[activeWappChatId]['unread_'+usuarioUid]>0){db.collection('private_chats').doc(activeWappChatId).update({['unread_'+usuarioUid]:0});}});renderWappSidebar();}
 
-async function enviarMsgPrivado(){
-    if(!activeWappChatId || !activeWappOtherUid) return;
-    const inp = document.getElementById('wapp-input');
-    const txt = inp.value.trim();
-    if(!txt) return;
-    inp.value = '';
+async function enviarMsgPrivado(){if(!activeWappChatId || !activeWappOtherUid) return;const inp = document.getElementById('wapp-input');const txt = inp.value.trim();if(!txt) return;inp.value = '';const tempId = 'temp_' + Date.now();const timeStr = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});const b = document.getElementById('wapp-messages');const localBubble = document.createElement('div');localBubble.id = tempId;localBubble.style.cssText = "max-width:75%;align-self:flex-end;background:var(--brand);color:#fff;padding:10px 14px;border-radius:14px 14px 2px 14px;box-shadow:0 2px 4px rgba(0,0,0,0.04);position:relative;animation:fadeIn 0.2s ease;";localBubble.innerHTML = `<span style="font-size:0.9rem;word-break:break-word;">${txt}</span><div style="font-size:0.65rem;color:rgba(255,255,255,0.8);text-align:right;margin-top:2px;display:flex;align-items:center;justify-content:flex-end;gap:4px;"><span>${timeStr}</span><i class="fas fa-clock" style="font-size:0.6rem;" title="Enviando..."></i></div>`;b.appendChild(localBubble);b.scrollTop = b.scrollHeight;const rRef = db.collection('private_chats').doc(activeWappChatId);const ts = firebase.firestore.FieldValue.serverTimestamp();try {await rRef.set({users: [usuarioUid, activeWappOtherUid],lastMessage: txt,lastUpdate: Date.now(),['unread_' + activeWappOtherUid]: firebase.firestore.FieldValue.increment(1)}, {merge: true});await rRef.collection('messages').add({sender: usuarioUid,text: txt,timestamp: ts});const el = document.getElementById(tempId);if(el) el.remove();} catch(e) {const el = document.getElementById(tempId);if(el) {el.style.opacity = '0.7';el.querySelector('i').className = 'fas fa-exclamation-circle text-warning';el.querySelector('i').title = 'Error al enviar';}}}
 
-    const tempId = 'temp_' + Date.now();
-    const timeStr = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-    const b = document.getElementById('wapp-messages');
-    
-    const localBubble = document.createElement('div');
-    localBubble.id = tempId;
-    localBubble.style.cssText = "max-width:75%;align-self:flex-end;background:var(--brand);color:#fff;padding:10px 14px;border-radius:14px 14px 2px 14px;box-shadow:0 2px 4px rgba(0,0,0,0.04);position:relative;animation:fadeIn 0.2s ease;";
-    localBubble.innerHTML = `<span style="font-size:0.9rem;word-break:break-word;">${txt}</span><div style="font-size:0.65rem;color:rgba(255,255,255,0.8);text-align:right;margin-top:2px;display:flex;align-items:center;justify-content:flex-end;gap:4px;"><span>${timeStr}</span><i class="fas fa-clock" style="font-size:0.6rem;" title="Enviando..."></i></div>`;
-    b.appendChild(localBubble);
-    b.scrollTop = b.scrollHeight;
-
-    const rRef = db.collection('private_chats').doc(activeWappChatId);
-    const ts = firebase.firestore.FieldValue.serverTimestamp();
-    try {
-        await rRef.set({
-            users: [usuarioUid, activeWappOtherUid],
-            lastMessage: txt,
-            lastUpdate: Date.now(),
-            ['unread_' + activeWappOtherUid]: firebase.firestore.FieldValue.increment(1)
-        }, {merge: true});
-        await rRef.collection('messages').add({
-            sender: usuarioUid,
-            text: txt,
-            timestamp: ts
-        });
-        const el = document.getElementById(tempId);
-        if(el) el.remove();
-    } catch(e) {
-        const el = document.getElementById(tempId);
-        if(el) {
-            el.style.opacity = '0.7';
-            el.querySelector('i').className = 'fas fa-exclamation-circle text-warning';
-            el.querySelector('i').title = 'Error al enviar';
-        }
-    }
-}
+let aCL={},rSt={};
+function toggleComentarios(nId){const s=document.getElementById(`comments-section-${nId}`);if(s.classList.contains('d-none')){s.classList.remove('d-none');Array.from(document.querySelectorAll(`#comments-section-${nId} .user-av-thumb`)).forEach(i=>i.src=avatarUrlActual||'https://ui-avatars.com/api/?name=?');if(!aCL[nId]){const l=document.getElementById(`comments-list-${nId}`);l.innerHTML='<div class="text-center small text-muted my-3"><i class="fas fa-spinner fa-spin"></i></div>';aCL[nId]=db.collection('investigaciones').doc(curInv).collection('notas').doc(nId).collection('comentarios').orderBy('timestamp','asc').onSnapshot(sn=>{const ds=sn.docs.map(d=>({id:d.id,...d.data({serverTimestamps:"estimate"})}));let r=ds.filter(c=>!c.replyTo),rp=ds.filter(c=>c.replyTo),h='';r.forEach(rt=>{h+=bCH(nId,rt);let th=rp.filter(x=>x.replyTo===rt.id);if(th.length)h+=`<div class="ms-4 ps-2 border-start mt-1 border-2" id="replies-${rt.id}">${th.map(x=>bCH(nId,x,true)).join('')}</div>`;});if(!h)h='<div class="text-muted small text-center mb-2">Sé el primero en comentar.</div>';l.innerHTML=h;l.scrollTop=l.scrollHeight;});}}else{s.classList.add('d-none');cancelarReply(nId);}}
+function bCH(nId,c,iR=false){let m=c.timestamp?c.timestamp.toMillis():Date.now();return `<div id="comment-${c.id}" class="d-flex mb-2 ${c.tmp?'opacity-75':''}" style="transition:0.2s;"><img src="${c.autorAvatar}" class="rounded-circle me-2 border" width="${iR?24:32}" height="${iR?24:32}" style="object-fit:cover;flex-shrink:0;"><div><div class="bg-light p-2 rounded-3 shadow-sm" style="display:inline-block;"><div class="fw-bold text-dark" style="font-size:0.75rem;">${c.autor}</div><div class="text-dark" style="font-size:0.85rem;line-height:1.2;">${c.texto}</div></div><div class="d-flex align-items-center gap-3 ms-2 mt-1"><span class="text-muted t-rel" dt="${m}" style="font-size:0.65rem;">${tRel(m)}</span>${!iR?`<button class="btn-icon fw-bold text-muted" style="font-size:0.65rem;" onclick="prepararReply('${nId}','${c.id}','${c.autor}')">Responder</button>`:''}${c.autorUid===usuarioUid?`<button class="btn-icon text-danger" style="font-size:0.65rem;" onclick="eliminarComentario('${nId}','${c.id}')"><i class="fas fa-trash"></i></button>`:''}</div></div></div>`;}
+function prepararReply(nId,cId,aN){rSt[nId]={id:cId,n:aN};document.getElementById(`reply-indicator-${nId}`).classList.remove('d-none');document.getElementById(`reply-to-name-${nId}`).innerText=aN;document.getElementById(`comment-input-${nId}`).focus();}
+function cancelarReply(nId){delete rSt[nId];let ind=document.getElementById(`reply-indicator-${nId}`);if(ind)ind.classList.add('d-none');}
+async function enviarComentario(nId){if(!usuarioUid)return;const i=document.getElementById(`comment-input-${nId}`),tx=i.value.trim();if(!tx)return;i.value='';const iR=rSt[nId]?rSt[nId].id:null;cancelarReply(nId);const tId='tmp_'+Date.now(),tC={id:tId,autor:usuarioActual,autorUid:usuarioUid,autorAvatar:avatarUrlActual,texto:tx,timestamp:firebase.firestore.Timestamp.now(),replyTo:iR,tmp:true},l=document.getElementById(`comments-list-${nId}`);if(l.innerHTML.includes('primero'))l.innerHTML='';let th=bCH(nId,tC,!!iR);if(iR){let cE=document.getElementById(`comment-${iR}`);if(cE){let nx=cE.nextElementSibling;if(nx&&nx.classList.contains('border-start'))nx.insertAdjacentHTML('beforeend',th);else cE.insertAdjacentHTML('afterend',`<div class="ms-4 ps-2 border-start mt-1 border-2" id="replies-${iR}">${th}</div>`);}}else{l.insertAdjacentHTML('beforeend',th);}l.scrollTop=l.scrollHeight;try{await db.collection('investigaciones').doc(curInv).collection('notas').doc(nId).collection('comentarios').add({autor:usuarioActual,autorUid:usuarioUid,autorAvatar:avatarUrlActual,texto:tx,timestamp:firebase.firestore.FieldValue.serverTimestamp(),replyTo:iR});}catch(e){document.getElementById(`comment-${tId}`).style.border='1px solid red';}}
+function eliminarComentario(nId,cId){if(confirm('¿Eliminar comentario?'))db.collection('investigaciones').doc(curInv).collection('notas').doc(nId).collection('comentarios').doc(cId).delete();}
 </script></body></html>
