@@ -22,7 +22,8 @@
 #chat-floating-panel{position:fixed;bottom:90px;right:25px;width:340px;max-width:90vw;z-index:1050;display:none;box-shadow:0 0.5rem 1.5rem rgba(0,0,0,0.2);border-radius:10px;overflow:hidden;background:#fff;}
 .chat-bubble{max-width:85%;padding:8px 12px;border-radius:18px;font-size:0.85rem;line-height:1.3;}.chat-me{background-color:var(--brand);color:white;align-self:flex-end; border-bottom-right-radius: 4px;}.chat-other{background-color:#f1f3f5;color:#1c1e21;align-self:flex-start; border-bottom-left-radius: 4px;}
 .modal-overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.6);z-index:2000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);padding:15px;}
-.perfil-card{width:95vw;max-width:1050px;height:92vh;max-height:95vh;border-radius:1rem;overflow:hidden;animation:scaleIn 0.2s ease-out;display:flex;flex-direction:column;background:#fff;}
+/* Modificaciones en .perfil-card para evitar scroll global */
+.perfil-card{width:95vw;max-width:1050px;height:92vh;max-height:92vh;border-radius:1rem;overflow:hidden;animation:scaleIn 0.2s ease-out;display:flex;flex-direction:column;background:#fff;}
 @keyframes scaleIn{from{transform:scale(0.95);opacity:0;}to{transform:scale(1);opacity:1;}}
 .insta-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:700px;margin:0 auto;}
 .insta-tile{aspect-ratio:4/5;background:#f8f9fa;border-radius:8px;overflow:hidden;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center;border:1px solid #dee2e6;transition:0.2s;}
@@ -52,7 +53,17 @@
 @keyframes fadeIn{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
 @media (max-width:767.98px){#chat-sidebar{width:100% !important;}}
 .chat-item-priv:hover{background:#f8f9fa;}
-@media (max-width:991.98px){body{padding-bottom:80px;}#col-canales,#col-paneles{display:none;}#mobile-bottom-nav{position:fixed;bottom:0;left:0;width:100%;background:white;border-top:1px solid #ddd;display:flex;justify-content:space-around;align-items:center;z-index:9000 !important;height:65px;box-shadow: 0 -2px 10px rgba(0,0,0,0.05);}.nav-btn{background:transparent;border:none;color:#6c757d;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;flex:1;}.nav-btn i{font-size:1.3rem; margin-bottom: 2px;}.nav-btn span{font-size:0.65rem;font-weight:600;}.nav-btn.active{color:var(--brand);}.perfil-card{height:95vh;width:100vw;max-width:100%;border-radius:0;}}
+@media (max-width:991.98px){
+  body{padding-bottom:80px;}
+  #col-canales,#col-paneles{display:none;}
+  #mobile-bottom-nav{position:fixed;bottom:0;left:0;width:100%;background:white;border-top:1px solid #ddd;display:flex;justify-content:space-around;align-items:center;z-index:9000 !important;height:65px;box-shadow: 0 -2px 10px rgba(0,0,0,0.05);}
+  .nav-btn{background:transparent;border:none;color:#6c757d;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;flex:1;}
+  .nav-btn i{font-size:1.3rem; margin-bottom: 2px;}
+  .nav-btn span{font-size:0.65rem;font-weight:600;}
+  .nav-btn.active{color:var(--brand);}
+  /* Asegurar que en móvil también se respete el flex layout sin scroll en body de modal */
+  .perfil-card{height:100vh;max-height:100vh;width:100vw;max-width:100%;border-radius:0;}
+}
 .comment-thread-line{border-left:2px solid #eef0f3;margin-left:10px;padding-left:12px;margin-top:8px;}
 #notif-panel{position:fixed;z-index:1050;border-radius:10px;overflow:hidden;background:#fff;flex-direction:column;box-shadow:0 0.5rem 1.5rem rgba(0,0,0,0.2);}
 @media (min-width:992px){#notif-panel{top:65px;right:25px;bottom:auto;left:auto;width:340px;max-height:400px;}}
@@ -84,7 +95,6 @@
             <div id="logged-out-view"><button class="btn btn-light border btn-sm fw-bold shadow-sm d-flex align-items-center gap-2" onclick="iniciarSesionGoogle()"><img src="https://www.svgrepo.com/show/475656/google-color.svg" width="16" height="16"> Entrar</button></div>
             <div id="logged-in-view" class="d-none align-items-center">
                 
-                <!-- Notificaciones en Navbar (Desktop) -->
                 <div class="position-relative me-4 d-none d-lg-block" style="cursor:pointer;" onclick="toggleNotifPanel()">
                     <i class="fas fa-bell text-secondary fs-5 hover-brand" style="transition: color 0.2s;"></i>
                     <span id="badge-notif-nav" class="position-absolute badge rounded-pill bg-danger" style="top:-4px;right:-8px;font-size:0.55rem;display:none;">0</span>
@@ -143,8 +153,95 @@
 <!-- Visor Historias -->
 <div id="story-view-modal" class="modal-overlay d-none" style="z-index: 2050;"><div style="width:100%;max-width:400px;height:85vh;background:#000;border-radius:12px;position:relative;overflow:hidden;display:flex;align-items:center;"><div class="story-progress" id="sv-progress-container"></div><div class="position-absolute top-0 w-100 p-3 d-flex justify-content-between align-items-center mt-3" style="z-index:10; pointer-events:none;"><div class="d-flex align-items-center gap-2" style="pointer-events:auto;"><img id="sv-avatar" src="" class="rounded-circle border border-white" style="width:36px;height:36px;min-width:36px;min-height:36px;object-fit:cover;"><span id="sv-name" class="text-white fw-bold shadow-sm" style="text-shadow:1px 1px 3px #000;"></span></div><div class="d-flex gap-3" style="pointer-events:auto;"><button id="sv-del" class="btn-icon text-white d-none shadow-sm" style="text-shadow:1px 1px 3px #000;"><i class="fas fa-trash"></i></button><button class="btn-icon text-white shadow-sm" style="text-shadow:1px 1px 3px #000;font-size:1.5rem;" onclick="cerrarHistoria()"><i class="fas fa-times"></i></button></div></div><div style="position:absolute;top:0;left:0;width:30%;height:100%;z-index:5;cursor:pointer;" onclick="prevStory()"></div><div style="position:absolute;top:0;right:0;width:70%;height:100%;z-index:5;cursor:pointer;" onclick="nextStory()"></div><img id="sv-img" src="" style="position:relative;z-index:1;"></div></div>
 
-<!-- Modal Perfil -->
-<div id="perfil-modal" class="modal-overlay d-none"><div class="perfil-card card shadow-lg border-0 bg-white"><div class="card-header bg-white border-bottom px-4 py-2 d-flex justify-content-between align-items-center"><h6 class="mb-0 fw-bold text-dark"><i class="fas fa-user-circle me-2 text-brand"></i> Perfil Investigador</h6><div class="d-flex align-items-center"><button id="btn-iniciar-chat-perfil" class="btn-icon text-brand me-3 d-none" onclick="irAChatDesdePerfil()" title="Enviar mensaje"><i class="fas fa-comment-dots fa-lg"></i></button><button class="btn-icon text-dark" onclick="document.getElementById('perfil-modal').classList.add('d-none')"><i class="fas fa-times fa-lg"></i></button></div></div><div class="card-body p-0 overflow-y-auto d-flex flex-column" style="flex:1;"><div class="py-2 px-4 bg-white border-bottom d-flex flex-column align-items-center text-center gap-2"><div class="position-relative"><img id="perfil-foto" src="" class="rounded-circle border shadow-sm p-1 bg-white" width="75" height="75" style="object-fit:cover;border:2px solid var(--brand) !important;"><button id="btn-edit-foto" class="btn btn-sm btn-light border shadow-sm position-absolute bottom-0 end-0 rounded-circle d-none" style="width:28px;height:28px;padding:0;" onclick="document.getElementById('input-perfil-foto').click()"><i class="fas fa-camera text-brand" style="font-size:0.75rem;"></i></button><input type="file" id="input-perfil-foto" accept="image/*" class="d-none" onchange="subirFotoPerfil(event)"></div><div class="w-100"><h5 id="perfil-nombre" class="fw-bold mb-1 text-dark">Cargando...</h5><div id="perfil-bio-display" class="text-secondary small mb-1" style="line-height:1.2;max-width:400px;margin:0 auto;"></div><textarea id="perfil-bio-edit" class="form-control d-none mb-1 small text-center" rows="1" placeholder="Escribe algo sobre ti..."></textarea><div id="perfil-actions" class="d-none"><button id="btn-edit-perfil" class="btn btn-outline-secondary btn-sm shadow-sm px-3 py-0 fw-bold" style="font-size:0.8rem;" onclick="habilitarEdicionPerfil()">Editar</button><button id="btn-save-perfil" class="btn btn-brand btn-sm shadow-sm px-3 py-0 fw-bold d-none" style="font-size:0.8rem;" onclick="guardarPerfil()">Guardar <i class="fas fa-check"></i></button></div></div></div><div class="p-3 bg-light flex-grow-1"><div id="panel-crear-post" class="card border-0 shadow-sm p-2 mb-3 d-none" style="max-width: 600px; margin: 0 auto;"><h6 id="titulo-crear-post-muro" class="fw-bold text-muted small mb-1" style="font-size:0.75rem;"><i class="fas fa-edit me-1"></i> Publicar en mi muro</h6><textarea id="perfil-nuevo-post" class="form-control mb-2 border shadow-sm" rows="2" placeholder="¿Qué estás pensando?" style="font-size:0.85rem;resize:none;"></textarea><div id="pf-preview-container" style="display:none;position:relative;margin-bottom:8px;"><img id="pf-preview-img" class="img-fluid rounded border w-100" style="max-height:100px;object-fit:cover;"><button class="btn btn-danger btn-sm rounded-circle position-absolute" style="top:-8px;left:-8px;padding:2px 6px;" onclick="quitarImagenPerfil()"><i class="fas fa-times text-white" style="font-size:0.7rem;"></i></button></div><div class="d-flex justify-content-between align-items-center"><input type="file" id="input-foto-pf" accept="image/*" style="display:none;" onchange="cargarImagenPerfil(event)"><button class="btn btn-sm btn-light border shadow-sm py-1 px-2" style="font-size:0.8rem;" onclick="document.getElementById('input-foto-pf').click()"><i class="fas fa-camera text-muted me-1"></i> Foto</button><div><button id="btn-cancelar-muro-edicion" class="btn btn-sm btn-secondary d-none py-1 px-2 me-1" style="font-size:0.8rem;" onclick="cancelarEdicionMuro()">Cancelar</button><button id="btn-publicar-muro" class="btn btn-brand btn-sm shadow-sm fw-bold px-3 py-1" style="font-size:0.8rem;" onclick="publicarDesdePerfil(this)">Publicar <i class="fas fa-paper-plane ms-1"></i></button></div></div></div><div id="perfil-view-container" style="max-width: 750px; margin: 0 auto;"><h6 class="fw-bold text-muted small mb-2 text-center" style="font-size:0.8rem;"><i class="fas fa-th me-1"></i> Muro de investigador</h6><div id="perfil-grid-posts"></div></div><div id="perfil-detail-container" class="d-none"><div style="max-width: 720px; margin: 0 auto;"><div class="mb-2 d-flex justify-content-between align-items-center"><button class="btn btn-sm btn-light border shadow-sm fw-bold py-1 px-2" style="font-size:0.8rem;" onclick="volverAlGridPerfil()"><i class="fas fa-arrow-left me-1"></i> Volver al muro</button><div id="detail-owner-actions" class="d-none gap-2"><button class="btn btn-sm btn-outline-primary py-1 px-2" style="font-size:0.8rem;" onclick="iniciarEdicionMuroDetalle()"><i class="fas fa-pencil-alt"></i> Editar</button><button class="btn btn-sm btn-outline-danger py-1 px-2" style="font-size:0.8rem;" onclick="eliminarPostMuroDetalle()"><i class="fas fa-trash-alt"></i> Eliminar</button></div></div><div class="card border-0 shadow-sm overflow-hidden"><div class="row g-0"><div class="col-md-7 bg-dark d-flex align-items-center justify-content-center position-relative" style="min-height:260px;max-height:360px;cursor:pointer;" id="detail-img-wrapper" ondblclick="dobleTapDarLike()"></div><div class="col-md-5 d-flex flex-column bg-white p-3" style="max-height:360px;"><div class="d-flex align-items-center mb-2 pb-2 border-bottom"><img id="detail-avatar" src="" class="rounded-circle me-2 border" width="28" height="28" style="object-fit:cover;"><span id="detail-autor" class="fw-bold small text-dark"></span></div><div class="flex-grow-1 overflow-y-auto mb-2" style="font-size:0.85rem;word-break:break-word;" id="detail-texto"></div><div class="border-top pt-2 mt-auto d-flex justify-content-between align-items-center"><div id="detail-like-btn"></div><span class="text-muted small" id="detail-fecha" style="font-size:0.75rem;"></span></div></div></div></div></div></div></div></div></div></div>
+<!-- Modal Perfil (Estructura Flexbox estricta para evitar scroll en el padre) -->
+<div id="perfil-modal" class="modal-overlay d-none">
+    <div class="perfil-card card shadow-lg border-0 bg-white d-flex flex-column">
+        <!-- Header (Fijo) -->
+        <div class="card-header bg-white border-bottom px-4 py-2 d-flex justify-content-between align-items-center" style="flex-shrink: 0;">
+            <h6 class="mb-0 fw-bold text-dark"><i class="fas fa-user-circle me-2 text-brand"></i> Perfil Investigador</h6>
+            <div class="d-flex align-items-center">
+                <button id="btn-iniciar-chat-perfil" class="btn-icon text-brand me-3 d-none" onclick="irAChatDesdePerfil()" title="Enviar mensaje"><i class="fas fa-comment-dots fa-lg"></i></button>
+                <button class="btn-icon text-dark" onclick="document.getElementById('perfil-modal').classList.add('d-none')"><i class="fas fa-times fa-lg"></i></button>
+            </div>
+        </div>
+        
+        <!-- Info Perfil (Fijo/Auto-ajustable sin scroll) -->
+        <div class="py-2 px-4 bg-white border-bottom d-flex flex-column align-items-center text-center gap-2" style="flex-shrink: 0;">
+            <div class="position-relative">
+                <img id="perfil-foto" src="" class="rounded-circle border shadow-sm p-1 bg-white" width="75" height="75" style="object-fit:cover;border:2px solid var(--brand) !important;">
+                <button id="btn-edit-foto" class="btn btn-sm btn-light border shadow-sm position-absolute bottom-0 end-0 rounded-circle d-none" style="width:28px;height:28px;padding:0;" onclick="document.getElementById('input-perfil-foto').click()"><i class="fas fa-camera text-brand" style="font-size:0.75rem;"></i></button>
+                <input type="file" id="input-perfil-foto" accept="image/*" class="d-none" onchange="subirFotoPerfil(event)">
+            </div>
+            <div class="w-100">
+                <h5 id="perfil-nombre" class="fw-bold mb-1 text-dark">Cargando...</h5>
+                <div id="perfil-bio-display" class="text-secondary small mb-1" style="line-height:1.2;max-width:400px;margin:0 auto;"></div>
+                <textarea id="perfil-bio-edit" class="form-control d-none mb-1 small text-center" rows="1" placeholder="Escribe algo sobre ti..."></textarea>
+                <div id="perfil-actions" class="d-none">
+                    <button id="btn-edit-perfil" class="btn btn-outline-secondary btn-sm shadow-sm px-3 py-0 fw-bold" style="font-size:0.8rem;" onclick="habilitarEdicionPerfil()">Editar</button>
+                    <button id="btn-save-perfil" class="btn btn-brand btn-sm shadow-sm px-3 py-0 fw-bold d-none" style="font-size:0.8rem;" onclick="guardarPerfil()">Guardar <i class="fas fa-check"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenedor scrolleable independiente (Muro y Detalle) -->
+        <div class="p-3 bg-light d-flex flex-column" style="flex: 1 1 auto; overflow-y: auto;">
+            
+            <!-- Crear Post -->
+            <div id="panel-crear-post" class="card border-0 shadow-sm p-2 mb-3 d-none" style="max-width: 600px; margin: 0 auto; width: 100%; flex-shrink: 0;">
+                <h6 id="titulo-crear-post-muro" class="fw-bold text-muted small mb-1" style="font-size:0.75rem;"><i class="fas fa-edit me-1"></i> Publicar en mi muro</h6>
+                <textarea id="perfil-nuevo-post" class="form-control mb-2 border shadow-sm" rows="2" placeholder="¿Qué estás pensando?" style="font-size:0.85rem;resize:none;"></textarea>
+                <div id="pf-preview-container" style="display:none;position:relative;margin-bottom:8px;">
+                    <img id="pf-preview-img" class="img-fluid rounded border w-100" style="max-height:100px;object-fit:cover;">
+                    <button class="btn btn-danger btn-sm rounded-circle position-absolute" style="top:-8px;left:-8px;padding:2px 6px;" onclick="quitarImagenPerfil()"><i class="fas fa-times text-white" style="font-size:0.7rem;"></i></button>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <input type="file" id="input-foto-pf" accept="image/*" style="display:none;" onchange="cargarImagenPerfil(event)">
+                    <button class="btn btn-sm btn-light border shadow-sm py-1 px-2" style="font-size:0.8rem;" onclick="document.getElementById('input-foto-pf').click()"><i class="fas fa-camera text-muted me-1"></i> Foto</button>
+                    <div>
+                        <button id="btn-cancelar-muro-edicion" class="btn btn-sm btn-secondary d-none py-1 px-2 me-1" style="font-size:0.8rem;" onclick="cancelarEdicionMuro()">Cancelar</button>
+                        <button id="btn-publicar-muro" class="btn btn-brand btn-sm shadow-sm fw-bold px-3 py-1" style="font-size:0.8rem;" onclick="publicarDesdePerfil(this)">Publicar <i class="fas fa-paper-plane ms-1"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vista Grid Muro -->
+            <div id="perfil-view-container" style="max-width: 750px; margin: 0 auto; width: 100%;">
+                <h6 class="fw-bold text-muted small mb-2 text-center" style="font-size:0.8rem;"><i class="fas fa-th me-1"></i> Muro de investigador</h6>
+                <div id="perfil-grid-posts"></div>
+            </div>
+
+            <!-- Vista Detalle Post -->
+            <div id="perfil-detail-container" class="d-none" style="width: 100%;">
+                <div style="max-width: 720px; margin: 0 auto;">
+                    <div class="mb-2 d-flex justify-content-between align-items-center">
+                        <button class="btn btn-sm btn-light border shadow-sm fw-bold py-1 px-2" style="font-size:0.8rem;" onclick="volverAlGridPerfil()"><i class="fas fa-arrow-left me-1"></i> Volver al muro</button>
+                        <div id="detail-owner-actions" class="d-none gap-2">
+                            <button class="btn btn-sm btn-outline-primary py-1 px-2" style="font-size:0.8rem;" onclick="iniciarEdicionMuroDetalle()"><i class="fas fa-pencil-alt"></i> Editar</button>
+                            <button class="btn btn-sm btn-outline-danger py-1 px-2" style="font-size:0.8rem;" onclick="eliminarPostMuroDetalle()"><i class="fas fa-trash-alt"></i> Eliminar</button>
+                        </div>
+                    </div>
+                    <div class="card border-0 shadow-sm overflow-hidden d-flex flex-column">
+                        <div class="row g-0">
+                            <div class="col-md-7 bg-dark d-flex align-items-center justify-content-center position-relative" style="min-height:260px;cursor:pointer;" id="detail-img-wrapper" ondblclick="dobleTapDarLike()"></div>
+                            <div class="col-md-5 d-flex flex-column bg-white p-3" style="max-height:400px;">
+                                <div class="d-flex align-items-center mb-2 pb-2 border-bottom">
+                                    <img id="detail-avatar" src="" class="rounded-circle me-2 border" width="28" height="28" style="object-fit:cover;">
+                                    <span id="detail-autor" class="fw-bold small text-dark"></span>
+                                </div>
+                                <div class="flex-grow-1 mb-2" style="font-size:0.85rem;word-break:break-word;overflow-y:auto;" id="detail-texto"></div>
+                                <div class="border-top pt-2 mt-auto d-flex justify-content-between align-items-center" style="flex-shrink: 0;">
+                                    <div id="detail-like-btn"></div>
+                                    <span class="text-muted small" id="detail-fecha" style="font-size:0.75rem;"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
 
 <!-- Chat Privado -->
 <div id="whatsapp-view" class="d-none" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:#fff;z-index:9999;display:flex;"><div id="chat-sidebar" style="width:320px;background:#fff;border-right:1px solid #e1e4e8;display:flex;flex-direction:column;box-shadow:2px 0 5px rgba(0,0,0,0.02);"><div style="background:#fff;padding:12px 18px;display:flex;align-items:center;height:65px;border-bottom:1px solid #e1e4e8;"><button class="btn-icon me-3 text-secondary" onclick="cerrarPaginaChats()"><i class="fas fa-arrow-left fa-lg d-lg-none"></i><i class="fas fa-times fa-lg d-none d-lg-inline"></i></button><img id="wapp-my-av" src="" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:1px solid #e1e4e8;" class="me-3"><span class="fw-bold text-dark fs-6">Mensajes Privados</span></div><div id="wapp-chat-list" style="flex:1;overflow-y:auto;background:#fff;"></div></div><div id="wapp-main" class="d-none d-md-flex" style="flex:1;flex-direction:column;background:#f4f6f9;"><div style="background:#fff;padding:12px 20px;display:flex;align-items:center;height:65px;border-bottom:1px solid #e1e4e8;box-shadow:0 1px 2px rgba(0,0,0,0.02);"><button class="btn-icon me-3 text-secondary" onclick="wappVolverLista()"><i class="fas fa-arrow-left fa-lg"></i></button><img id="wapp-active-av" src="" style="width:38px;height:38px;border-radius:50%;object-fit:cover;display:none;border:1px solid #e1e4e8;" class="me-3"><span id="wapp-active-name" class="fw-bold text-dark fs-6">Selecciona una conversación</span></div><div id="wapp-messages" style="flex:1;overflow-y:auto;padding:25px;display:flex;flex-direction:column;gap:12px;"></div><div id="wapp-input-area" style="background:#fff;padding:15px 20px;display:none;align-items:center;gap:12px;border-top:1px solid #e1e4e8;"><input type="text" id="wapp-input" class="form-control rounded-pill border bg-light px-4 py-2 shadow-none" placeholder="Escribe tu mensaje..." onkeypress="if(event.key==='Enter') enviarMsgPrivado()"><button class="btn btn-brand rounded-circle shadow-sm d-flex justify-content-center align-items-center" style="width:44px;height:44px;min-width:44px;" onclick="enviarMsgPrivado()"><i class="fas fa-paper-plane"></i></button></div></div></div>
